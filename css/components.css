@@ -1434,3 +1434,141 @@
   color: var(--color-primary);
   font-weight: var(--fw-medium);
 }
+
+/* ============================================
+   ENGAGEMENT FEATURES — Added CSS
+   ============================================ */
+
+/* Dark mode global transition */
+html {
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
+}
+
+/* Override to prevent transition on transforms/layout (perf) */
+.product-card,
+.category-card,
+.btn,
+.nav-action-btn,
+.product-card-quick,
+.product-card-quickview {
+  transition: all var(--duration-base) var(--ease-out);
+}
+
+/* Dark mode button in nav */
+#dark-mode-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--duration-fast);
+}
+
+#dark-mode-btn:hover {
+  background: var(--color-bg-alt);
+}
+
+/* Quick View button on product card */
+.product-card-actions {
+  position: absolute;
+  bottom: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 2;
+}
+
+.product-card-quickview {
+  width: 38px;
+  height: 38px;
+  background: var(--color-surface);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all var(--duration-fast) var(--ease-out);
+  cursor: pointer;
+  font-size: 16px;
+  border: none;
+}
+
+.product-card:hover .product-card-quickview {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 60ms;
+}
+
+.product-card-quickview:hover {
+  background: var(--color-sky);
+  color: white;
+}
+
+/* Keep quick button working alongside new layout */
+.product-card-quick {
+  position: static !important;
+  transform: translateY(8px);
+  opacity: 0;
+}
+
+.product-card:hover .product-card-quick {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Flash sale countdown seconds pulse */
+#flash-s {
+  display: inline-block;
+  transition: transform 0.15s var(--ease-spring);
+}
+
+/* Announcement bar — fix opacity so CSS animation runs cleanly (override JS) */
+.announcement-bar .announcement-text {
+  position: absolute;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: none;
+}
+
+/* Recently viewed section title */
+.recently-viewed-section {
+  margin-top: var(--space-8);
+}
+
+/* Search dropdown z-index fix */
+.nav-search,
+.mobile-search {
+  position: relative;
+  z-index: var(--z-dropdown);
+}
+
+/* Dark mode — announcement bar */
+[data-theme="dark"] .announcement-bar {
+  background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+}
+
+/* Dark mode — flash sale banner */
+[data-theme="dark"] #flash-sale-banner > div {
+  background: linear-gradient(135deg, #0a0a1a 0%, #0d1226 50%, #08203a 100%) !important;
+}
+
+/* Dark mode — social proof toast */
+[data-theme="dark"] #social-proof-feed > div {
+  background: rgba(30,30,30,0.95) !important;
+  border-color: var(--color-dark-border) !important;
+}
+

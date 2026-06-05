@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -18,11 +18,11 @@
   <div class="profile-header">
     <div class="container">
       <div class="profile-header-content">
-        <div class="profile-avatar">👤</div>
+        <div class="profile-avatar">ðŸ‘¤</div>
         <div class="profile-info">
           <h1>Pet Parent Profile</h1>
           <div class="profile-meta">
-            <span>🗓 Member since Jan 2024</span>
+            <span>ðŸ—“ Member since Jan 2024</span>
             <span id="tier-badge"></span>
           </div>
         </div>
@@ -34,11 +34,11 @@
     <div class="container" style="padding-bottom: var(--space-16);">
       <!-- Tabs -->
       <div class="profile-tabs" id="profile-tabs">
-        <div class="profile-tab active" onclick="ProfilePage.switchTab('pets')">🐾 My Pets</div>
-        <div class="profile-tab" onclick="ProfilePage.switchTab('loyalty')">⭐ Loyalty</div>
-        <div class="profile-tab" onclick="ProfilePage.switchTab('orders')">📦 Orders</div>
-        <div class="profile-tab" onclick="ProfilePage.switchTab('subscriptions')">🔄 Subscriptions</div>
-        <div class="profile-tab" onclick="ProfilePage.switchTab('wishlist')">❤️ Wishlist</div>
+        <div class="profile-tab active" onclick="ProfilePage.switchTab('pets')">ðŸ¾ My Pets</div>
+        <div class="profile-tab" onclick="ProfilePage.switchTab('loyalty')">â­ Loyalty</div>
+        <div class="profile-tab" onclick="ProfilePage.switchTab('orders')">ðŸ“¦ Orders</div>
+        <div class="profile-tab" onclick="ProfilePage.switchTab('subscriptions')">ðŸ”„ Subscriptions</div>
+        <div class="profile-tab" onclick="ProfilePage.switchTab('wishlist')">â¤ï¸ Wishlist</div>
       </div>
 
       <!-- My Pets Section -->
@@ -63,7 +63,7 @@
     <div class="modal">
       <div class="modal-header">
         <h3 id="pet-modal-title">Add a Pet</h3>
-        <button class="modal-close" onclick="ProfilePage.closeModal()">✕</button>
+        <button class="modal-close" onclick="ProfilePage.closeModal()">âœ•</button>
       </div>
       <div class="modal-body">
         <div class="input-group mb-4">
@@ -74,10 +74,10 @@
           <div class="input-group">
             <label for="pet-species">Species</label>
             <select id="pet-species">
-              <option value="dog">🐕 Dog</option>
-              <option value="cat">🐈 Cat</option>
-              <option value="small-pet">🐹 Small Pet</option>
-              <option value="bird">🦜 Bird</option>
+              <option value="dog">ðŸ• Dog</option>
+              <option value="cat">ðŸˆ Cat</option>
+              <option value="small-pet">ðŸ¹ Small Pet</option>
+              <option value="bird">ðŸ¦œ Bird</option>
             </select>
           </div>
           <div class="input-group">
@@ -93,13 +93,13 @@
           <div class="input-group">
             <label for="pet-emoji">Avatar Emoji</label>
             <select id="pet-emoji">
-              <option value="🐕">🐕 Dog</option>
-              <option value="🐈">🐈 Cat</option>
-              <option value="🐹">🐹 Hamster</option>
-              <option value="🐰">🐰 Bunny</option>
-              <option value="🦜">🦜 Bird</option>
-              <option value="🐶">🐶 Puppy Face</option>
-              <option value="😸">😸 Cat Face</option>
+              <option value="ðŸ•">ðŸ• Dog</option>
+              <option value="ðŸˆ">ðŸˆ Cat</option>
+              <option value="ðŸ¹">ðŸ¹ Hamster</option>
+              <option value="ðŸ°">ðŸ° Bunny</option>
+              <option value="ðŸ¦œ">ðŸ¦œ Bird</option>
+              <option value="ðŸ¶">ðŸ¶ Puppy Face</option>
+              <option value="ðŸ˜¸">ðŸ˜¸ Cat Face</option>
             </select>
           </div>
         </div>
@@ -115,16 +115,33 @@
       </div>
     </div>
   </div>
+  <!-- ======== DAILY STREAK ======== -->
+  <section class="section" id="streak-section" style="background: var(--color-bg-alt);">
+    <div class="container" style="max-width: 480px;">
+      <span class="section-label">Daily Habit</span>
+      <h2 class="section-title" style="margin-bottom: var(--space-6);">🔥 Daily Paw Streak</h2>
+      <div id="streak-widget-mount"></div>
+    </div>
+  </section>
+
 
   <div id="footer-slot"></div>
 
   <script src="js/store.js"></script>
-  <script src="js/app.js"></script>
+    <script src="js/flash-sale.js"></script>
+  <script src="js/social-proof.js"></script>
+  <script src="js/streak.js"></script>
+  <script src="js/spinwheel.js"></script>
+  <script src="js/quickview.js"></script><script src="js/app.js"></script>
   <script src="js/animations.js"></script>
   <script src="js/profile.js"></script>
   <script>
     WowApp.init('profile');
+      setTimeout(() => { if (typeof WowStreak !== 'undefined') WowStreak.initWidget(); }, 200);
     ProfilePage.init();
   </script>
 </body>
 </html>
+
+
+

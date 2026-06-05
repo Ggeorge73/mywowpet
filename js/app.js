@@ -120,7 +120,10 @@ const WowApp = (() => {
         <a href="product.html?id=${product.id}" class="product-card-image" style="background: ${gradient};" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
           ${badgeHtml}
           <video src="${WowStore.getProductVideo(product)}" muted loop playsinline preload="metadata" poster="${imgSrc}" style="width:100%;height:100%;object-fit:cover;"></video>
-          <button class="product-card-quick" onclick="event.preventDefault(); event.stopPropagation(); WowApp.quickAdd(${product.id})" title="Quick add to cart">+</button>
+          <div class="product-card-actions">
+            <button class="product-card-quick" onclick="event.preventDefault(); event.stopPropagation(); WowApp.quickAdd(${product.id})" title="Quick add to cart">+</button>
+            <button class="product-card-quickview" onclick="event.preventDefault(); event.stopPropagation(); WowQuickView.open(${product.id})" title="Quick view">👁</button>
+          </div>
         </a>
         <div class="product-card-body">
           <span class="product-card-category">${product.brand}</span>
@@ -198,7 +201,7 @@ const WowApp = (() => {
           </div>
         </div>
         <div class="footer-bottom">
-          <span class="footer-copyright">© 2024 WowPetStore. All rights reserved. Made with ❤️ for pets.</span>
+          <span class="footer-copyright">© 2025 WowPetStore. All rights reserved. Made with ❤️ for pets.</span>
           <div class="footer-payment-icons">
             <span title="Visa">💳</span>
             <span title="Mastercard">💳</span>
@@ -237,8 +240,9 @@ const WowApp = (() => {
           <input type="search" placeholder="Search products..." id="nav-search-input" autocomplete="off">
         </div>
         <div class="nav-actions">
-          <a href="profile.html" class="nav-action-btn" title="My Profile">👤</a>
-          <a href="cart.html" class="nav-action-btn" title="Cart" id="cart-btn">
+          <button class="nav-action-btn" id="dark-mode-btn" onclick="WowApp.toggleDarkMode()" title="Toggle dark mode" style="font-size:18px;">🌙</button>
+          <a href="profile.html" class="nav-action-btn" title="My Profile" style="position:relative;">👤</a>
+          <a href="cart.html" class="nav-action-btn" title="Cart" id="cart-btn" style="position:relative;">
             🛒
             <span class="cart-count" style="display: none;">0</span>
           </a>
@@ -267,14 +271,127 @@ const WowApp = (() => {
     </div>`;
   }
 
-  // ---- Search handling ----
+  // ---- Dark Mode ----
+  function toggleDarkMode() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? '' : 'dark');
+    localStorage.setItem('wow_theme', isDark ? 'light' : 'dark');
+    const btn = document.getElementById('dark-mode-btn');
+    if (btn) btn.textContent = isDark ? '🌙' : '☀️';
+  }
+
+  function initDarkMode() {
+    const saved = localStorage.getItem('wow_theme');
+    if (saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      const btn = document.getElementById('dark-mode-btn');
+      if (btn) btn.textContent = '☀️';
+    }
+  }
+
+  // ---- Recently Viewed ----
+  function trackRecentlyViewed(productId) {
+    try {
+      let recent = JSON.parse(localStorage.getItem('wow_recently_viewed') || '[]');
+      recent = recent.filter(id => id !== productId);
+      recent.unshift(productId);
+      recent = recent.slice(0, 8);
+      localStorage.setItem('wow_recently_viewed', JSON.stringify(recent));
+    } catch(e) {}
+  }
+
+  function renderRecentlyViewed(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    try {
+      const recent = JSON.parse(localStorage.getItem('wow_recently_viewed') || '[]');
+      const currentId = new URLSearchParams(window.location.search).get('id');
+      const filtered = recent.filter(id => String(id) !== String(currentId)).slice(0, 6);
+      if (!filtered.length) { container.closest('section, .section')?.style && (container.closest('section, .section').style.display = 'none'); return; }
+      const products = filtered.map(id => WowStore.getProduct(parseInt(id))).filter(Boolean);
+      container.innerHTML = products.map(p => renderProductCard(p)).join('');
+      if (typeof WowAnimations !== 'undefined') WowAnimations.init();
+    } catch(e) {}
+  }
+
+  // ---- Live Search Autocomplete ----
   function initSearch() {
     const inputs = document.querySelectorAll('#nav-search-input, #mobile-search-input');
     inputs.forEach(input => {
+      let dropdown = null;
+      let debounceTimer = null;
+
+      function removeDropdown() {
+        if (dropdown) { dropdown.remove(); dropdown = null; }
+      }
+
+      function createDropdown(results, query) {
+        removeDropdown();
+        if (!results.length && !query) return;
+        dropdown = document.createElement('div');
+        dropdown.style.cssText = `
+          position:absolute;top:calc(100% + 8px);left:0;right:0;
+          background:var(--color-surface,#fff);
+          border:1px solid var(--color-border,#e8e2d8);
+          border-radius:16px;z-index:600;
+          box-shadow:0 16px 48px rgba(0,0,0,0.15);
+          overflow:hidden;max-height:400px;overflow-y:auto;
+        `;
+        if (!results.length) {
+          dropdown.innerHTML = `<div style="padding:16px 20px;color:var(--color-text-muted);font-size:14px;">No results for "${query}"</div>`;
+        } else {
+          dropdown.innerHTML = results.slice(0,6).map(p => `
+            <a href="product.html?id=${p.id}" style="
+              display:flex;align-items:center;gap:14px;padding:12px 16px;
+              text-decoration:none;color:var(--color-text);
+              transition:background 0.15s ease;
+              border-bottom:1px solid var(--color-border-light,#f0ebe3);
+            " onmouseenter="this.style.background='var(--color-bg-alt)'" onmouseleave="this.style.background=''">
+              <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;background:${WowStore.generateProductGradient(p)};">
+                <img src="${WowStore.getProductImage(p)}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                <div style="font-size:12px;color:var(--color-text-muted);margin-top:2px;">${p.brand} • ${WowStore.formatPrice(p.price)}</div>
+              </div>
+            </a>
+          `).join('') + `
+            <a href="shop.html?search=${encodeURIComponent(query)}" style="
+              display:block;padding:12px 16px;text-align:center;
+              font-size:13px;color:var(--color-primary);font-weight:600;
+              text-decoration:none;background:var(--color-bg-alt,#f3ede3);
+            ">See all results for "${query}" →</a>
+          `;
+        }
+        const wrapper = input.closest('.nav-search, .mobile-search');
+        if (wrapper) { wrapper.style.position = 'relative'; wrapper.appendChild(dropdown); }
+      }
+
+      input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        const q = input.value.trim();
+        if (q.length < 2) { removeDropdown(); return; }
+        debounceTimer = setTimeout(() => {
+          const results = WowStore.getProducts().filter(p =>
+            p.name.toLowerCase().includes(q.toLowerCase()) ||
+            p.brand.toLowerCase().includes(q.toLowerCase()) ||
+            p.tags.some(t => t.includes(q.toLowerCase()))
+          );
+          createDropdown(results, q);
+        }, 200);
+      });
+
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && input.value.trim()) {
+          removeDropdown();
           window.location.href = `shop.html?search=${encodeURIComponent(input.value.trim())}`;
         }
+        if (e.key === 'Escape') removeDropdown();
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && (!dropdown || !dropdown.contains(e.target))) removeDropdown();
       });
     });
   }
@@ -292,15 +409,20 @@ const WowApp = (() => {
     initNavbar();
     initMobileMenu();
     initSearch();
+    initDarkMode();
     updateCartBadge();
 
     // Listen for cart changes
     window.addEventListener('cartUpdated', updateCartBadge);
 
     // Init scroll animations
-    if (typeof WowAnimations !== 'undefined') {
-      WowAnimations.init();
-    }
+    if (typeof WowAnimations !== 'undefined') WowAnimations.init();
+
+    // Engagement features
+    if (typeof WowFlashSale !== 'undefined') WowFlashSale.init();
+    if (typeof WowSocialProof !== 'undefined') WowSocialProof.init();
+    if (typeof WowStreak !== 'undefined') WowStreak.init();
+    if (typeof WowSpinWheel !== 'undefined') WowSpinWheel.init();
   }
 
   return {
@@ -310,6 +432,9 @@ const WowApp = (() => {
     quickAdd,
     updateCartBadge,
     getNavHTML,
-    getFooterHTML
+    getFooterHTML,
+    toggleDarkMode,
+    trackRecentlyViewed,
+    renderRecentlyViewed
   };
 })();

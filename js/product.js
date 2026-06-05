@@ -34,6 +34,18 @@ const ProductPage = (() => {
     renderFBT();
     renderRelated();
     WowAnimations.init();
+
+    // Track recently viewed
+    if (typeof WowApp !== 'undefined') {
+      WowApp.trackRecentlyViewed(product.id);
+    }
+
+    // Render recently viewed (excluding current product)
+    setTimeout(() => {
+      if (typeof WowApp !== 'undefined') {
+        WowApp.renderRecentlyViewed('recently-viewed-grid');
+      }
+    }, 300);
   }
 
   function renderBreadcrumbs() {
