@@ -20,13 +20,13 @@
       <video class="hero-video" id="hero-video-1" autoplay muted loop playsinline preload="auto" poster="assets/images/hero.jpg" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1.5s ease; opacity: 1; z-index: 1;">
         <source src="assets/videos/hero_dog.mp4" type="video/mp4">
       </video>
-      <video class="hero-video" id="hero-video-2" muted loop playsinline preload="auto" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1.5s ease; opacity: 0; z-index: 1;">
+      <video class="hero-video" id="hero-video-2" autoplay muted loop playsinline preload="auto" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1.5s ease; opacity: 0; z-index: 1;">
         <source src="assets/videos/hero_cat.mp4" type="video/mp4">
       </video>
-      <video class="hero-video" id="hero-video-3" muted loop playsinline preload="auto" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1.5s ease; opacity: 0; z-index: 1;">
+      <video class="hero-video" id="hero-video-3" autoplay muted loop playsinline preload="auto" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1.5s ease; opacity: 0; z-index: 1;">
         <source src="assets/videos/hero_bunny.mp4" type="video/mp4">
       </video>
-      <video class="hero-video" id="hero-video-4" muted loop playsinline preload="auto" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1.5s ease; opacity: 0; z-index: 1;">
+      <video class="hero-video" id="hero-video-4" autoplay muted loop playsinline preload="auto" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1.5s ease; opacity: 0; z-index: 1;">
         <source src="assets/videos/hero_bird.mp4" type="video/mp4">
       </video>
     </div>
@@ -329,11 +329,14 @@
     ];
     let currentHeroIdx = 0;
 
-    // Initialize initial video layers styles to ensure clean z-index stacking
+    // Initialize initial video layers styles to ensure clean z-index stacking and explicit muting
     heroVideos.forEach((v, idx) => {
       if (v) {
+        v.muted = true; // explicitly force mute in JS to bypass browser play blocks
         v.style.opacity = idx === 0 ? '1' : '0';
         v.style.zIndex = idx === 0 ? '2' : '1';
+        // Start playing all of them in parallel so they are always ready and buffered
+        v.play().catch(() => {});
       }
     });
 
@@ -344,10 +347,9 @@
 
       if (!currentVideo || !nextVideo) return;
 
-      // Play the next video immediately
-      nextVideo.play().catch(err => {
-        console.warn('Hero video play interrupted:', err);
-      });
+      // Ensure next video is playing in case it was interrupted
+      nextVideo.muted = true;
+      nextVideo.play().catch(() => {});
 
       // Layer the incoming video on top and fade it in
       nextVideo.style.zIndex = '2';
@@ -356,14 +358,6 @@
       // Layer the outgoing video on bottom and fade it out
       currentVideo.style.zIndex = '1';
       currentVideo.style.opacity = '0';
-
-      // Pause the old video after transition completes to optimize CPU usage
-      setTimeout(() => {
-        // Double check it's not the active video now before pausing
-        if (currentHeroIdx !== heroVideos.indexOf(currentVideo)) {
-          currentVideo.pause();
-        }
-      }, 1500);
     }
 
     // Transition videos every 7 seconds
