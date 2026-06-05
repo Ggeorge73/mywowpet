@@ -329,26 +329,41 @@
     ];
     let currentHeroIdx = 0;
 
+    // Initialize initial video layers styles to ensure clean z-index stacking
+    heroVideos.forEach((v, idx) => {
+      if (v) {
+        v.style.opacity = idx === 0 ? '1' : '0';
+        v.style.zIndex = idx === 0 ? '2' : '1';
+      }
+    });
+
     function cycleHeroVideos() {
       const currentVideo = heroVideos[currentHeroIdx];
       currentHeroIdx = (currentHeroIdx + 1) % heroVideos.length;
       const nextVideo = heroVideos[currentHeroIdx];
 
-      // Pre-play the next video so it's ready to show
-      nextVideo.play().then(() => {
-        // Crossfade
-        nextVideo.style.opacity = '1';
-        currentVideo.style.opacity = '0';
+      if (!currentVideo || !nextVideo) return;
 
-        // Pause the old video after transition completes to optimize CPU usage
-        setTimeout(() => {
-          if (currentHeroIdx !== heroVideos.indexOf(currentVideo)) {
-            currentVideo.pause();
-          }
-        }, 1500);
-      }).catch(err => {
-        console.warn('Hero video failed to play:', err);
+      // Play the next video immediately
+      nextVideo.play().catch(err => {
+        console.warn('Hero video play interrupted:', err);
       });
+
+      // Layer the incoming video on top and fade it in
+      nextVideo.style.zIndex = '2';
+      nextVideo.style.opacity = '1';
+
+      // Layer the outgoing video on bottom and fade it out
+      currentVideo.style.zIndex = '1';
+      currentVideo.style.opacity = '0';
+
+      // Pause the old video after transition completes to optimize CPU usage
+      setTimeout(() => {
+        // Double check it's not the active video now before pausing
+        if (currentHeroIdx !== heroVideos.indexOf(currentVideo)) {
+          currentVideo.pause();
+        }
+      }, 1500);
     }
 
     // Transition videos every 7 seconds
