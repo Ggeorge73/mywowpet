@@ -1,0 +1,169 @@
+/* ============================================
+   WowPetStore — Design Tokens
+   ============================================ */
+
+:root {
+  /* ---- Brand Colors ---- */
+  --color-primary: #D4A853;
+  --color-primary-light: #E8C97A;
+  --color-primary-dark: #B8913A;
+  --color-primary-rgb: 212, 168, 83;
+
+  --color-secondary: #2D5F3A;
+  --color-secondary-light: #3D7A4E;
+  --color-secondary-dark: #1E4228;
+
+  /* ---- Accent Colors ---- */
+  --color-coral: #E8745A;
+  --color-coral-light: #F09A86;
+  --color-sky: #5BA4D9;
+  --color-sky-light: #8DC3E8;
+  --color-lavender: #9B8EC4;
+  --color-mint: #6BC5A0;
+
+  /* ---- Neutrals ---- */
+  --color-bg: #FAF7F2;
+  --color-bg-alt: #F3EDE3;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F9F6F1;
+  --color-border: #E8E2D8;
+  --color-border-light: #F0EBE3;
+  --color-text: #2C2C2C;
+  --color-text-secondary: #5A5A5A;
+  --color-text-muted: #8A8A8A;
+  --color-text-inverse: #FFFFFF;
+
+  /* ---- Dark Sections ---- */
+  --color-dark-bg: #1A1A1A;
+  --color-dark-surface: #262626;
+  --color-dark-border: #3A3A3A;
+  --color-dark-text: #E8E2D8;
+  --color-dark-text-muted: #9A9A9A;
+
+  /* ---- Semantic Colors ---- */
+  --color-success: #4CAF50;
+  --color-warning: #FF9800;
+  --color-error: #E53935;
+  --color-info: #5BA4D9;
+
+  /* ---- Typography ---- */
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-accent: 'DM Sans', 'Inter', sans-serif;
+
+  --fs-xs: 0.75rem;    /* 12px */
+  --fs-sm: 0.8125rem;  /* 13px */
+  --fs-base: 0.9375rem;/* 15px */
+  --fs-md: 1rem;       /* 16px */
+  --fs-lg: 1.125rem;   /* 18px */
+  --fs-xl: 1.25rem;    /* 20px */
+  --fs-2xl: 1.5rem;    /* 24px */
+  --fs-3xl: 2rem;      /* 32px */
+  --fs-4xl: 2.5rem;    /* 40px */
+  --fs-5xl: 3.25rem;   /* 52px */
+  --fs-6xl: 4rem;      /* 64px */
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --lh-tight: 1.2;
+  --lh-base: 1.6;
+  --lh-relaxed: 1.8;
+
+  --ls-tight: -0.02em;
+  --ls-normal: 0;
+  --ls-wide: 0.02em;
+  --ls-wider: 0.06em;
+  --ls-widest: 0.1em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+  --space-20: 5rem;    /* 80px */
+  --space-24: 6rem;    /* 96px */
+  --space-32: 8rem;    /* 128px */
+
+  /* ---- Border Radius ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 24px rgba(var(--color-primary-rgb), 0.25);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  --shadow-card-hover: 0 8px 28px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(0, 0, 0, 0.04);
+
+  /* ---- Transitions ---- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  /* ---- Z-Index Scale ---- */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+
+  /* ---- Layout ---- */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1200px;
+  --container-2xl: 1400px;
+
+  --nav-height: 64px;
+  --announcement-height: 36px;
+
+  /* ---- Glassmorphism ---- */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-dark: rgba(26, 26, 26, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-blur: 20px;
+}
+
+/* ---- Dark Mode (optional) ---- */
+[data-theme="dark"] {
+  --color-bg: #121212;
+  --color-bg-alt: #1A1A1A;
+  --color-surface: #1E1E1E;
+  --color-surface-hover: #262626;
+  --color-border: #333333;
+  --color-border-light: #2A2A2A;
+  --color-text: #E8E2D8;
+  --color-text-secondary: #B0A89C;
+  --color-text-muted: #7A756E;
+
+  --glass-bg: rgba(30, 30, 30, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.08);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-card-hover: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}

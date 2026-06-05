@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Subscribe & Save up to 15% on every delivery. Never run out of your pet's essentials.">
+  <title>Subscribe & Save | WowPetStore</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <div id="nav-slot"></div>
+
+  <!-- Hero -->
+  <section class="subscribe-hero">
+    <div class="container" style="position: relative; z-index: 1;">
+      <h1 class="slide-up">Never Run Out Again</h1>
+      <p class="slide-up">Set it and forget it. Save 15% on every delivery with flexible scheduling — pause, skip, or cancel anytime.</p>
+      <a href="#sub-products" class="btn btn-primary btn-lg slide-up">Start Subscribing</a>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section">
+    <div class="container">
+      <span class="section-label fade-in">How It Works</span>
+      <h2 class="section-title fade-in">3 Simple Steps</h2>
+      <p class="section-subtitle fade-in">Getting started is easy — and so is saving money.</p>
+      <div class="steps-grid stagger">
+        <div class="step-card fade-in">
+          <div class="step-number">1</div>
+          <div class="step-icon">🛒</div>
+          <h4>Choose</h4>
+          <p>Pick your pet's favorite food, treats, and essentials from our curated selection.</p>
+        </div>
+        <div class="step-card fade-in">
+          <div class="step-number">2</div>
+          <div class="step-icon">📅</div>
+          <h4>Schedule</h4>
+          <p>Set your delivery frequency — every 2, 4, 6, or 8 weeks. Change anytime.</p>
+        </div>
+        <div class="step-card fade-in">
+          <div class="step-number">3</div>
+          <div class="step-icon">💰</div>
+          <h4>Save</h4>
+          <p>Enjoy 15% off every order, plus free shipping. It's that simple.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Subscribable Products -->
+  <section class="section" style="background: var(--color-bg-alt);" id="sub-products">
+    <div class="container">
+      <span class="section-label fade-in">Products</span>
+      <h2 class="section-title fade-in">Subscribe-Eligible Products</h2>
+      <p class="section-subtitle fade-in">All these products qualify for 15% off with Subscribe & Save</p>
+      <div class="product-grid" id="subscribable-grid"></div>
+    </div>
+  </section>
+
+  <!-- Active Subscriptions -->
+  <section class="section" id="active-subs-section">
+    <div class="container">
+      <span class="section-label fade-in">My Subscriptions</span>
+      <h2 class="section-title fade-in">Active Subscriptions</h2>
+      <p class="section-subtitle fade-in">Manage your recurring deliveries</p>
+      <div id="active-subs"></div>
+    </div>
+  </section>
+
+  <!-- Savings Calculator -->
+  <section class="section" style="background: var(--color-bg-alt);">
+    <div class="container">
+      <span class="section-label fade-in">Calculator</span>
+      <h2 class="section-title fade-in">See How Much You'll Save</h2>
+      <p class="section-subtitle fade-in">Calculate your estimated savings with Subscribe & Save</p>
+      <div class="savings-calc fade-in" style="max-width: 600px; margin: 0 auto;">
+        <div class="input-group mb-4">
+          <label>Monthly Spending on Pet Products</label>
+          <input type="range" id="spending-slider" min="20" max="300" value="100" oninput="SubscribePage.calcSavings(this.value)" style="width: 100%; accent-color: var(--color-primary);">
+          <div class="flex justify-between text-sm text-muted"><span>$20</span><span id="spending-display">$100</span><span>$300</span></div>
+        </div>
+        <div class="savings-result">
+          <div class="text-sm text-muted mb-2">Your estimated annual savings</div>
+          <div class="savings-amount" id="savings-amount">$180</div>
+          <div class="text-sm text-muted" style="margin-top: var(--space-2);">That's <strong id="savings-monthly">$15</strong>/month back in your pocket!</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-slot"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/subscribe.js"></script>
+  <script>
+    WowApp.init('subscribe');
+    SubscribePage.init();
+  </script>
+</body>
+</html>

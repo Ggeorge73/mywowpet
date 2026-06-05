@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Browse premium pet products — food, treats, toys, health, and accessories for dogs, cats, small pets, and birds.">
+  <title>Shop | WowPetStore</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <div id="nav-slot"></div>
+
+  <div class="page-body">
+    <div class="container section" style="padding-top: var(--space-6);">
+      <!-- Breadcrumbs -->
+      <nav class="breadcrumbs" id="breadcrumbs">
+        <a href="index.html">Home</a>
+        <span class="separator">›</span>
+        <span class="current">Shop</span>
+      </nav>
+
+      <!-- Shop Header -->
+      <div style="margin-bottom: var(--space-6);">
+        <h1 id="shop-title" style="font-size: var(--fs-3xl); margin-bottom: var(--space-2);">Shop All Products</h1>
+      </div>
+
+      <!-- Active Filters -->
+      <div class="active-filters" id="active-filters"></div>
+
+      <!-- Top Bar -->
+      <div class="shop-top-bar">
+        <div class="flex items-center gap-3">
+          <button class="mobile-filter-btn" id="filter-toggle-btn" onclick="toggleMobileFilter()">
+            ☰ Filters
+          </button>
+          <span class="result-count" id="result-count">24 products</span>
+        </div>
+        <div class="shop-sort">
+          <label for="sort-select">Sort by:</label>
+          <select id="sort-select" onchange="handleSort(this.value)">
+            <option value="bestselling">Best Selling</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="rating">Top Rated</option>
+            <option value="newest">Newest</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Main Layout -->
+      <div class="layout-with-sidebar">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar-sticky" id="desktop-sidebar">
+          <div class="filter-sidebar" id="filter-sidebar"></div>
+        </aside>
+
+        <!-- Product Grid -->
+        <main>
+          <div class="product-grid" id="product-grid"></div>
+          <div id="no-results" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">🔍</div>
+            <h3>No products found</h3>
+            <p>Try adjusting your filters or search terms</p>
+            <button class="btn btn-primary" onclick="clearAllFilters()">Clear All Filters</button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Filter Bottom Sheet -->
+  <div class="filter-backdrop" id="filter-backdrop" onclick="toggleMobileFilter()"></div>
+  <div class="filter-sidebar-mobile" id="filter-mobile">
+    <div class="flex justify-between items-center mb-6">
+      <h3>Filters</h3>
+      <button class="btn btn-ghost" onclick="toggleMobileFilter()">✕ Close</button>
+    </div>
+    <div class="filter-sidebar" id="filter-sidebar-mobile"></div>
+    <div style="padding-top: var(--space-4);">
+      <button class="btn btn-primary btn-block" onclick="toggleMobileFilter()">Apply Filters</button>
+    </div>
+  </div>
+
+  <div id="footer-slot"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/shop.js"></script>
+  <script>
+    WowApp.init('shop');
+    ShopPage.init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Test your pet nutrition knowledge and earn shopping discounts! Play Pet Nutrition IQ at WowPetStore.">
+  <title>Pet Nutrition IQ 🧠 | WowPetStore</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/game.css">
+</head>
+<body class="game-page">
+
+  <!-- Nav -->
+  <div class="game-nav">
+    <a href="index.html" class="game-nav-back">← Back to Store</a>
+    <span style="font-family: var(--font-heading); color: white; font-size: var(--fs-sm);">🐾 Wow<span class="logo-accent">Pet</span>Store</span>
+  </div>
+
+  <!-- Intro Screen -->
+  <div class="game-intro" id="game-intro">
+    <div class="game-intro-particles" id="particles"></div>
+    <div class="game-title-icon">🧠</div>
+    <h1 class="game-title">Pet Nutrition IQ</h1>
+    <p class="game-subtitle">Test your knowledge about pet health & nutrition. Score high enough and earn real shopping discounts!</p>
+
+    <div class="game-rules">
+      <div class="game-rule"><span class="game-rule-icon">❓</span> 10 questions about pet health & nutrition</div>
+      <div class="game-rule"><span class="game-rule-icon">⏱️</span> 15 seconds per question — speed earns bonus points</div>
+      <div class="game-rule"><span class="game-rule-icon">🔥</span> Build streaks for a score multiplier</div>
+      <div class="game-rule"><span class="game-rule-icon">🎁</span> Earn loyalty points + discount codes based on your score</div>
+    </div>
+
+    <button class="btn btn-primary btn-lg" onclick="PetGame.start()" style="min-width: 200px;">Start Game</button>
+
+    <div class="game-high-score" id="high-score-display"></div>
+  </div>
+
+  <!-- Game Play Screen -->
+  <div class="game-play" id="game-play">
+    <div class="game-header">
+      <span class="game-progress" id="game-progress">Question 1 / 10</span>
+      <span class="game-streak" id="game-streak" style="display: none;">🔥 0 streak</span>
+      <span class="game-score-display">⭐ <span id="game-score">0</span></span>
+    </div>
+    <div class="game-timer"><div class="game-timer-fill" id="game-timer-fill"></div></div>
+    <div class="game-question-card">
+      <div class="game-question-number" id="q-number">Question 1</div>
+      <h2 class="game-question-text" id="q-text"></h2>
+      <div class="game-answers" id="q-answers"></div>
+      <div class="game-fact" id="q-fact" style="display: none;"></div>
+    </div>
+  </div>
+
+  <!-- Results Screen -->
+  <div class="game-results" id="game-results">
+    <div class="results-rank-icon" id="results-icon"></div>
+    <h2 class="results-rank-title" id="results-title"></h2>
+    <div class="results-score" id="results-score">0</div>
+    <p class="results-detail" id="results-detail"></p>
+
+    <div class="results-reward" id="results-reward">
+      <h4>🎁 Your Reward</h4>
+      <div class="reward-points" id="reward-points"></div>
+      <div id="reward-code-container"></div>
+    </div>
+
+    <div class="results-actions">
+      <button class="btn btn-primary btn-lg" onclick="PetGame.restart()">Play Again</button>
+      <a href="shop.html" class="btn btn-secondary btn-lg">Shop Now</a>
+    </div>
+
+    <div class="game-leaderboard" id="game-leaderboard"></div>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/game.js"></script>
+  <script>
+    PetGame.init();
+    // Generate particles
+    const pc = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'game-particle';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.top = Math.random() * 100 + '%';
+      p.style.animationDelay = Math.random() * 5 + 's';
+      p.style.animationDuration = (5 + Math.random() * 8) + 's';
+      pc.appendChild(p);
+    }
+  </script>
+</body>
+</html>

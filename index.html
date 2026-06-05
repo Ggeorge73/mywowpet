@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="WowPetStore — Premium pet products curated for the modern pet parent. Shop food, treats, toys & more with Subscribe & Save.">
+  <title>WowPetStore — Premium Pet Products for Modern Pet Parents</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <div id="nav-slot"></div>
+
+  <!-- ======== HERO ======== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <video autoplay muted loop playsinline preload="auto" poster="assets/images/hero.jpg" style="width:100%;height:100%;object-fit:cover;">
+        <source src="assets/videos/hero.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="container">
+      <div class="hero-content slide-up">
+        <span class="hero-label">✦ Premium Pet Care</span>
+        <h1>Everything Your Pet Deserves</h1>
+        <p class="hero-subtitle">Curated, high-quality products delivered to your door. Because your fur babies deserve nothing but the best.</p>
+        <div class="hero-actions">
+          <a href="shop.html" class="btn btn-primary btn-lg">Shop Now</a>
+          <a href="subscribe.html" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.5); color: white;">Subscribe & Save</a>
+        </div>
+      </div>
+      <div class="hero-floating-badge">
+        <span class="badge-icon">⭐</span>
+        <div>
+          <div class="badge-text">4.9/5 Rating</div>
+          <div class="badge-sub">10,000+ Happy Pets</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== TRUST BAR ======== -->
+  <section class="trust-bar">
+    <div class="container">
+      <div class="trust-item">
+        <span class="trust-item-icon">🚚</span>
+        <span class="trust-item-text">Free Shipping $49+</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-item-icon">🔄</span>
+        <span class="trust-item-text">Easy Returns</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-item-icon">🔒</span>
+        <span class="trust-item-text">Secure Checkout</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-item-icon">⭐</span>
+        <span class="trust-item-text">4.9/5 Rating</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== SHOP BY PET ======== -->
+  <section class="section" id="shop-by-pet">
+    <div class="container text-center">
+      <span class="section-label fade-in">Browse</span>
+      <h2 class="section-title fade-in">Shop by Pet</h2>
+      <p class="section-subtitle fade-in">Find the perfect products tailored to your pet's needs</p>
+      <div class="category-grid stagger" id="category-grid">
+        <a href="shop.html?pet=dog" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
+          <div class="category-card-icon" style="overflow:hidden;position:relative;">
+            <video muted loop playsinline preload="metadata" poster="assets/images/dog_food.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="assets/videos/dog_park.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="category-card-name">Dogs</span>
+        </a>
+        <a href="shop.html?pet=cat" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
+          <div class="category-card-icon" style="overflow:hidden;position:relative;">
+            <video muted loop playsinline preload="metadata" poster="assets/images/cat_food.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="assets/videos/cat_playing.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="category-card-name">Cats</span>
+        </a>
+        <a href="shop.html?pet=small-pet" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
+          <div class="category-card-icon" style="overflow:hidden;position:relative;">
+            <video muted loop playsinline preload="metadata" poster="assets/images/small_pet.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="assets/videos/hamster_wheel.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="category-card-name">Small Pets</span>
+        </a>
+        <a href="shop.html?pet=bird" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
+          <div class="category-card-icon" style="overflow:hidden;position:relative;">
+            <video muted loop playsinline preload="metadata" poster="assets/images/bird_pet.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="assets/videos/bird_colorful.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="category-card-name">Birds</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== TRENDING PRODUCTS ======== -->
+  <section class="section" style="background: var(--color-bg-alt);" id="trending">
+    <div class="container">
+      <span class="section-label fade-in">Popular</span>
+      <h2 class="section-title fade-in">Trending Now</h2>
+      <p class="section-subtitle fade-in">Our customers' top picks this month</p>
+      <div class="horizontal-scroll stagger" id="trending-products"></div>
+    </div>
+  </section>
+
+  <!-- ======== SOLAR JOURNEY CTA ======== -->
+  <section class="section" id="journey-cta" style="background: linear-gradient(135deg, #0a0a2e 0%, #1a1040 50%, #050520 100%); color: white; position: relative; overflow: hidden;">
+    <div style="position: absolute; inset: 0; background: radial-gradient(circle at 30% 50%, rgba(212,168,83,0.08) 0%, transparent 50%);"></div>
+    <div class="container text-center" style="position: relative; z-index: 1;">
+      <span class="section-label fade-in" style="color: rgba(212,168,83,0.8);">New Experience</span>
+      <h2 class="section-title fade-in" style="color: white;">🪐 Explore the Solar Journey</h2>
+      <p class="section-subtitle fade-in" style="color: rgba(255,255,255,0.6); max-width: 600px; margin: 0 auto var(--space-6);">Discover our products in an immersive 3D solar system. Each planet is a product category — click to explore, learn, and shop.</p>
+      <div class="fade-in" style="display: flex; gap: var(--space-6); justify-content: center; flex-wrap: wrap; margin-bottom: var(--space-8);">
+        <div style="display: flex; align-items: center; gap: var(--space-3);"><span style="font-size: 28px;">🥩</span><span style="color: rgba(255,255,255,0.7); font-size: var(--fs-sm);">Food</span></div>
+        <div style="display: flex; align-items: center; gap: var(--space-3);"><span style="font-size: 28px;">🦴</span><span style="color: rgba(255,255,255,0.7); font-size: var(--fs-sm);">Treats</span></div>
+        <div style="display: flex; align-items: center; gap: var(--space-3);"><span style="font-size: 28px;">🎾</span><span style="color: rgba(255,255,255,0.7); font-size: var(--fs-sm);">Toys</span></div>
+        <div style="display: flex; align-items: center; gap: var(--space-3);"><span style="font-size: 28px;">💊</span><span style="color: rgba(255,255,255,0.7); font-size: var(--fs-sm);">Health</span></div>
+        <div style="display: flex; align-items: center; gap: var(--space-3);"><span style="font-size: 28px;">🎀</span><span style="color: rgba(255,255,255,0.7); font-size: var(--fs-sm);">Accessories</span></div>
+      </div>
+      <a href="journey.html" class="btn btn-primary btn-lg fade-in" style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light)); min-width: 220px;">Launch Solar Journey →</a>
+    </div>
+  </section>
+
+  <!-- ======== GAME CTA ======== -->
+  <section class="section" style="background: var(--color-bg-alt);" id="game-cta">
+    <div class="container">
+      <div class="split-section">
+        <div class="split-content slide-up">
+          <span class="section-label">Play & Learn</span>
+          <h2 style="margin-bottom: var(--space-5);">🧠 Pet Nutrition IQ</h2>
+          <p style="color: var(--color-text-secondary); margin-bottom: var(--space-6); line-height: var(--lh-relaxed);">Think you know what's best for your pet? Test your knowledge with our fun trivia game and earn real rewards!</p>
+          <div style="display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-8);">
+            <div class="flex items-center gap-4">
+              <span style="font-size: var(--fs-xl); width: 40px; height: 40px; background: rgba(var(--color-primary-rgb), 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">🔥</span>
+              <div><strong>10 Questions</strong><span class="text-sm text-muted" style="margin-left: var(--space-2);">Timed & streak-scored</span></div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span style="font-size: var(--fs-xl); width: 40px; height: 40px; background: rgba(107,197,160,0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">💰</span>
+              <div><strong>Up to 25% Off</strong><span class="text-sm text-muted" style="margin-left: var(--space-2);">Earn promo codes</span></div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span style="font-size: var(--fs-xl); width: 40px; height: 40px; background: rgba(91,164,217,0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">⭐</span>
+              <div><strong>Up to 500 Points</strong><span class="text-sm text-muted" style="margin-left: var(--space-2);">Loyalty rewards</span></div>
+            </div>
+          </div>
+          <div style="display: flex; gap: var(--space-4); align-items: center;">
+            <a href="game.html" class="btn btn-primary btn-lg">Play Now</a>
+            <span class="text-sm text-muted" id="home-game-high"></span>
+          </div>
+        </div>
+        <div class="split-image slide-up" style="background: linear-gradient(135deg, #1a1040, #2d1f6e); display: flex; align-items: center; justify-content: center; aspect-ratio: 4/3;">
+          <div style="text-align: center; color: white; padding: var(--space-8);">
+            <div style="font-size: 80px; margin-bottom: var(--space-4); animation: bounce 2s ease-in-out infinite;">🧠</div>
+            <div style="font-family: var(--font-heading); font-size: var(--fs-3xl); font-weight: var(--fw-bold); margin-bottom: var(--space-2); background: linear-gradient(135deg, var(--color-primary-light), #FFD700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">NUTRITION IQ</div>
+            <div style="font-family: var(--font-accent); font-size: var(--fs-base); opacity: 0.7;">Learn • Play • Save</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== SUBSCRIBE & SAVE CTA ======== -->
+  <section class="section" id="subscribe-cta">
+    <div class="container">
+      <div class="split-section">
+        <div class="split-content slide-up">
+          <span class="section-label">Save More</span>
+          <h2 style="margin-bottom: var(--space-5);">Never Run Out of Essentials</h2>
+          <p style="color: var(--color-text-secondary); margin-bottom: var(--space-8); line-height: var(--lh-relaxed);">Set up automatic deliveries for your pet's favorites and enjoy 15% off every single order. Pause, skip, or cancel anytime.</p>
+          <div style="display: flex; flex-direction: column; gap: var(--space-5); margin-bottom: var(--space-8);">
+            <div class="flex items-center gap-4">
+              <span style="font-size: var(--fs-2xl); width: 48px; height: 48px; background: rgba(var(--color-primary-rgb), 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">💰</span>
+              <div>
+                <strong>Save 15% Every Time</strong>
+                <p class="text-sm text-muted" style="margin-top: 2px;">Automatic discount on every delivery</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span style="font-size: var(--fs-2xl); width: 48px; height: 48px; background: rgba(91, 164, 217, 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">📦</span>
+              <div>
+                <strong>Flexible Schedule</strong>
+                <p class="text-sm text-muted" style="margin-top: 2px;">Choose delivery every 2, 4, 6, or 8 weeks</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span style="font-size: var(--fs-2xl); width: 48px; height: 48px; background: rgba(107, 197, 160, 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">✨</span>
+              <div>
+                <strong>No Commitment</strong>
+                <p class="text-sm text-muted" style="margin-top: 2px;">Pause, skip, or cancel anytime — no fees</p>
+              </div>
+            </div>
+          </div>
+          <a href="subscribe.html" class="btn btn-primary btn-lg">Start Saving Today</a>
+        </div>
+        <div class="split-image slide-up" style="position: relative; overflow: hidden; aspect-ratio: 4/3; border-radius: var(--radius-xl);">
+          <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+            <source src="assets/videos/dog_happy.mp4" type="video/mp4">
+          </video>
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg, rgba(26,58,92,0.7), rgba(45,95,138,0.5));display:flex;align-items:center;justify-content:center;">
+            <div style="text-align: center; color: white; padding: var(--space-8);">
+              <div style="font-family: var(--font-heading); font-size: var(--fs-4xl); font-weight: var(--fw-bold); margin-bottom: var(--space-2);">15% OFF</div>
+              <div style="font-family: var(--font-accent); font-size: var(--fs-lg); opacity: 0.85;">Every Delivery, Every Time</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== TESTIMONIALS ======== -->
+  <section class="section" style="background: var(--color-bg-alt);" id="testimonials">
+    <div class="container">
+      <span class="section-label fade-in">Reviews</span>
+      <h2 class="section-title fade-in">Loved by Pet Parents</h2>
+      <p class="section-subtitle fade-in">See what our happy customers have to say</p>
+      <div class="testimonials-grid stagger" id="testimonials-grid"></div>
+    </div>
+  </section>
+
+  <!-- ======== PET PARENT PERKS ======== -->
+  <section class="section" id="perks">
+    <div class="container">
+      <span class="section-label fade-in">Rewards</span>
+      <h2 class="section-title fade-in">Pet Parent Perks</h2>
+      <p class="section-subtitle fade-in">Join our loyalty program and unlock exclusive benefits</p>
+      <div class="perks-grid stagger">
+        <div class="perk-card fade-in">
+          <div class="perk-icon">🎁</div>
+          <h4>Earn Points</h4>
+          <p>Earn 4 points for every $1 you spend. Redeem for discounts, free products, and exclusive perks.</p>
+        </div>
+        <div class="perk-card fade-in">
+          <div class="perk-icon">🎂</div>
+          <h4>Birthday Treats</h4>
+          <p>Register your pet's birthday and receive a special surprise gift — because every pet deserves to celebrate!</p>
+        </div>
+        <div class="perk-card fade-in">
+          <div class="perk-icon">⚡</div>
+          <h4>Exclusive Deals</h4>
+          <p>Members get early access to sales, limited edition products, and double-points events throughout the year.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== NEWSLETTER ======== -->
+  <section class="newsletter-section" id="newsletter">
+    <div class="container">
+      <div class="newsletter-content fade-in">
+        <h2>Join the Pack</h2>
+        <p>Subscribe to our newsletter and get 15% off your first order, plus tips, deals, and adorable pet content.</p>
+        <form class="newsletter-form" onsubmit="event.preventDefault(); WowApp.showToast('Thanks for joining! Check your inbox for 15% off. 🎉', '📧'); this.reset();">
+          <input type="email" placeholder="Enter your email" required>
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-slot"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/animations.js"></script>
+  <script>
+    // Init app
+    WowApp.init('home');
+
+    // Render trending products
+    const trendingContainer = document.getElementById('trending-products');
+    const trending = WowStore.getProducts({ sort: 'bestselling' }).slice(0, 8);
+    trendingContainer.innerHTML = trending.map(p => WowApp.renderProductCard(p)).join('');
+
+    // Render testimonials
+    const testimonialsGrid = document.getElementById('testimonials-grid');
+    testimonialsGrid.innerHTML = WowStore.testimonials.map(t => `
+      <div class="testimonial-card fade-in">
+        <p class="testimonial-text">${t.text}</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">${t.avatar}</div>
+          <div class="testimonial-author-info">
+            <span class="testimonial-author-name">${t.author}</span>
+            <span class="testimonial-author-pet">${t.pet}</span>
+          </div>
+        </div>
+        <div style="margin-top: var(--space-3);">${WowStore.renderStars(t.rating)}</div>
+      </div>
+    `).join('');
+
+    // Re-init animations for dynamically added elements
+    WowAnimations.init();
+
+    // Show game high score if available
+    const ghs = WowStore.getGameHighScore();
+    const ghsEl = document.getElementById('home-game-high');
+    if (ghs.played > 0 && ghsEl) {
+      ghsEl.textContent = `🏆 High Score: ${ghs.score} pts`;
+    }
+  </script>
+  <style>
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  </style>
+</body>
+</html>

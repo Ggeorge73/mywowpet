@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage your pet profiles, loyalty rewards, orders, and subscriptions at WowPetStore.">
+  <title>My Profile | WowPetStore</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <div id="nav-slot"></div>
+
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div class="container">
+      <div class="profile-header-content">
+        <div class="profile-avatar">👤</div>
+        <div class="profile-info">
+          <h1>Pet Parent Profile</h1>
+          <div class="profile-meta">
+            <span>🗓 Member since Jan 2024</span>
+            <span id="tier-badge"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <div class="container" style="padding-bottom: var(--space-16);">
+      <!-- Tabs -->
+      <div class="profile-tabs" id="profile-tabs">
+        <div class="profile-tab active" onclick="ProfilePage.switchTab('pets')">🐾 My Pets</div>
+        <div class="profile-tab" onclick="ProfilePage.switchTab('loyalty')">⭐ Loyalty</div>
+        <div class="profile-tab" onclick="ProfilePage.switchTab('orders')">📦 Orders</div>
+        <div class="profile-tab" onclick="ProfilePage.switchTab('subscriptions')">🔄 Subscriptions</div>
+        <div class="profile-tab" onclick="ProfilePage.switchTab('wishlist')">❤️ Wishlist</div>
+      </div>
+
+      <!-- My Pets Section -->
+      <div class="profile-section active" id="section-pets"></div>
+
+      <!-- Loyalty Section -->
+      <div class="profile-section" id="section-loyalty"></div>
+
+      <!-- Orders Section -->
+      <div class="profile-section" id="section-orders"></div>
+
+      <!-- Subscriptions Section -->
+      <div class="profile-section" id="section-subscriptions"></div>
+
+      <!-- Wishlist Section -->
+      <div class="profile-section" id="section-wishlist"></div>
+    </div>
+  </div>
+
+  <!-- Add Pet Modal -->
+  <div class="modal-overlay" id="pet-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="pet-modal-title">Add a Pet</h3>
+        <button class="modal-close" onclick="ProfilePage.closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-4">
+          <label for="pet-name">Pet Name</label>
+          <input type="text" id="pet-name" placeholder="Buddy">
+        </div>
+        <div class="form-row two-col" style="margin-bottom: var(--space-4);">
+          <div class="input-group">
+            <label for="pet-species">Species</label>
+            <select id="pet-species">
+              <option value="dog">🐕 Dog</option>
+              <option value="cat">🐈 Cat</option>
+              <option value="small-pet">🐹 Small Pet</option>
+              <option value="bird">🦜 Bird</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="pet-breed">Breed</label>
+            <input type="text" id="pet-breed" placeholder="Golden Retriever">
+          </div>
+        </div>
+        <div class="form-row two-col" style="margin-bottom: var(--space-4);">
+          <div class="input-group">
+            <label for="pet-birthday">Birthday</label>
+            <input type="date" id="pet-birthday">
+          </div>
+          <div class="input-group">
+            <label for="pet-emoji">Avatar Emoji</label>
+            <select id="pet-emoji">
+              <option value="🐕">🐕 Dog</option>
+              <option value="🐈">🐈 Cat</option>
+              <option value="🐹">🐹 Hamster</option>
+              <option value="🐰">🐰 Bunny</option>
+              <option value="🦜">🦜 Bird</option>
+              <option value="🐶">🐶 Puppy Face</option>
+              <option value="😸">😸 Cat Face</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="pet-notes">Dietary Notes</label>
+          <textarea id="pet-notes" rows="2" placeholder="Allergies, preferences, etc." style="resize: vertical;"></textarea>
+        </div>
+        <input type="hidden" id="pet-edit-id" value="">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="ProfilePage.closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="ProfilePage.savePet()">Save Pet</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-slot"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/profile.js"></script>
+  <script>
+    WowApp.init('profile');
+    ProfilePage.init();
+  </script>
+</body>
+</html>

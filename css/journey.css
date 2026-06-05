@@ -1,0 +1,435 @@
+/* ============================================
+   WowPetStore — 3D Solar Journey Styles
+   ============================================ */
+
+.journey-page {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #050510;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* Canvas */
+#journey-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Loading Screen */
+.journey-loader {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #0a0a2e 0%, #050510 100%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s ease;
+}
+
+.journey-loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.journey-loader .loader-logo {
+  font-family: var(--font-heading);
+  font-size: var(--fs-4xl);
+  color: white;
+  margin-bottom: var(--space-4);
+  animation: loader-pulse 2s ease-in-out infinite;
+}
+
+.journey-loader .loader-logo .logo-accent {
+  color: var(--color-primary-light);
+}
+
+@keyframes loader-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.journey-loader .loader-bar {
+  width: 200px;
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.journey-loader .loader-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  width: 0%;
+  border-radius: var(--radius-full);
+  transition: width 0.3s;
+}
+
+.journey-loader .loader-text {
+  margin-top: var(--space-4);
+  font-family: var(--font-accent);
+  font-size: var(--fs-sm);
+  color: rgba(255,255,255,0.4);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+}
+
+/* HUD Overlay */
+.journey-hud {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.journey-hud > * {
+  pointer-events: auto;
+}
+
+/* Top Bar */
+.journey-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5);
+  pointer-events: none;
+}
+
+.journey-top > * {
+  pointer-events: auto;
+}
+
+.journey-back {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-full);
+  color: rgba(255,255,255,0.8);
+  font-family: var(--font-accent);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.journey-back:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+.journey-logo {
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  color: white;
+}
+
+.journey-logo .logo-accent {
+  color: var(--color-primary-light);
+}
+
+.journey-controls {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.journey-ctrl-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-full);
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: var(--fs-sm);
+}
+
+.journey-ctrl-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+/* Bottom Hint */
+.journey-hint {
+  position: fixed;
+  bottom: var(--space-8);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-family: var(--font-accent);
+  font-size: var(--fs-sm);
+  color: rgba(255,255,255,0.4);
+  letter-spacing: var(--ls-wide);
+  animation: hint-fade 3s ease-in-out infinite;
+  text-align: center;
+}
+
+@keyframes hint-fade {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+/* Category Label (follows cursor near planet) */
+.journey-label {
+  position: fixed;
+  z-index: 15;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-5);
+  color: white;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+
+.journey-label.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.journey-label .label-name {
+  font-family: var(--font-accent);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+}
+
+.journey-label .label-count {
+  font-size: var(--fs-xs);
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+}
+
+/* Product Info Panel */
+.journey-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 420px;
+  max-width: 90vw;
+  background: rgba(10, 10, 30, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-left: 1px solid rgba(255,255,255,0.08);
+  z-index: 20;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+  padding: var(--space-8) var(--space-6);
+}
+
+.journey-panel.open {
+  transform: translateX(0);
+}
+
+.journey-panel-close {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-5);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.08);
+  border-radius: var(--radius-full);
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.2s;
+  font-size: var(--fs-lg);
+}
+
+.journey-panel-close:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+.journey-panel-category {
+  font-family: var(--font-accent);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-widest);
+  color: var(--color-primary-light);
+  margin-bottom: var(--space-2);
+}
+
+.journey-panel h2 {
+  color: white;
+  font-size: var(--fs-2xl);
+  margin-bottom: var(--space-3);
+}
+
+.journey-panel-desc {
+  color: rgba(255,255,255,0.6);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed);
+  margin-bottom: var(--space-8);
+}
+
+.journey-panel-products {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.journey-product-card {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.journey-product-card:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(var(--color-primary-rgb), 0.3);
+  transform: translateX(4px);
+}
+
+.journey-product-img {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.05);
+}
+
+.journey-product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.journey-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.journey-product-name {
+  color: white;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.journey-product-price {
+  color: var(--color-primary-light);
+  font-family: var(--font-accent);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-sm);
+}
+
+.journey-product-sub {
+  font-size: var(--fs-xs);
+  color: rgba(91, 164, 217, 0.8);
+  margin-top: 2px;
+}
+
+.journey-product-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  color: white;
+  font-size: var(--fs-base);
+  flex-shrink: 0;
+  align-self: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.journey-product-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 16px rgba(var(--color-primary-rgb), 0.4);
+}
+
+/* Nutrition Facts Popup */
+.journey-nutrition {
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-lg);
+}
+
+.journey-nutrition h4 {
+  color: white;
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-3);
+  font-family: var(--font-accent);
+}
+
+.journey-nutrition .fact {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: var(--fs-sm);
+}
+
+.journey-nutrition .fact-label {
+  color: rgba(255,255,255,0.5);
+}
+
+.journey-nutrition .fact-value {
+  color: rgba(255,255,255,0.9);
+  font-weight: var(--fw-medium);
+}
+
+/* Mobile hint to drag */
+@media (max-width: 768px) {
+  .journey-panel {
+    width: 100%;
+    max-width: 100%;
+    top: auto;
+    bottom: 0;
+    height: 70vh;
+    border-left: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top-left-radius: var(--radius-xl);
+    border-top-right-radius: var(--radius-xl);
+    transform: translateY(100%);
+  }
+  .journey-panel.open {
+    transform: translateY(0);
+  }
+}
