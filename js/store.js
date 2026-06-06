@@ -901,9 +901,20 @@ const WowStore = (() => {
     } catch { return []; }
   }
 
+  function triggerSync() {
+    if (typeof WowFirebase !== 'undefined') {
+      if (WowFirebase.isMockMode()) {
+        WowFirebase.syncMockDataLocally();
+      } else {
+        WowFirebase.syncUserData();
+      }
+    }
+  }
+
   function saveCart(cart) {
     localStorage.setItem('wow_cart', JSON.stringify(cart));
     window.dispatchEvent(new CustomEvent('cartUpdated', { detail: cart }));
+    triggerSync();
   }
 
   function addToCart(productId, qty = 1, isSubscription = false, frequency = '4weeks') {
@@ -979,12 +990,14 @@ const WowStore = (() => {
       pets.push(pet);
     }
     localStorage.setItem('wow_pets', JSON.stringify(pets));
+    triggerSync();
     return pets;
   }
 
   function removePet(petId) {
     const pets = getPets().filter(p => p.id !== petId);
     localStorage.setItem('wow_pets', JSON.stringify(pets));
+    triggerSync();
     return pets;
   }
 
@@ -1009,6 +1022,7 @@ const WowStore = (() => {
       points
     });
     localStorage.setItem('wow_loyalty', JSON.stringify(loyalty));
+    triggerSync();
     return loyalty;
   }
 
@@ -1041,6 +1055,7 @@ const WowStore = (() => {
       list.push(productId);
     }
     localStorage.setItem('wow_wishlist', JSON.stringify(list));
+    triggerSync();
     return list;
   }
 
@@ -1060,6 +1075,7 @@ const WowStore = (() => {
 
   function saveSubscriptions(subs) {
     localStorage.setItem('wow_subscriptions', JSON.stringify(subs));
+    triggerSync();
   }
 
   // ---- Order History (localStorage) ----
@@ -1096,6 +1112,7 @@ const WowStore = (() => {
     const orders = getOrders();
     orders.unshift(order);
     localStorage.setItem('wow_orders', JSON.stringify(orders));
+    triggerSync();
     return orders;
   }
 
@@ -1147,6 +1164,7 @@ const WowStore = (() => {
     validatePromo,
     productColors,
     getGameHighScore,
-    setGameHighScore
+    setGameHighScore,
+    triggerSync
   };
 })();

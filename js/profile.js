@@ -12,7 +12,86 @@ const ProfilePage = (() => {
   ];
 
   function init() {
-    // Seed demo pets if none
+    // Check if user is logged in
+    const user = typeof WowFirebase !== 'undefined' ? WowFirebase.getCurrentUser() : null;
+    
+    const header = document.querySelector('.profile-header');
+    const tabs = document.getElementById('profile-tabs');
+    const body = document.querySelector('.page-body .container');
+
+    if (!user) {
+      if (header) header.style.display = 'none';
+      if (tabs) tabs.style.display = 'none';
+      
+      document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
+      
+      if (body) {
+        body.innerHTML = `
+          <div class="empty-state" style="max-width: 480px; margin: 60px auto; padding: var(--space-10); background: var(--glass-bg); backdrop-filter: blur(15px); border-radius: var(--radius-xl); border: 1px solid var(--glass-border); box-shadow: var(--shadow-xl); text-align: center;">
+            <div class="empty-state-icon" style="font-size: 64px; margin-bottom: var(--space-4);">🔒</div>
+            <h2 style="font-size: var(--fs-2xl); margin-bottom: var(--space-2); font-weight: var(--fw-bold);">Members-Only Profile</h2>
+            <p style="color: var(--color-text-muted); font-size: var(--fs-sm); margin-bottom: var(--space-6); line-height: var(--lh-relaxed);">
+              Join the pack or sign in to view your pet profiles, track your loyalty tier, manage subscriptions, and see order history.
+            </p>
+            <button class="btn btn-primary btn-lg" onclick="WowApp.showAuthModal()" style="width: 100%; font-family: var(--font-accent); font-weight: var(--fw-bold);">
+              Sign In / Create Account
+            </button>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    // User is logged in: Restore header and layout structure
+    if (header) header.style.display = 'block';
+    
+    if (body) {
+      body.innerHTML = `
+        <!-- Tabs -->
+        <div class="profile-tabs" id="profile-tabs">
+          <div class="profile-tab active" onclick="ProfilePage.switchTab('pets')">&#x1F43E; My Pets</div>
+          <div class="profile-tab" onclick="ProfilePage.switchTab('loyalty')">&#x2B50; Loyalty</div>
+          <div class="profile-tab" onclick="ProfilePage.switchTab('orders')">&#x1F4E6; Orders</div>
+          <div class="profile-tab" onclick="ProfilePage.switchTab('subscriptions')">&#x1F504; Subscriptions</div>
+          <div class="profile-tab" onclick="ProfilePage.switchTab('wishlist')">&#x2764;&#xFE0F; Wishlist</div>
+        </div>
+        <div class="profile-section active" id="section-pets"></div>
+        <div class="profile-section" id="section-loyalty"></div>
+        <div class="profile-section" id="section-orders"></div>
+        <div class="profile-section" id="section-subscriptions"></div>
+        <div class="profile-section" id="section-wishlist"></div>
+      `;
+
+      // Re-bind click event handlers for newly injected tabs
+      document.querySelectorAll('.profile-tab').forEach((t, i) => {
+        const tabList = ['pets', 'loyalty', 'orders', 'subscriptions', 'wishlist'];
+        t.onclick = () => switchTab(tabList[i]);
+      });
+    }
+
+    // Populate user profile info in header
+    const nameEl = header ? header.querySelector('h1') : null;
+    if (nameEl) nameEl.textContent = user.displayName || 'Pet Parent';
+    
+    const metaEl = header ? header.querySelector('.profile-meta span:first-child') : null;
+    if (metaEl) {
+      metaEl.innerHTML = `&#x2709;&#xFE0F; ${user.email}`;
+    }
+
+    // Inject Sign Out button in the header if it doesn't exist
+    let signOutBtn = header ? header.querySelector('.btn-sign-out') : null;
+    if (header && !signOutBtn) {
+      const headerContent = header.querySelector('.profile-header-content');
+      if (headerContent) {
+        headerContent.insertAdjacentHTML('beforeend', `
+          <button class="btn btn-outline btn-sign-out" onclick="WowFirebase.logout()" style="margin-left: auto; border-color: rgba(255,255,255,0.3); color: white; background: transparent; padding: 6px 16px; border-radius: var(--radius-md); font-family: var(--font-accent); cursor: pointer; transition: all var(--duration-fast);">
+            🚪 Sign Out
+          </button>
+        `);
+      }
+    }
+
+    // Seed demo pets if none exist
     if (WowStore.getPets().length === 0) {
       defaultPets.forEach(p => WowStore.savePet(p));
     }
@@ -337,5 +416,9 @@ const ProfilePage = (() => {
     container.innerHTML = `<div class="product-grid">${products.map(p => WowApp.renderProductCard(p)).join('')}</div>`;
   }
 
-  return { init, switchTab, openAddPet: openAddPet, editPet, savePet, deletePet, closeModal, redeemReward, reorder };
+  // Listen for login/logout events to dynamically refresh page content
+  window.addEventListener('userLoggedIn', () => { init(); });
+  window.addEventListener('userLoggedOut', () => { init(); });
+
+  return { init, switchTab, openAddPet, editPet, savePet, deletePet, closeModal, redeemReward, reorder };
 })();

@@ -11,6 +11,63 @@ const CheckoutPage = (() => {
       window.location.href = 'cart.html';
       return;
     }
+
+    const user = typeof WowFirebase !== 'undefined' ? WowFirebase.getCurrentUser() : null;
+    if (!user) {
+      document.getElementById('progress-steps').style.display = 'none';
+      document.getElementById('checkout-steps').innerHTML = `
+        <div class="empty-state" style="padding: var(--space-8); text-align: center; background: var(--glass-bg); border-radius: var(--radius-xl); border: 1px solid var(--glass-border); box-shadow: var(--shadow-lg);">
+          <div class="empty-state-icon" style="font-size: 48px; margin-bottom: var(--space-4);">🔒</div>
+          <h3 style="font-size: var(--fs-xl); margin-bottom: var(--space-2); font-weight: var(--fw-bold);">Sign In to Checkout</h3>
+          <p class="text-muted mb-6" style="font-size: var(--fs-sm); line-height: var(--lh-relaxed);">Please sign in or create an account to complete your checkout. We will save your shipping details and link loyalty points directly to your profile.</p>
+          <button class="btn btn-primary btn-lg" onclick="WowApp.showAuthModal()" style="width: 100%; font-family: var(--font-accent); font-weight: var(--fw-bold);">Sign In / Create Account</button>
+        </div>
+      `;
+      // Reload on successful sign in
+      window.addEventListener('userLoggedIn', () => {
+        window.location.reload();
+      }, { once: true });
+      return;
+    }
+
+    // Pre-fill profile info if exists
+    document.getElementById('progress-steps').style.display = 'flex';
+    const emailField = document.getElementById('email');
+    if (emailField) emailField.value = user.email || '';
+
+    try {
+      const profile = JSON.parse(localStorage.getItem('wow_profile_info'));
+      if (profile) {
+        if (profile.name) {
+          const names = profile.name.split(' ');
+          const fName = document.getElementById('firstName');
+          const lName = document.getElementById('lastName');
+          if (fName) fName.value = names[0] || '';
+          if (lName) lName.value = names.slice(1).join(' ') || '';
+        }
+        if (profile.phone) {
+          const phField = document.getElementById('phone');
+          if (phField) phField.value = profile.phone;
+        }
+        if (profile.address) {
+          const addrField = document.getElementById('address');
+          if (addrField) addrField.value = profile.address;
+        }
+        if (profile.city) {
+          const cityField = document.getElementById('city');
+          if (cityField) cityField.value = profile.city;
+        }
+        if (profile.state) {
+          const stateField = document.getElementById('state');
+          if (stateField) stateField.value = profile.state;
+        }
+        if (profile.zip) {
+          const zipField = document.getElementById('zip');
+          if (zipField) zipField.value = profile.zip;
+        }
+      }
+    } catch (e) {}
+
     renderSummary();
     formatCardInput();
   }
@@ -177,9 +234,30 @@ const CheckoutPage = (() => {
     const pointsEarned = Math.floor(totals.total * 4);
     const orderNum = '#WOW-' + (1000 + Math.floor(Math.random() * 9000));
 
-    // Save order
+    // Save shipping profile details
+    try {
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const phone = document.getElementById('phone').value;
+      const address = document.getElementById('address').value;
+      const city = document.getElementById('city').value;
+      const state = document.getElementById('state').value;
+      const zip = document.getElementById('zip').value;
+      
+      const profileInfo = {
+        name: `${firstName} ${lastName}`.trim(),
+        phone,
+        address,
+        city,
+        state,
+        zip
+      };
+      localStorage.setItem('wow_profile_info', JSON.stringify(profileInfo));
+      localStorage.setItem('wow_checkout_email', document.getElementById('email').value);
+    } catch(e) {}
+
     const cart = WowStore.getCart();
-    WowStore.addOrder({
+    const order = {
       id: orderNum,
       date: new Date().toISOString().split('T')[0],
       status: 'shipping',
@@ -194,7 +272,15 @@ const CheckoutPage = (() => {
       }),
       total: totals.total,
       pointsEarned
-    });
+    };
+
+    // Save order
+    WowStore.addOrder(order);
+
+    // Save transaction to root orders collection
+    if (typeof WowFirebase !== 'undefined') {
+      WowFirebase.writeOrderToRootDb(order);
+    }
 
     // Add loyalty points
     WowStore.addLoyaltyPoints(pointsEarned, `Purchase — Order ${orderNum}`);

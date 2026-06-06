@@ -241,7 +241,9 @@ const WowApp = (() => {
         </div>
         <div class="nav-actions">
           <button class="nav-action-btn" id="dark-mode-btn" onclick="WowApp.toggleDarkMode()" title="Toggle dark mode" style="font-size:18px;">🌙</button>
-          <a href="profile.html" class="nav-action-btn" title="My Profile" style="position:relative;">👤</a>
+          <div id="nav-profile-slot" style="display: inline-block;">
+            <a href="profile.html" class="nav-action-btn" title="My Profile">👤</a>
+          </div>
           <a href="cart.html" class="nav-action-btn" title="Cart" id="cart-btn" style="position:relative;">
             🛒
             <span class="cart-count" style="display: none;">0</span>
@@ -266,7 +268,7 @@ const WowApp = (() => {
       <a href="journey.html" class="mobile-nav-link"><span class="link-icon">🪐</span> Solar Journey</a>
       <a href="game.html" class="mobile-nav-link"><span class="link-icon">🧠</span> Play & Learn</a>
       <a href="subscribe.html" class="mobile-nav-link"><span class="link-icon">🔄</span> Subscribe & Save</a>
-      <a href="profile.html" class="mobile-nav-link"><span class="link-icon">👤</span> My Profile</a>
+      <a href="profile.html" id="mobile-profile-link" class="mobile-nav-link"><span class="link-icon">👤</span> My Profile</a>
       <a href="cart.html" class="mobile-nav-link"><span class="link-icon">🛒</span> Cart</a>
     </div>`;
   }
@@ -396,6 +398,359 @@ const WowApp = (() => {
     });
   }
 
+  // ---- Script Loader Helpers ----
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) {
+        resolve();
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+      document.body.appendChild(s);
+    });
+  }
+
+  function loadStyle(href) {
+    if (document.querySelector(`link[href="${href}"]`)) return;
+    const l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = href;
+    document.head.appendChild(l);
+  }
+
+  async function loadFirebaseAssets() {
+    loadStyle("css/auth-modal.css");
+    try {
+      await loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js");
+      await Promise.all([
+        loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"),
+        loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js")
+      ]);
+      await loadScript("js/firebase-db.js");
+      
+      WowFirebase.init();
+      injectAuthModal();
+      setupAuthListeners();
+    } catch (err) {
+      console.error("🐾 [WowPetStore] Failed to load Firebase assets:", err);
+    }
+  }
+
+  function injectAuthModal() {
+    if (document.getElementById('auth-modal')) return;
+    const modalHTML = `
+    <div class="modal-overlay" id="auth-modal">
+      <div class="modal auth-modal">
+        <div class="modal-header" style="border-bottom:none; padding-bottom:0;">
+          <button class="modal-close" onclick="WowApp.closeAuthModal()" style="margin-left:auto;">&#x2715;</button>
+        </div>
+        <div class="auth-header-logo">
+          <span>&#x1F43E;</span> Wow<span class="logo-accent">Pet</span>Store
+        </div>
+        
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-signin" onclick="WowApp.switchAuthTab('signin')">Sign In</button>
+          <button class="auth-tab" id="tab-signup" onclick="WowApp.switchAuthTab('signup')">Create Account</button>
+        </div>
+
+        <div class="auth-error-msg" id="auth-error">
+          <span>&#x26A0;&#xFE0F;</span> <span id="auth-error-text"></span>
+        </div>
+
+        <form class="auth-form active" id="form-signin" onsubmit="WowApp.handleAuthSubmit(event, 'signin')">
+          <div class="auth-input-wrapper">
+            <span class="input-icon">&#x2709;&#xFE0F;</span>
+            <input type="email" placeholder="Email Address" id="signin-email" required>
+          </div>
+          <div class="auth-input-wrapper">
+            <span class="input-icon">&#x1F512;</span>
+            <input type="password" placeholder="Password" id="signin-password" required>
+          </div>
+          <div class="auth-form-footer">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="signin-remember"> Remember me
+            </label>
+            <button type="button" class="auth-forgot-link" onclick="WowApp.toggleForgotPassword(true)">Forgot Password?</button>
+          </div>
+          <button type="submit" class="auth-btn-submit" id="btn-signin-submit">
+            <span>Sign In</span>
+          </button>
+        </form>
+
+        <form class="auth-form" id="form-signup" onsubmit="WowApp.handleAuthSubmit(event, 'signup')">
+          <div class="auth-input-wrapper">
+            <span class="input-icon">&#x1F464;</span>
+            <input type="text" placeholder="Full Name" id="signup-name" required>
+          </div>
+          <div class="auth-input-wrapper">
+            <span class="input-icon">&#x2709;&#xFE0F;</span>
+            <input type="email" placeholder="Email Address" id="signup-email" required>
+          </div>
+          <div class="auth-input-wrapper">
+            <span class="input-icon">&#x1F512;</span>
+            <input type="password" placeholder="Password" id="signup-password" required minlength="6">
+          </div>
+          <button type="submit" class="auth-btn-submit" id="btn-signup-submit">
+            <span>Create Account</span>
+          </button>
+        </form>
+
+        <form class="auth-form" id="form-forgot" onsubmit="WowApp.handlePasswordReset(event)">
+          <h3 style="font-size:var(--fs-base); margin-bottom:var(--space-2); text-align:center;">Reset Password</h3>
+          <p style="color:var(--color-text-muted); font-size:var(--fs-xs); margin-bottom:var(--space-4); text-align:center; line-height:var(--lh-relaxed);">Enter your email address and we'll send you a link to reset your password.</p>
+          <div class="auth-input-wrapper">
+            <span class="input-icon">&#x2709;&#xFE0F;</span>
+            <input type="email" placeholder="Email Address" id="forgot-email" required>
+          </div>
+          <button type="submit" class="auth-btn-submit" id="btn-forgot-submit" style="margin-bottom:var(--space-3);">
+            <span>Send Reset Link</span>
+          </button>
+          <button type="button" class="btn btn-ghost" style="width:100%; font-size:var(--fs-xs);" onclick="WowApp.toggleForgotPassword(false)">Back to Sign In</button>
+        </form>
+
+        <div id="auth-social-divider" class="auth-divider">or sign in with</div>
+
+        <div id="auth-social-buttons" class="auth-social-container">
+          <button class="auth-social-btn google" onclick="WowApp.handleSocialAuth('google')">
+            <span class="social-icon">G</span> Sign in with Google
+          </button>
+          <button class="auth-social-btn facebook" onclick="WowApp.handleSocialAuth('facebook')">
+            <span class="social-icon">&#x1F4D8;</span> Sign in with Facebook
+          </button>
+          <button class="auth-social-btn apple" onclick="WowApp.handleSocialAuth('apple')">
+            <span class="social-icon">&#x1F34E;</span> Sign in with Apple
+          </button>
+        </div>
+
+        <div class="auth-switch-msg" id="auth-switch-prompt" style="padding-bottom: var(--space-6);">
+          Don't have an account? <button onclick="WowApp.switchAuthTab('signup')">Create one</button>
+        </div>
+      </div>
+    </div>`;
+    const div = document.createElement('div');
+    div.innerHTML = modalHTML;
+    document.body.appendChild(div.firstElementChild);
+  }
+
+  function showAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+      modal.classList.add('open');
+      switchAuthTab('signin');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+      document.getElementById('auth-error').classList.remove('show');
+      document.getElementById('form-signin').reset();
+      document.getElementById('form-signup').reset();
+      document.getElementById('form-forgot').reset();
+    }
+  }
+
+  function switchAuthTab(tab) {
+    const errorEl = document.getElementById('auth-error');
+    if (errorEl) errorEl.classList.remove('show');
+    
+    const tabSignin = document.getElementById('tab-signin');
+    const tabSignup = document.getElementById('tab-signup');
+    const formSignin = document.getElementById('form-signin');
+    const formSignup = document.getElementById('form-signup');
+    const formForgot = document.getElementById('form-forgot');
+    const socialDivider = document.getElementById('auth-social-divider');
+    const socialButtons = document.getElementById('auth-social-buttons');
+    const switchPrompt = document.getElementById('auth-switch-prompt');
+
+    if (tabSignin) tabSignin.classList.toggle('active', tab === 'signin');
+    if (tabSignup) tabSignup.classList.toggle('active', tab === 'signup');
+    if (formSignin) formSignin.classList.toggle('active', tab === 'signin');
+    if (formSignup) formSignup.classList.toggle('active', tab === 'signup');
+    if (formForgot) formForgot.classList.toggle('active', tab === 'forgot');
+    
+    if (socialDivider) socialDivider.style.display = tab === 'forgot' ? 'none' : 'flex';
+    if (socialButtons) socialButtons.style.display = tab === 'forgot' ? 'none' : 'flex';
+    
+    if (switchPrompt) {
+      if (tab === 'signin') {
+        switchPrompt.innerHTML = `Don't have an account? <button type="button" onclick="WowApp.switchAuthTab('signup')">Create one</button>`;
+        switchPrompt.style.display = 'block';
+      } else if (tab === 'signup') {
+        switchPrompt.innerHTML = `Already have an account? <button type="button" onclick="WowApp.switchAuthTab('signin')">Sign In</button>`;
+        switchPrompt.style.display = 'block';
+      } else {
+        switchPrompt.style.display = 'none';
+      }
+    }
+  }
+
+  function toggleForgotPassword(show) {
+    const errorEl = document.getElementById('auth-error');
+    if (errorEl) errorEl.classList.remove('show');
+    
+    const formSignin = document.getElementById('form-signin');
+    const formSignup = document.getElementById('form-signup');
+    const formForgot = document.getElementById('form-forgot');
+
+    if (show) {
+      if (formSignin) formSignin.classList.remove('active');
+      if (formSignup) formSignup.classList.remove('active');
+      if (formForgot) formForgot.classList.add('active');
+      switchAuthTab('forgot');
+    } else {
+      switchAuthTab('signin');
+    }
+  }
+
+  async function handleAuthSubmit(event, action) {
+    event.preventDefault();
+    const errorEl = document.getElementById('auth-error');
+    const errorText = document.getElementById('auth-error-text');
+    const submitBtn = document.getElementById(`btn-${action}-submit`);
+    
+    if (errorEl) errorEl.classList.remove('show');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.dataset.original = submitBtn.innerHTML;
+      submitBtn.innerHTML = `<span class="auth-loading-spinner"></span> <span>Loading...</span>`;
+    }
+    
+    try {
+      if (action === 'signin') {
+        const email = document.getElementById('signin-email').value;
+        const password = document.getElementById('signin-password').value;
+        await WowFirebase.signInWithEmail(email, password);
+        showToast('Successfully signed in!', '🎉');
+      } else if (action === 'signup') {
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        await WowFirebase.signUpWithEmail(email, password, name);
+        showToast(`Welcome to the pack, ${name}! 🎉`, '🐾');
+      }
+      closeAuthModal();
+    } catch (err) {
+      if (errorText) errorText.textContent = err.message || 'An error occurred. Please try again.';
+      if (errorEl) errorEl.classList.add('show');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = submitBtn.dataset.original;
+      }
+    }
+  }
+
+  async function handlePasswordReset(event) {
+    event.preventDefault();
+    const errorEl = document.getElementById('auth-error');
+    const errorText = document.getElementById('auth-error-text');
+    const submitBtn = document.getElementById('btn-forgot-submit');
+    const email = document.getElementById('forgot-email').value;
+    
+    if (errorEl) errorEl.classList.remove('show');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.dataset.original = submitBtn.innerHTML;
+      submitBtn.innerHTML = `<span class="auth-loading-spinner"></span> <span>Loading...</span>`;
+    }
+    
+    try {
+      await WowFirebase.sendPasswordReset(email);
+      showToast('Password reset link sent to your email!', '✉️');
+      toggleForgotPassword(false);
+    } catch (err) {
+      if (errorText) errorText.textContent = err.message || 'Failed to send reset link. Please try again.';
+      if (errorEl) errorEl.classList.add('show');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = submitBtn.dataset.original;
+      }
+    }
+  }
+
+  async function handleSocialAuth(provider) {
+    const errorEl = document.getElementById('auth-error');
+    const errorText = document.getElementById('auth-error-text');
+    if (errorEl) errorEl.classList.remove('show');
+    
+    try {
+      let result;
+      if (provider === 'google') {
+        result = await WowFirebase.signInWithGoogle();
+      } else if (provider === 'facebook') {
+        result = await WowFirebase.signInWithFacebook();
+      } else if (provider === 'apple') {
+        result = await WowFirebase.signInWithApple();
+      }
+      const name = result?.user?.displayName || 'Pet Parent';
+      showToast(`Welcome back, ${name}! 🎉`, '🐾');
+      closeAuthModal();
+    } catch (err) {
+      if (errorText) errorText.textContent = err.message || 'Social sign-in failed. Please try again.';
+      if (errorEl) errorEl.classList.add('show');
+    }
+  }
+
+  function setupAuthListeners() {
+    WowFirebase.onAuthStateChanged((user) => {
+      updateNavProfileSlot(user);
+    });
+  }
+
+  function updateNavProfileSlot(user) {
+    const slot = document.getElementById('nav-profile-slot');
+    const mobileLink = document.getElementById('mobile-profile-link');
+    
+    if (slot) {
+      if (user) {
+        const name = user.displayName || 'Pet Parent';
+        slot.innerHTML = `
+          <div class="profile-dropdown-container">
+            <a href="profile.html" class="nav-action-btn" title="My Profile">👤</a>
+            <div class="profile-dropdown-menu">
+              <div class="profile-dropdown-header">Hello, <span id="nav-user-name">${name}</span></div>
+              <a href="profile.html">🐾 My Profile</a>
+              <a href="profile.html#subscriptions">🔄 Subscriptions</a>
+              <button onclick="WowFirebase.logout()">🚪 Sign Out</button>
+            </div>
+          </div>
+        `;
+      } else {
+        slot.innerHTML = `
+          <a href="#" onclick="event.preventDefault(); WowApp.showAuthModal();" class="nav-action-btn" title="Sign In">👤</a>
+        `;
+      }
+    }
+    
+    if (mobileLink) {
+      if (user) {
+        mobileLink.href = "profile.html";
+        mobileLink.onclick = null;
+      } else {
+        mobileLink.href = "#";
+        mobileLink.onclick = (e) => {
+          e.preventDefault();
+          const btn = document.querySelector('.mobile-menu-btn');
+          const menu = document.querySelector('.mobile-menu');
+          if (btn && menu) {
+            btn.classList.remove('active');
+            menu.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+          showAuthModal();
+        };
+      }
+    }
+  }
+
   // ---- Init ----
   function init(activePage = '') {
     // Inject nav & footer
@@ -423,6 +778,9 @@ const WowApp = (() => {
     if (typeof WowSocialProof !== 'undefined') WowSocialProof.init();
     if (typeof WowStreak !== 'undefined') WowStreak.init();
     if (typeof WowSpinWheel !== 'undefined') WowSpinWheel.init();
+
+    // Load Firebase assets dynamically
+    loadFirebaseAssets();
   }
 
   return {
@@ -435,6 +793,13 @@ const WowApp = (() => {
     getFooterHTML,
     toggleDarkMode,
     trackRecentlyViewed,
-    renderRecentlyViewed
+    renderRecentlyViewed,
+    showAuthModal,
+    closeAuthModal,
+    switchAuthTab,
+    handleAuthSubmit,
+    handleSocialAuth,
+    handlePasswordReset,
+    toggleForgotPassword
   };
 })();
