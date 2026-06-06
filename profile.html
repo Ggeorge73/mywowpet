@@ -117,6 +117,19 @@
     </div>
   </div>
 
+  <!-- Order Details Modal -->
+  <div class="modal-overlay" id="order-modal">
+    <div class="modal" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 id="order-modal-title">Order Details</h3>
+        <button class="modal-close" onclick="ProfilePage.closeOrderModal()">&#x2715;</button>
+      </div>
+      <div class="modal-body" id="order-modal-body" style="padding: var(--space-6);">
+        <!-- Details injected dynamically -->
+      </div>
+    </div>
+  </div>
+
   <div id="footer-slot"></div>
 
   <script src="js/store.js"></script>

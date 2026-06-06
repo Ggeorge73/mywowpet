@@ -439,3 +439,109 @@
 [data-theme="dark"] .profile-dropdown-menu button:hover {
   background: rgba(255, 255, 255, 0.08);
 }
+
+/* ---- Order Tracking Timeline ---- */
+.order-timeline-container {
+  padding: var(--space-4) 0 var(--space-8);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+[data-theme="dark"] .order-timeline-container {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.order-timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-top: 30px;
+}
+
+.order-timeline::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-border-light);
+  z-index: 1;
+}
+
+[data-theme="dark"] .order-timeline::before {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.order-timeline-progress {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  height: 4px;
+  background: var(--color-secondary);
+  z-index: 2;
+  transition: width 0.6s ease;
+}
+
+.timeline-step {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.timeline-step-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 3px solid var(--color-border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: var(--fw-bold);
+  color: var(--color-text-muted);
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .timeline-step-circle {
+  background: #1e1e1e;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.timeline-step.completed .timeline-step-circle {
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: white;
+}
+
+.timeline-step.active .timeline-step-circle {
+  background: var(--color-surface);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+  box-shadow: 0 0 0 4px rgba(107, 197, 160, 0.2);
+}
+
+[data-theme="dark"] .timeline-step.active .timeline-step-circle {
+  background: #1e1e1e;
+  box-shadow: 0 0 0 4px rgba(107, 197, 160, 0.3);
+}
+
+.timeline-step-label {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wide);
+  transition: color 0.3s ease;
+}
+
+.timeline-step.active .timeline-step-label,
+.timeline-step.completed .timeline-step-label {
+  color: var(--color-text);
+}

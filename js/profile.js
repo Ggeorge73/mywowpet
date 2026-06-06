@@ -54,17 +54,19 @@ const ProfilePage = (() => {
           <div class="profile-tab" onclick="ProfilePage.switchTab('orders')">&#x1F4E6; Orders</div>
           <div class="profile-tab" onclick="ProfilePage.switchTab('subscriptions')">&#x1F504; Subscriptions</div>
           <div class="profile-tab" onclick="ProfilePage.switchTab('wishlist')">&#x2764;&#xFE0F; Wishlist</div>
+          <div class="profile-tab" onclick="ProfilePage.switchTab('settings')">&#x2699;&#xFE0F; Settings</div>
         </div>
         <div class="profile-section active" id="section-pets"></div>
         <div class="profile-section" id="section-loyalty"></div>
         <div class="profile-section" id="section-orders"></div>
         <div class="profile-section" id="section-subscriptions"></div>
         <div class="profile-section" id="section-wishlist"></div>
+        <div class="profile-section" id="section-settings"></div>
       `;
 
       // Re-bind click event handlers for newly injected tabs
       document.querySelectorAll('.profile-tab').forEach((t, i) => {
-        const tabList = ['pets', 'loyalty', 'orders', 'subscriptions', 'wishlist'];
+        const tabList = ['pets', 'loyalty', 'orders', 'subscriptions', 'wishlist', 'settings'];
         t.onclick = () => switchTab(tabList[i]);
       });
     }
@@ -102,16 +104,18 @@ const ProfilePage = (() => {
     renderOrders();
     renderSubscriptions();
     renderWishlist();
+    renderSettings();
   }
 
   function switchTab(tab) {
     activeTab = tab;
     document.querySelectorAll('.profile-tab').forEach((t, i) => {
-      const tabs = ['pets', 'loyalty', 'orders', 'subscriptions', 'wishlist'];
+      const tabs = ['pets', 'loyalty', 'orders', 'subscriptions', 'wishlist', 'settings'];
       t.classList.toggle('active', tabs[i] === tab);
     });
     document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
-    document.getElementById(`section-${tab}`).classList.add('active');
+    const section = document.getElementById(`section-${tab}`);
+    if (section) section.classList.add('active');
   }
 
   function renderTierBadge() {
@@ -335,7 +339,7 @@ const ProfilePage = (() => {
         ${orders.map(order => {
           const statusClass = order.status === 'delivered' ? 'delivered' : 'shipping';
           return `
-            <div class="order-card">
+            <div class="order-card" onclick="ProfilePage.openOrderDetails('${order.id}')" style="cursor: pointer; transition: transform var(--duration-fast), box-shadow var(--duration-fast);" onmouseenter="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-md)';" onmouseleave="this.style.transform=''; this.style.boxShadow='';">
               <div class="order-card-header">
                 <span class="order-id">${order.id}</span>
                 <span class="order-date">${order.date}</span>
@@ -349,7 +353,7 @@ const ProfilePage = (() => {
                 }).join('')}
                 ${order.items.length > 4 ? `<div class="order-item-thumb" style="background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; font-size: var(--fs-xs); color: var(--color-text-muted);">+${order.items.length - 4}</div>` : ''}
               </div>
-              <div class="flex justify-between items-center">
+              <div class="flex justify-between items-center" onclick="event.stopPropagation();">
                 <span class="order-total">Total: ${WowStore.formatPrice(order.total)}</span>
                 <div class="flex gap-2">
                   <span class="text-sm" style="color: var(--color-primary);">⭐ +${order.pointsEarned} pts</span>
@@ -416,9 +420,253 @@ const ProfilePage = (() => {
     container.innerHTML = `<div class="product-grid">${products.map(p => WowApp.renderProductCard(p)).join('')}</div>`;
   }
 
+  // ---- Order Details Modal ----
+  function openOrderDetails(orderId) {
+    const orders = WowStore.getOrders();
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
+
+    const modal = document.getElementById('order-modal');
+    const body = document.getElementById('order-modal-body');
+    if (!modal || !body) return;
+
+    const statuses = ['ordered', 'processing', 'shipping', 'delivered'];
+    let statusIndex = statuses.indexOf(order.status);
+    if (statusIndex === -1) statusIndex = 2; // fallback to shipping
+
+    const steps = [
+      { label: 'Ordered', icon: '📝' },
+      { label: 'Processing', icon: '⚙️' },
+      { label: 'Shipped', icon: '🚚' },
+      { label: 'Delivered', icon: '🎁' }
+    ];
+
+    const timelineHtml = `
+      <div class="order-timeline-container">
+        <div class="font-semibold text-center mb-1" style="font-family: var(--font-accent); font-size: 13px;">Status: <span style="color: var(--color-secondary); font-weight: bold;">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span></div>
+        <div class="order-timeline">
+          <div class="order-timeline-progress" style="width: ${(statusIndex / (steps.length - 1)) * 100}%;"></div>
+          ${steps.map((step, idx) => {
+            let stateClass = '';
+            let circleContent = step.icon;
+            if (idx < statusIndex) {
+              stateClass = 'completed';
+              circleContent = '✓';
+            } else if (idx === statusIndex) {
+              stateClass = 'active';
+            }
+            return `
+              <div class="timeline-step ${stateClass}">
+                <div class="timeline-step-circle">${circleContent}</div>
+                <div class="timeline-step-label">${step.label}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+
+    const itemsHtml = order.items.map(item => {
+      const product = WowStore.getProduct(item.productId);
+      if (!product) return '';
+      return `
+        <div class="flex items-center gap-4 py-3" style="border-bottom: 1px solid var(--color-border-light);">
+          <div style="width: 52px; height: 52px; background: ${WowStore.generateProductGradient(product)}; border-radius: var(--radius-md); overflow: hidden; flex-shrink: 0;">
+            <img src="${WowStore.getProductImage(product)}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;">
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div class="font-semibold truncate text-sm">${product.name}</div>
+            <div class="text-xs text-muted">Qty: ${item.qty} · ${WowStore.formatPrice(item.price || product.price)}</div>
+          </div>
+          <span class="font-semibold text-sm">${WowStore.formatPrice((item.price || product.price) * item.qty)}</span>
+        </div>
+      `;
+    }).join('');
+
+    const subtotal = order.items.reduce((s, item) => s + (item.price || 0) * item.qty, 0);
+    const shipping = subtotal >= 49 ? 0 : 5.99;
+    const tax = subtotal * 0.08;
+
+    let profile = { name: 'Pet Parent', phone: '', address: '123 Pet Lane, San Francisco, CA 94105' };
+    try {
+      const saved = JSON.parse(localStorage.getItem('wow_profile_info'));
+      if (saved) {
+        profile = {
+          name: saved.name || 'Pet Parent',
+          phone: saved.phone || '',
+          address: `${saved.address || ''}, ${saved.city || ''}, ${saved.state || ''} ${saved.zip || ''}`
+        };
+      }
+    } catch(e) {}
+
+    body.innerHTML = `
+      ${timelineHtml}
+      
+      <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--space-6); margin-top: var(--space-6); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border-light);">
+        <!-- Invoice Details -->
+        <div>
+          <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: var(--ls-wide); color: var(--color-text-muted); margin-bottom: var(--space-3); font-family: var(--font-accent);">Order Summary</h4>
+          <div class="summary-row text-xs" style="display:flex; justify-content:between; margin-bottom:4px; font-family:var(--font-accent); color:var(--color-text-secondary);"><span>Subtotal</span><span style="margin-left:auto;">${WowStore.formatPrice(subtotal)}</span></div>
+          <div class="summary-row text-xs" style="display:flex; justify-content:between; margin-bottom:4px; font-family:var(--font-accent); color:var(--color-text-secondary);"><span>Shipping</span><span style="margin-left:auto;">${shipping === 0 ? 'FREE' : WowStore.formatPrice(shipping)}</span></div>
+          <div class="summary-row text-xs" style="display:flex; justify-content:between; margin-bottom:4px; font-family:var(--font-accent); color:var(--color-text-secondary);"><span>Tax</span><span style="margin-left:auto;">${WowStore.formatPrice(tax)}</span></div>
+          <div class="summary-row text-sm font-bold" style="display:flex; justify-content:between; border-top: 1px solid var(--color-border-light); padding-top:4px; margin-top:4px; font-family:var(--font-accent); font-size: 14px;"><span>Total</span><span style="margin-left:auto;">${WowStore.formatPrice(order.total || total)}</span></div>
+          
+          <div style="margin-top: var(--space-4); padding: var(--space-2); background: rgba(var(--color-primary-rgb), 0.08); border-radius: var(--radius-md); text-align: center;">
+            <span style="font-size: 11px; color: var(--color-primary-dark); font-family: var(--font-accent);">⭐ Points Earned: <strong>+${order.pointsEarned}</strong></span>
+          </div>
+        </div>
+
+        <!-- Shipping Details -->
+        <div style="border-left: 1px solid var(--color-border-light); padding-left: var(--space-6);">
+          <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: var(--ls-wide); color: var(--color-text-muted); margin-bottom: var(--space-3); font-family: var(--font-accent);">Shipping Address</h4>
+          <div class="text-xs font-semibold mb-1" style="font-family: var(--font-accent);">${profile.name}</div>
+          <p class="text-xs text-muted mb-2" style="line-height: var(--lh-relaxed); font-family: var(--font-accent);">${profile.address}</p>
+          ${profile.phone ? `<div class="text-xs text-muted mb-3" style="font-family: var(--font-accent);">📞 ${profile.phone}</div>` : ''}
+          
+          <div style="padding: 6px var(--space-3); background: var(--color-bg-alt); border-radius: var(--radius-md); font-size: 10px; font-family: var(--font-accent); line-height: 1.4;">
+            🚚 <strong>Carrier:</strong> FedEx Express<br>
+            📦 <strong>Tracking:</strong> WOW-${orderId.replace(/\D/g, '') || '940382'}
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: var(--space-4);">
+        <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: var(--ls-wide); color: var(--color-text-muted); margin-bottom: var(--space-2); font-family: var(--font-accent);">Items Ordered</h4>
+        <div style="max-height: 160px; overflow-y: auto;">
+          ${itemsHtml}
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap: var(--space-3); margin-top: var(--space-5); padding-top: var(--space-3); border-top: 1px solid var(--color-border-light);">
+        <button class="btn btn-secondary btn-sm" onclick="ProfilePage.closeOrderModal()">Close</button>
+        <button class="btn btn-primary btn-sm" onclick="ProfilePage.reorder(${JSON.stringify(order.items).replace(/"/g, '&quot;')}); ProfilePage.closeOrderModal();">🔄 Buy Again</button>
+      </div>
+    `;
+
+    document.getElementById('order-modal-title').textContent = `Order Details ${order.id}`;
+    modal.classList.add('open');
+  }
+
+  function closeOrderModal() {
+    const modal = document.getElementById('order-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  // ---- Settings Tab ----
+  function renderSettings() {
+    const container = document.getElementById('section-settings');
+    if (!container) return;
+    
+    let profile = { name: '', phone: '', address: '', city: '', state: '', zip: '' };
+    try {
+      const saved = JSON.parse(localStorage.getItem('wow_profile_info'));
+      if (saved) profile = { ...profile, ...saved };
+    } catch (e) {}
+
+    const user = typeof WowFirebase !== 'undefined' ? WowFirebase.getCurrentUser() : null;
+    if (!profile.name && user) {
+      profile.name = user.displayName || '';
+    }
+
+    container.innerHTML = `
+      <div style="background: var(--color-surface); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-card); max-width: 600px; margin: 0 auto;">
+        <h4 style="margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border-light); padding-bottom: var(--space-2);">⚙️ Profile Settings</h4>
+        <form id="settings-form" onsubmit="ProfilePage.saveSettings(event)">
+          <div class="input-group mb-4">
+            <label for="settings-name">Full Name</label>
+            <input type="text" id="settings-name" value="${profile.name}" placeholder="Your Name" required style="width:100%; padding:var(--space-2) var(--space-3); border:1.5px solid var(--color-border); border-radius:var(--radius-md); background:var(--color-bg); color:var(--color-text);">
+          </div>
+          <div class="input-group mb-4">
+            <label for="settings-phone">Phone Number</label>
+            <input type="tel" id="settings-phone" value="${profile.phone}" placeholder="(555) 123-4567" style="width:100%; padding:var(--space-2) var(--space-3); border:1.5px solid var(--color-border); border-radius:var(--radius-md); background:var(--color-bg); color:var(--color-text);">
+          </div>
+          <div class="input-group mb-4">
+            <label for="settings-address">Street Address</label>
+            <input type="text" id="settings-address" value="${profile.address}" placeholder="123 Pet Lane" style="width:100%; padding:var(--space-2) var(--space-3); border:1.5px solid var(--color-border); border-radius:var(--radius-md); background:var(--color-bg); color:var(--color-text);">
+          </div>
+          <div class="form-row two-col" style="margin-bottom: var(--space-4); display:grid; grid-template-columns:1fr 1fr; gap:var(--space-4);">
+            <div class="input-group">
+              <label for="settings-city">City</label>
+              <input type="text" id="settings-city" value="${profile.city}" placeholder="San Francisco" style="width:100%; padding:var(--space-2) var(--space-3); border:1.5px solid var(--color-border); border-radius:var(--radius-md); background:var(--color-bg); color:var(--color-text);">
+            </div>
+            <div class="input-group">
+              <label for="settings-state">State</label>
+              <select id="settings-state" style="width:100%; padding:var(--space-2) var(--space-3); border:1.5px solid var(--color-border); border-radius:var(--radius-md); background:var(--color-bg); color:var(--color-text);">
+                <option value="">Select...</option>
+                ${['CA', 'NY', 'TX', 'FL', 'IL', 'PA', 'OH', 'GA', 'WA', 'CO'].map(st => {
+                  const labelMap = { CA: 'California', NY: 'New York', TX: 'Texas', FL: 'Florida', IL: 'Illinois', PA: 'Pennsylvania', OH: 'Ohio', GA: 'Georgia', WA: 'Washington', CO: 'Colorado' };
+                  return `<option value="${st}" ${profile.state === st ? 'selected' : ''}>${labelMap[st]}</option>`;
+                }).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="form-row two-col" style="margin-bottom: var(--space-5); display:grid; grid-template-columns:1fr 1fr; gap:var(--space-4);">
+            <div class="input-group">
+              <label for="settings-zip">ZIP Code</label>
+              <input type="text" id="settings-zip" value="${profile.zip}" placeholder="94105" style="width:100%; padding:var(--space-2) var(--space-3); border:1.5px solid var(--color-border); border-radius:var(--radius-md); background:var(--color-bg); color:var(--color-text);">
+            </div>
+            <div></div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="btn-save-settings" style="width: 100%;">Save Profile Details</button>
+        </form>
+      </div>
+    `;
+  }
+
+  async function saveSettings(event) {
+    event.preventDefault();
+    const submitBtn = document.getElementById('btn-save-settings');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+    }
+
+    try {
+      const profileInfo = {
+        name: document.getElementById('settings-name').value.trim(),
+        phone: document.getElementById('settings-phone').value.trim(),
+        address: document.getElementById('settings-address').value.trim(),
+        city: document.getElementById('settings-city').value.trim(),
+        state: document.getElementById('settings-state').value,
+        zip: document.getElementById('settings-zip').value.trim()
+      };
+
+      localStorage.setItem('wow_profile_info', JSON.stringify(profileInfo));
+      
+      const user = typeof WowFirebase !== 'undefined' ? WowFirebase.getCurrentUser() : null;
+      if (user && profileInfo.name && user.displayName !== profileInfo.name) {
+        if (!WowFirebase.isMockMode()) {
+          await user.updateProfile({ displayName: profileInfo.name });
+        } else {
+          user.displayName = profileInfo.name;
+          localStorage.setItem('wow_mock_user', JSON.stringify(user));
+        }
+        
+        const nameEl = document.querySelector('.profile-header h1');
+        if (nameEl) nameEl.textContent = profileInfo.name;
+        const navNameEl = document.getElementById('nav-user-name');
+        if (navNameEl) navNameEl.textContent = profileInfo.name;
+      }
+
+      if (typeof WowStore !== 'undefined') {
+        WowStore.triggerSync();
+      }
+
+      WowApp.showToast('Profile updated successfully!', '🎉');
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+      WowApp.showToast('Error saving profile.', '⚠️');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save Profile Details';
+      }
+    }
+  }
+
   // Listen for login/logout events to dynamically refresh page content
   window.addEventListener('userLoggedIn', () => { init(); });
   window.addEventListener('userLoggedOut', () => { init(); });
 
-  return { init, switchTab, openAddPet, editPet, savePet, deletePet, closeModal, redeemReward, reorder };
+  return { init, switchTab, openAddPet, editPet, savePet, deletePet, closeModal, redeemReward, reorder, openOrderDetails, closeOrderModal, saveSettings };
 })();
