@@ -1,5 +1,5 @@
 /* ============================================
-   WowPetStore — Global App Logic
+   My Wow Pet — Global App Logic
    Nav, search, toasts, cart badge, announcements
    ============================================ */
 
@@ -160,7 +160,7 @@ const WowApp = (() => {
       <div class="container">
         <div class="footer-top">
           <div class="footer-brand">
-            <div class="footer-logo">🐾 Wow<span class="logo-accent">Pet</span>Store</div>
+            <div class="footer-logo">🐾 My Wow <span class="logo-accent">Pet</span></div>
             <p class="footer-desc">Premium pet products curated for the modern pet parent. Because your fur babies deserve the absolute best.</p>
             <div class="footer-social">
               <a href="#" aria-label="Facebook">📘</a>
@@ -201,7 +201,7 @@ const WowApp = (() => {
           </div>
         </div>
         <div class="footer-bottom">
-          <span class="footer-copyright">© 2025 WowPetStore. All rights reserved. Made with ❤️ for pets.</span>
+          <span class="footer-copyright">© 2025 My Wow Pet. All rights reserved. Made with ❤️ for pets.</span>
           <div class="footer-payment-icons">
             <span title="Visa">💳</span>
             <span title="Mastercard">💳</span>
@@ -226,7 +226,7 @@ const WowApp = (() => {
       <div class="container">
         <a href="index.html" class="nav-logo">
           <span class="logo-icon">🐾</span>
-          Wow<span class="logo-accent">Pet</span>Store
+          My Wow <span class="logo-accent">Pet</span>
         </a>
         <div class="nav-links">
           <a href="shop.html" class="nav-link ${activePage === 'shop' ? 'active' : ''}">Shop</a>
@@ -453,7 +453,7 @@ const WowApp = (() => {
       WowFirebase.init();
       setupAuthListeners();
     } catch (err) {
-      console.warn("🐾 [WowPetStore] Failed to load Firebase assets, setting up fallback mock auth service:", err);
+      console.warn("🐾 [My Wow Pet] Failed to load Firebase assets, setting up fallback mock auth service:", err);
       setupMockAuthService();
     }
   }
@@ -597,7 +597,7 @@ const WowApp = (() => {
           <button class="modal-close" onclick="WowApp.closeAuthModal()" style="margin-left:auto;">&#x2715;</button>
         </div>
         <div class="auth-header-logo">
-          <span>&#x1F43E;</span> Wow<span class="logo-accent">Pet</span>Store
+          <span>&#x1F43E;</span> My Wow <span class="logo-accent">Pet</span>
         </div>
         
         <div class="auth-tabs">

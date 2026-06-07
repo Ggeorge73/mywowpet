@@ -711,7 +711,7 @@ const WowStore = (() => {
   // ---- Testimonials ----
   const testimonials = [
     {
-      text: "WowPetStore transformed how I shop for my pets. The Subscribe & Save feature means I never run out of Luna's food, and I save 15% every month!",
+      text: "My Wow Pet transformed how I shop for my pets. The Subscribe & Save feature means I never run out of Luna's food, and I save 15% every month!",
       author: "Jessica R.",
       pet: "Pet Parent of Luna (Labrador)",
       avatar: "👩",

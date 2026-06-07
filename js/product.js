@@ -1,5 +1,5 @@
 /* ============================================
-   WowPetStore — Product Detail Page
+   My Wow Pet — Product Detail Page
    ============================================ */
 
 const ProductPage = (() => {
@@ -34,7 +34,7 @@ const ProductPage = (() => {
           localStorage.setItem('wow_custom_reviews', JSON.stringify(custom));
         }
       } catch (err) {
-        console.error("🐾 [WowPetStore] Failed to fetch cloud reviews on init:", err);
+        console.error("🐾 [My Wow Pet] Failed to fetch cloud reviews on init:", err);
       }
     }
 
@@ -52,7 +52,7 @@ const ProductPage = (() => {
       return;
     }
 
-    document.title = `${product.name} | WowPetStore`;
+    document.title = `${product.name} | My Wow Pet`;
     renderBreadcrumbs();
     renderProduct();
     renderTabs();
@@ -179,7 +179,7 @@ const ProductPage = (() => {
     if (typeof ShopifyBuy !== 'undefined') {
       initShopifyBuyButton(product.shopifyId);
     } else {
-      console.warn("🐾 [WowPetStore] ShopifyBuy SDK not loaded.");
+      console.warn("🐾 [My Wow Pet] ShopifyBuy SDK not loaded.");
     }
   }
 
