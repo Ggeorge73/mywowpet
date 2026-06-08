@@ -1,7 +1,7 @@
 /* ============================================
    My Wow Pet — Cart Page Logic
-   Local cart is retained for browsing/wishlist convenience only.
-   Real payments must use the Shopify Buy Button checkout on product pages.
+   Local cart is retained for browsing/wishlist convenience.
+   Production payment is routed through the approved secure checkout provider.
    ============================================ */
 
 const CartPage = (() => {
@@ -18,7 +18,7 @@ const CartPage = (() => {
 
     document.getElementById('cart-layout').style.display = isEmpty ? 'none' : '';
     document.getElementById('empty-cart').style.display = isEmpty ? '' : 'none';
-    document.getElementById('cart-count-text').textContent = isEmpty ? '' : `${WowStore.getCartCount()} item${WowStore.getCartCount() !== 1 ? 's' : ''} saved in your local cart`;
+    document.getElementById('cart-count-text').textContent = isEmpty ? '' : `${WowStore.getCartCount()} item${WowStore.getCartCount() !== 1 ? 's' : ''} saved in your cart`;
 
     if (isEmpty) return;
 
@@ -80,12 +80,12 @@ const CartPage = (() => {
 
     const pointsEarned = Math.floor(totals.total * 4);
     const firstCartProduct = WowStore.getCart()[0] ? WowStore.getProduct(WowStore.getCart()[0].productId) : null;
-    const shopifyStartUrl = firstCartProduct ? `product.html?id=${firstCartProduct.id}` : 'shop.html';
+    const secureCheckoutStartUrl = firstCartProduct ? `product.html?id=${firstCartProduct.id}` : 'shop.html';
 
     document.getElementById('order-summary').innerHTML = `
       <h3>Saved Cart Summary</h3>
-      <div style="margin-bottom: var(--space-4); padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.10); font-size: var(--fs-sm); line-height: var(--lh-relaxed);">
-        <strong>Shopify checkout only:</strong> Payments are handled through the Shopify Buy Button on product pages. This local cart is for browsing convenience and no longer routes to the custom checkout page.
+      <div style="margin-bottom: var(--space-4); padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid rgba(34, 197, 94, 0.35); background: rgba(34, 197, 94, 0.10); font-size: var(--fs-sm); line-height: var(--lh-relaxed);">
+        <strong>Secure checkout:</strong> To complete your purchase, continue from the product page and use the secure checkout button. Your cart items are saved here for easy review.
       </div>
       <div class="summary-row">
         <span>Estimated Subtotal</span>
@@ -115,7 +115,7 @@ const CartPage = (() => {
       </div>
       ${appliedPromo ? `<div style="font-size: var(--fs-xs); color: var(--color-secondary); margin-bottom: var(--space-4);">✓ Code applied locally: ${appliedPromo.description}</div>` : ''}
 
-      <a href="${shopifyStartUrl}" class="btn btn-primary btn-block btn-lg">Checkout with Shopify</a>
+      <a href="${secureCheckoutStartUrl}" class="btn btn-primary btn-block btn-lg">Continue to Secure Checkout</a>
       <a href="shop.html" class="btn btn-secondary btn-block btn-lg" style="margin-top: var(--space-3);">Continue Shopping</a>
 
       <div style="text-align: center; margin-top: var(--space-4); padding: var(--space-3); background: rgba(var(--color-primary-rgb), 0.06); border-radius: var(--radius-md);">
