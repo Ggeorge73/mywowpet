@@ -1,5 +1,7 @@
 /* ============================================
-   WowPetStore — Cart Page Logic
+   My Wow Pet — Cart Page Logic
+   Local cart is retained for browsing/wishlist convenience only.
+   Real payments must use the Shopify Buy Button checkout on product pages.
    ============================================ */
 
 const CartPage = (() => {
@@ -16,7 +18,7 @@ const CartPage = (() => {
 
     document.getElementById('cart-layout').style.display = isEmpty ? 'none' : '';
     document.getElementById('empty-cart').style.display = isEmpty ? '' : 'none';
-    document.getElementById('cart-count-text').textContent = isEmpty ? '' : `${WowStore.getCartCount()} item${WowStore.getCartCount() !== 1 ? 's' : ''} in your cart`;
+    document.getElementById('cart-count-text').textContent = isEmpty ? '' : `${WowStore.getCartCount()} item${WowStore.getCartCount() !== 1 ? 's' : ''} saved in your local cart`;
 
     if (isEmpty) return;
 
@@ -77,11 +79,16 @@ const CartPage = (() => {
     }
 
     const pointsEarned = Math.floor(totals.total * 4);
+    const firstCartProduct = WowStore.getCart()[0] ? WowStore.getProduct(WowStore.getCart()[0].productId) : null;
+    const shopifyStartUrl = firstCartProduct ? `product.html?id=${firstCartProduct.id}` : 'shop.html';
 
     document.getElementById('order-summary').innerHTML = `
-      <h3>Order Summary</h3>
+      <h3>Saved Cart Summary</h3>
+      <div style="margin-bottom: var(--space-4); padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.10); font-size: var(--fs-sm); line-height: var(--lh-relaxed);">
+        <strong>Shopify checkout only:</strong> Payments are handled through the Shopify Buy Button on product pages. This local cart is for browsing convenience and no longer routes to the custom checkout page.
+      </div>
       <div class="summary-row">
-        <span>Subtotal</span>
+        <span>Estimated Subtotal</span>
         <span>${WowStore.formatPrice(totals.subtotal)}</span>
       </div>
       ${totals.savings > 0 ? `<div class="summary-row savings">
@@ -90,7 +97,7 @@ const CartPage = (() => {
       </div>` : ''}
       ${promoHtml}
       <div class="summary-row">
-        <span>Shipping</span>
+        <span>Estimated Shipping</span>
         <span>${totals.shipping === 0 ? '<span style="color: var(--color-secondary); font-weight: var(--fw-semibold);">FREE</span>' : WowStore.formatPrice(totals.shipping)}</span>
       </div>
       <div class="summary-row">
@@ -98,7 +105,7 @@ const CartPage = (() => {
         <span>${WowStore.formatPrice(totals.tax)}</span>
       </div>
       <div class="summary-row total">
-        <span>Total</span>
+        <span>Estimated Total</span>
         <span>${WowStore.formatPrice(totals.total)}</span>
       </div>
 
@@ -106,15 +113,16 @@ const CartPage = (() => {
         <input type="text" id="promo-input" placeholder="Promo code" value="${activeCode || ''}">
         <button onclick="CartPage.applyPromo()">Apply</button>
       </div>
-      ${appliedPromo ? `<div style="font-size: var(--fs-xs); color: var(--color-secondary); margin-bottom: var(--space-4);">✓ Code applied: ${appliedPromo.description}</div>` : ''}
+      ${appliedPromo ? `<div style="font-size: var(--fs-xs); color: var(--color-secondary); margin-bottom: var(--space-4);">✓ Code applied locally: ${appliedPromo.description}</div>` : ''}
 
-      <a href="checkout.html" class="btn btn-primary btn-block btn-lg">Proceed to Checkout</a>
+      <a href="${shopifyStartUrl}" class="btn btn-primary btn-block btn-lg">Checkout with Shopify</a>
+      <a href="shop.html" class="btn btn-secondary btn-block btn-lg" style="margin-top: var(--space-3);">Continue Shopping</a>
 
       <div style="text-align: center; margin-top: var(--space-4); padding: var(--space-3); background: rgba(var(--color-primary-rgb), 0.06); border-radius: var(--radius-md);">
-        <span style="font-size: var(--fs-sm); color: var(--color-primary-dark);">⭐ You'll earn <strong>${pointsEarned}</strong> loyalty points</span>
+        <span style="font-size: var(--fs-sm); color: var(--color-primary-dark);">⭐ Estimated loyalty points: <strong>${pointsEarned}</strong></span>
       </div>
 
-      ${totals.shipping > 0 ? `<div style="text-align: center; margin-top: var(--space-3); font-size: var(--fs-xs); color: var(--color-text-muted);">Add ${WowStore.formatPrice(49 - totals.subtotal)} more for free shipping!</div>` : ''}
+      ${totals.shipping > 0 ? `<div style="text-align: center; margin-top: var(--space-3); font-size: var(--fs-xs); color: var(--color-text-muted);">Add ${WowStore.formatPrice(49 - totals.subtotal)} more for estimated free shipping.</div>` : ''}
     `;
   }
 
@@ -135,7 +143,7 @@ const CartPage = (() => {
     if (!code) return;
     const promo = WowStore.validatePromo(code);
     if (promo) {
-      WowApp.showToast(`Promo code applied: ${promo.description}`, '🎉');
+      WowApp.showToast(`Promo code applied locally: ${promo.description}`, '🎉');
       renderSummary();
     } else {
       WowApp.showToast('Invalid promo code', '❌');
