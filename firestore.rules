@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function hasOnlyAllowedUserFields() {
+      return request.resource.data.keys().hasOnly([
+        'uid',
+        'email',
+        'createdAt',
+        'updatedAt',
+        'profile',
+        'pets',
+        'cart',
+        'wishlist',
+        'gameHighScore',
+        'streak'
+      ]);
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && request.resource.data.uid == request.auth.uid
+        && hasOnlyAllowedUserFields();
+      allow update: if isOwner(userId)
+        && hasOnlyAllowedUserFields()
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'uid',
+          'email',
+          'createdAt'
+        ]);
+      allow delete: if false;
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.productId is int
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 2000;
+      allow update, delete: if false;
+    }
+
+    match /orders/{orderId} {
+      allow read, write: if false;
+    }
+
+    match /loyalty/{docId} {
+      allow read, write: if false;
+    }
+
+    match /subscriptions/{docId} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
