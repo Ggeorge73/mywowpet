@@ -4,6 +4,18 @@
    ============================================ */
 
 (function () {
+  const LEGACY_FALLBACK_SHOPIFY_ID = '7989696430163';
+
+  function isExplicitShopifyMapping(product) {
+    if (!product || !product.shopifyId) return false;
+
+    // Product 1 is the real owner of the legacy fallback ID. If any other
+    // product receives that ID, it came from the old fallback and must be blocked.
+    if (String(product.shopifyId) === LEGACY_FALLBACK_SHOPIFY_ID && Number(product.id) !== 1) return false;
+
+    return true;
+  }
+
   function renderUnavailable(node, productId) {
     if (!node) return;
     node.innerHTML = `
@@ -26,7 +38,7 @@
       const product = originalGetProduct(id);
       if (!product) return product;
 
-      const explicitShopifyId = product.shopifyId || null;
+      const explicitShopifyId = isExplicitShopifyMapping(product) ? product.shopifyId : null;
       return {
         ...product,
         shopifyId: explicitShopifyId,
@@ -36,7 +48,7 @@
 
     window.WowStore.getShopifyProductId = function getShopifyProductId(id) {
       const product = originalGetProduct(id);
-      return product && product.shopifyId ? product.shopifyId : null;
+      return isExplicitShopifyMapping(product) ? product.shopifyId : null;
     };
 
     window.WowStore.__shopifyMappingGuarded = true;
