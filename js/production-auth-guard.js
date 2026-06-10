@@ -1,6 +1,6 @@
 /* ============================================
    My Wow Pet — Production Auth Guard
-   Blocks mock authentication from being mistaken for real auth in production.
+   Prevents demo authentication from being used on production-like hosts.
    ============================================ */
 
 (function () {
@@ -23,4 +23,59 @@
       console.warn('[My Wow Pet] ' + message);
     }
   };
+
+  function unavailableAuthMethod() {
+    window.WowPetAuthUnavailable();
+    return Promise.reject(new Error('Account service is temporarily unavailable.'));
+  }
+
+  function applyProductionAuthGuard() {
+    if (!isProductionLike || !window.WowFirebase || typeof window.WowFirebase.isMockMode !== 'function') return;
+    if (!window.WowFirebase.isMockMode()) return;
+
+    console.warn('[My Wow Pet] Demo auth is not available on production-like hosts.');
+    try {
+      localStorage.removeItem('wow_mock_auth_user');
+      localStorage.removeItem('wow_mock_user');
+      localStorage.removeItem('wow_mock_database');
+    } catch (e) {}
+
+    window.WowFirebase = {
+      ...window.WowFirebase,
+      signInWithEmail: unavailableAuthMethod,
+      signUpWithEmail: unavailableAuthMethod,
+      signInWithGoogle: unavailableAuthMethod,
+      signInWithFacebook: unavailableAuthMethod,
+      signInWithApple: unavailableAuthMethod,
+      sendPasswordReset: unavailableAuthMethod,
+      logout: function () {
+        try {
+          localStorage.removeItem('wow_mock_auth_user');
+          localStorage.removeItem('wow_mock_user');
+          localStorage.removeItem('wow_mock_database');
+        } catch (e) {}
+        window.dispatchEvent(new CustomEvent('userLoggedOut'));
+        return Promise.resolve();
+      },
+      onAuthStateChanged: function (callback) {
+        if (typeof callback === 'function') callback(null);
+      },
+      getCurrentUser: function () {
+        return null;
+      },
+      isMockMode: function () {
+        return true;
+      }
+    };
+  }
+
+  window.WowPetEnforceProductionAuthGuard = applyProductionAuthGuard;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    applyProductionAuthGuard();
+    const guardTimer = window.setInterval(applyProductionAuthGuard, 500);
+    window.setTimeout(function () {
+      window.clearInterval(guardTimer);
+    }, 10000);
+  });
 })();
