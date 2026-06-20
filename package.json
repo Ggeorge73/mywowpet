@@ -15,9 +15,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",
-    "eslint": "^9.0.0",
-    "@shopify/cli": "^3.75.0",
-    "@shopify/theme": "^3.75.0"
+    "@shopify/cli": "^4.2.0",
+    "eslint": "^9.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
