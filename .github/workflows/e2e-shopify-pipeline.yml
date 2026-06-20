@@ -125,7 +125,6 @@ jobs:
 
     # Per-job environment variables
     env:
-      STOREFRONT_URL: ${{ secrets.STOREFRONT_URL || 'https://mywowpet.com' }}
       # Playwright configuration
       CI: "true"
       PLAYWRIGHT_RETRIES: "2"
@@ -163,6 +162,8 @@ jobs:
       # On failure, the HTML report and results are uploaded as artifacts.
       - name: "▶️ Run Playwright E2E tests"
         id: run-tests
+        env:
+          STOREFRONT_URL: ${{ secrets.STOREFRONT_URL || 'https://mywowpet.com' }}
         run: |
           echo "🌐 Testing against: $STOREFRONT_URL"
           npx playwright test --reporter=html,list
@@ -195,6 +196,8 @@ jobs:
       # -- Summary annotation --
       - name: "📝 Test run summary"
         if: always()
+        env:
+          STOREFRONT_URL: ${{ secrets.STOREFRONT_URL || 'https://mywowpet.com' }}
         run: |
           echo "## 🧪 E2E Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
