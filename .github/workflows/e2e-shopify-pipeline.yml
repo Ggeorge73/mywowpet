@@ -232,8 +232,7 @@ jobs:
     # with required reviewers, deployment branches, and wait timers.
     environment:
       name: production
-      url: ${{ secrets.SHOPIFY_STORE_URL }}
-
+      
     # Deployment needs write access for deployments API
     permissions:
       contents: read
