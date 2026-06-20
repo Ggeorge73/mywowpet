@@ -161,7 +161,7 @@ jobs:
       # The STOREFRONT_URL env var is available to all Playwright tests.
       # On failure, the HTML report and results are uploaded as artifacts.
       - name: "▶️ Run Playwright E2E tests"
-        id: run-tests
+        id: run_tests
         env:
           STOREFRONT_URL: ${{ secrets.STOREFRONT_URL || 'https://mywowpet.com' }}
         run: |
@@ -173,7 +173,7 @@ jobs:
       # The Playwright HTML report provides an interactive, browsable view
       # of all test results, screenshots, and traces for debugging.
       - name: "📊 Upload Playwright HTML report"
-        if: failure() && steps.run-tests.outcome == 'failure'
+        if: failure() && steps.run_tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-html-report-${{ github.run_id }}
@@ -205,7 +205,7 @@ jobs:
           echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Storefront URL | \`$STOREFRONT_URL\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Run ID | \`${{ github.run_id }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Outcome | \`${{ steps.run-tests.outcome }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Outcome | \`${{ steps.run_tests.outcome }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Triggered by | \`${{ github.event_name }}\` on \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
 
   # ==========================================================================
