@@ -172,7 +172,7 @@ jobs:
       # The Playwright HTML report provides an interactive, browsable view
       # of all test results, screenshots, and traces for debugging.
       - name: "📊 Upload Playwright HTML report"
-        if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
+        if: failure() && steps.run-tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-html-report-${{ github.run_id }}
@@ -184,7 +184,7 @@ jobs:
       # Raw test results are uploaded regardless of pass/fail for
       # historical tracking, trend analysis, and compliance auditing.
       - name: "📂 Upload test results"
-        if: ${{ always() }}
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-test-results-${{ github.run_id }}
@@ -194,7 +194,7 @@ jobs:
 
       # -- Summary annotation --
       - name: "📝 Test run summary"
-        if: ${{ always() }}
+        if: always()
         run: |
           echo "## 🧪 E2E Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -222,7 +222,7 @@ jobs:
 
     # -- Gate conditions --
     needs: e2e-tests
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     # -- Environment protection --
     # The "production" environment can be configured in the repo settings
@@ -291,7 +291,7 @@ jobs:
 
       # -- Deployment summary --
       - name: "📝 Deployment summary"
-        if: ${{ always() }}
+        if: always()
         run: |
           echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
