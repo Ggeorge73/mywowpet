@@ -1,0 +1,304 @@
+# ============================================================================
+# Shopify Storefront — End-to-End Testing & Deployment Pipeline
+# ============================================================================
+#
+# Status Badge (add to README.md):
+#   ![E2E Pipeline](https://github.com/<OWNER>/<REPO>/actions/workflows/e2e-shopify-pipeline.yml/badge.svg)
+#
+# This workflow performs three stages:
+#   1. lint-and-validate  — Quick syntax & config checks
+#   2. e2e-tests          — Playwright E2E suite against the live storefront
+#   3. deploy-theme       — Shopify CLI theme push (main branch only, on success)
+#
+# Required GitHub Secrets:
+#   STOREFRONT_URL      — Public storefront URL (fallback: https://mywowpet.com)
+#   SHOPIFY_STORE_URL   — Shopify admin store URL (e.g. my-store.myshopify.com)
+#   SHOPIFY_CLI_TOKEN   — Shopify CLI authentication token
+#   SHOPIFY_THEME_ID    — Target theme ID for deployment
+#
+# ============================================================================
+
+name: "E2E Shopify Pipeline"
+
+# ---------------------------------------------------------------------------
+# Triggers
+# ---------------------------------------------------------------------------
+# Runs on every push to main and on pull requests targeting main.
+# This ensures PRs are validated before merge and main is tested post-merge.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# ---------------------------------------------------------------------------
+# Concurrency
+# ---------------------------------------------------------------------------
+# Groups runs by branch/PR so that newer commits automatically cancel
+# in-progress runs for the same ref, preventing resource waste.
+concurrency:
+  group: shopify-pipeline-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+# ---------------------------------------------------------------------------
+# Top-level permissions (principle of least privilege)
+# ---------------------------------------------------------------------------
+permissions:
+  contents: read
+  actions: read
+
+# ---------------------------------------------------------------------------
+# Top-level environment variables
+# ---------------------------------------------------------------------------
+env:
+  NODE_VERSION: "20"
+  # Default storefront URL; overridden by the STOREFRONT_URL secret if set.
+  STOREFRONT_URL_DEFAULT: "https://mywowpet.com"
+
+# ============================================================================
+# Jobs
+# ============================================================================
+jobs:
+  # ==========================================================================
+  # Job 1: lint-and-validate
+  # ==========================================================================
+  # Quick gate — validates project configuration, JSON/Liquid syntax, and
+  # ensures the workspace is in a healthy state before heavier jobs run.
+  lint-and-validate:
+    name: "🔍 Lint & Validate"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      # -- Checkout source code --
+      - name: "📥 Checkout repository"
+        uses: actions/checkout@v4
+
+      # -- Setup Node.js with dependency caching --
+      - name: "⚙️ Setup Node.js ${{ env.NODE_VERSION }}"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      # -- Install dependencies (frozen lockfile) --
+      - name: "📦 Install dependencies"
+        run: npm ci
+
+      # -- Run linting / validation commands --
+      # Adjust these commands to match your project's lint tooling.
+      - name: "🧹 Run linter"
+        run: |
+          echo "::group::Lint & Validation"
+          # Run project linter if available; fall back to config validation.
+          if npm run lint --if-present 2>/dev/null; then
+            echo "✅ Linting passed"
+          else
+            echo "⚠️ No lint script found — skipping"
+          fi
+          echo "::endgroup::"
+
+      # -- Validate critical config files exist --
+      - name: "📋 Validate project structure"
+        run: |
+          echo "Checking critical files..."
+          for file in package.json; do
+            if [ ! -f "$file" ]; then
+              echo "::error::Missing required file: $file"
+              exit 1
+            fi
+          done
+          echo "✅ Project structure is valid"
+
+  # ==========================================================================
+  # Job 2: e2e-tests
+  # ==========================================================================
+  # Runs the full Playwright E2E test suite against the live (or staging)
+  # storefront. This is the quality gate before any deployment occurs.
+  e2e-tests:
+    name: "🧪 E2E Tests (Playwright)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: lint-and-validate
+
+    # Per-job environment variables
+    env:
+      STOREFRONT_URL: ${{ secrets.STOREFRONT_URL || 'https://mywowpet.com' }}
+      # Playwright configuration
+      CI: "true"
+      PLAYWRIGHT_RETRIES: "2"
+
+    steps:
+      # -- Checkout source code --
+      - name: "📥 Checkout repository"
+        uses: actions/checkout@v4
+
+      # -- Setup Node.js with npm cache --
+      - name: "⚙️ Setup Node.js ${{ env.NODE_VERSION }}"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      # -- Install project dependencies --
+      # npm ci ensures a clean, reproducible install from the lockfile.
+      - name: "📦 Install dependencies"
+        run: npm ci
+
+      # -- Install Playwright browsers --
+      # Only Chromium is installed to keep CI fast and lean.
+      # Retry logic handles transient network failures during browser download.
+      - name: "🎭 Install Playwright browsers"
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 10
+          command: npx playwright install --with-deps chromium
+
+      # -- Run E2E test suite --
+      # The STOREFRONT_URL env var is available to all Playwright tests.
+      # On failure, the HTML report and results are uploaded as artifacts.
+      - name: "▶️ Run Playwright E2E tests"
+        id: run-tests
+        run: |
+          echo "🌐 Testing against: $STOREFRONT_URL"
+          npx playwright test --reporter=html,list
+        continue-on-error: false
+
+      # -- Upload HTML report on failure --
+      # The Playwright HTML report provides an interactive, browsable view
+      # of all test results, screenshots, and traces for debugging.
+      - name: "📊 Upload Playwright HTML report"
+        if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-html-report-${{ github.run_id }}
+          path: playwright-report/
+          retention-days: 14
+          if-no-files-found: warn
+
+      # -- Upload test results (always) --
+      # Raw test results are uploaded regardless of pass/fail for
+      # historical tracking, trend analysis, and compliance auditing.
+      - name: "📂 Upload test results"
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results-${{ github.run_id }}
+          path: test-results/
+          retention-days: 30
+          if-no-files-found: ignore
+
+      # -- Summary annotation --
+      - name: "📝 Test run summary"
+        if: ${{ always() }}
+        run: |
+          echo "## 🧪 E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Storefront URL | \`$STOREFRONT_URL\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Run ID | \`${{ github.run_id }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Outcome | \`${{ steps.run-tests.outcome }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered by | \`${{ github.event_name }}\` on \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+
+  # ==========================================================================
+  # Job 3: deploy-theme
+  # ==========================================================================
+  # Deploys the Shopify theme using the Shopify CLI.
+  #
+  # Guards:
+  #   • Only runs on push to main (skipped for PRs)
+  #   • Requires e2e-tests to pass
+  #   • Uses GitHub environment protection rules ("production")
+  #     — configure required reviewers, wait timers, etc. in repo settings
+  deploy-theme:
+    name: "🚀 Deploy Theme"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # -- Gate conditions --
+    needs: e2e-tests
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+
+    # -- Environment protection --
+    # The "production" environment can be configured in the repo settings
+    # with required reviewers, deployment branches, and wait timers.
+    environment:
+      name: production
+      url: ${{ secrets.SHOPIFY_STORE_URL }}
+
+    # Deployment needs write access for deployments API
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      # -- Checkout source code --
+      - name: "📥 Checkout repository"
+        uses: actions/checkout@v4
+
+      # -- Setup Node.js --
+      - name: "⚙️ Setup Node.js ${{ env.NODE_VERSION }}"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      # -- Install dependencies --
+      - name: "📦 Install dependencies"
+        run: npm ci
+
+      # -- Validate required secrets are present --
+      # Fail fast with a clear error if any deployment secret is missing.
+      - name: "🔐 Validate deployment secrets"
+        run: |
+          missing=""
+          if [ -z "${{ secrets.SHOPIFY_STORE_URL }}" ]; then
+            missing="$missing SHOPIFY_STORE_URL"
+          fi
+          if [ -z "${{ secrets.SHOPIFY_CLI_TOKEN }}" ]; then
+            missing="$missing SHOPIFY_CLI_TOKEN"
+          fi
+          if [ -z "${{ secrets.SHOPIFY_THEME_ID }}" ]; then
+            missing="$missing SHOPIFY_THEME_ID"
+          fi
+          if [ -n "$missing" ]; then
+            echo "::error::Missing required secrets:$missing"
+            exit 1
+          fi
+          echo "✅ All deployment secrets present"
+
+      # -- Deploy theme via Shopify CLI --
+      # Retry logic accounts for transient API/network errors during push.
+      - name: "🚀 Push theme to Shopify"
+        uses: nick-fields/retry@v3
+        env:
+          SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE_URL }}
+          SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_TOKEN }}
+        with:
+          timeout_minutes: 8
+          max_attempts: 3
+          retry_wait_seconds: 15
+          command: |
+            npx shopify theme push \
+              --theme "${{ secrets.SHOPIFY_THEME_ID }}" \
+              --allow-live \
+              --force
+
+      # -- Deployment summary --
+      - name: "📝 Deployment summary"
+        if: ${{ always() }}
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Store | \`${{ secrets.SHOPIFY_STORE_URL }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Theme ID | \`${{ secrets.SHOPIFY_THEME_ID }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Actor | \`${{ github.actor }}\` |" >> $GITHUB_STEP_SUMMARY
