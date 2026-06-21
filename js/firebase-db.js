@@ -16,7 +16,7 @@ const WowFirebase = (() => {
     projectId: "wow-pet-store",
     storageBucket: "wow-pet-store.appspot.com",
     messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    appId: "YOUR_APP_ID"f
   };
 
   // Check if credentials are set
@@ -548,7 +548,7 @@ const WowFirebase = (() => {
       });
       return list.sort((a, b) => new Date(b.date) - new Date(a.date));
     } catch (err) {
-      console.error(`🐾 [WowPetStore] Failed to query reviews for product ${productId}:`, err);
+      console.error(`🐾 [WowPetStore] Failed to query reviews for product:`, productId, err);
       return [];
     }
   }
