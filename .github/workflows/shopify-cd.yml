@@ -18,19 +18,19 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install Dependencies
         run: npm ci
-        
+
       - name: Build Assets
         run: npm run build --if-present
-        
+
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -45,18 +45,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          
+
       - name: Install Shopify CLI
         run: npm install -g @shopify/cli @shopify/theme
-        
+
       - name: Run Shopify Theme Check
-        run: shopify theme check .
-        
+        run: shopify theme check
+
       - name: Run Unit Tests
         run: npm test --if-present
 
@@ -67,7 +67,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        
+
       - name: Run Trivy File System Scan
         uses: aquasecurity/trivy-action@master
         with:
@@ -88,21 +88,21 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        
+
       - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
           name: theme-build-artifacts
           path: assets/
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          
+
       - name: Install Shopify CLI
         run: npm install -g @shopify/cli @shopify/theme
-        
+
       - name: Deploy to Shopify Live Theme
         env:
           SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
