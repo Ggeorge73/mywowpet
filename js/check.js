@@ -301,7 +301,7 @@ const PetCheckPage = (() => {
       const negations = ["no", "not", "prevent", "don't", "dont", "never", "didn't", "didnt", "free", "without", "clear", "safe"];
       
       const hasNegation = negations.some(neg => {
-        const regex = new RegExp(`\\b${neg}\\b`, 'i');
+        const regex = new RegExp(`\\b${neg.replace(/[.*+?^${}()|[\]\]/g, '\$&')}\\b`, 'i');
         return regex.test(prefix);
       });
 
