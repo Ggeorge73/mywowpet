@@ -1,0 +1,64 @@
+name: DevSecOps Automated Gates
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+
+jobs:
+  # ---------------------------------------------------------
+  # 1. Secret Detection (Gitleaks)
+  # ---------------------------------------------------------
+  secret-detection:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to scan all commits in the PR
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Gitleaks automatically exits with code 1 if secrets are found, failing the job.
+
+  # ---------------------------------------------------------
+  # 2. Static Application Security Testing - SAST (Semgrep)
+  # ---------------------------------------------------------
+  sast-code-scan:
+    name: SAST Code Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          # Use default community rulesets for comprehensive coverage
+          config: "p/default"
+          # Fails the build if high-severity issues are found
+          generateSarif: "1"
+
+  # ---------------------------------------------------------
+  # 3. Software Composition Analysis - SCA (Trivy)
+  # ---------------------------------------------------------
+  sca-dependency-scan:
+    name: SCA Dependency Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          # CRITICAL: Exit code 1 ensures the pipeline fails if vulnerabilities are found
+          exit-code: '1'
+          severity: 'HIGH,CRITICAL'
