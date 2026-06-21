@@ -198,15 +198,19 @@ jobs:
         if: always()
         env:
           STOREFRONT_URL: ${{ secrets.STOREFRONT_URL || 'https://mywowpet.com' }}
+          RUN_ID: ${{ github.run_id }}
+          TEST_OUTCOME: ${{ steps.run_tests.outcome }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
           echo "## 🧪 E2E Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Storefront URL | \`$STOREFRONT_URL\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Run ID | \`${{ github.run_id }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Outcome | \`${{ steps.run_tests.outcome }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Triggered by | \`${{ github.event_name }}\` on \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Run ID | \`$RUN_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Outcome | \`$TEST_OUTCOME\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered by | \`$EVENT_NAME\` on \`$REF_NAME\` |" >> $GITHUB_STEP_SUMMARY
 
   # ==========================================================================
   # Job 3: deploy-theme
@@ -294,13 +298,19 @@ jobs:
       # -- Deployment summary --
       - name: "📝 Deployment summary"
         if: always()
+        env:
+          STORE_URL: ${{ secrets.SHOPIFY_STORE_URL }}
+          THEME_ID: ${{ secrets.SHOPIFY_THEME_ID }}
+          COMMIT_SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
         run: |
           echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Store | \`${{ secrets.SHOPIFY_STORE_URL }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Theme ID | \`${{ secrets.SHOPIFY_THEME_ID }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Actor | \`${{ github.actor }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Store | \`$STORE_URL\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Theme ID | \`$THEME_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`$COMMIT_SHA\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`$REF_NAME\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Actor | \`$ACTOR\` |" >> $GITHUB_STEP_SUMMARY
