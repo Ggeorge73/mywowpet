@@ -232,8 +232,8 @@
   right: 0;
   top: 0;
   bottom: 0;
-  width: 420px;
-  max-width: 90vw;
+  width: 100%;
+  max-width: 420px;
   background: rgba(10, 10, 30, 0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
