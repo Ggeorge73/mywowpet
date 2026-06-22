@@ -110,7 +110,35 @@ const ProductPage = (() => {
       `<span class="product-highlight"><span class="highlight-icon">${highlightIcons[tag] || '✦'}</span> ${tag.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>`
     ).join('');
 
-    const subscribeSection = ''; // Handled dynamically inside Shopify Buy Button widget if configured in Shopify
+    const subscribeSection = product.subscribable ? `
+      <div class="subscribe-toggle">
+        <label class="radio-label">
+          <input type="radio" name="purchaseType" value="onetime" ${!isSubscribe ? 'checked' : ''} onchange="ProductPage.setSubscribe(false)">
+          <div class="radio-content">
+            <span class="radio-title">One-time purchase</span>
+            <span class="radio-price">${WowStore.formatPrice(product.price)}</span>
+          </div>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="purchaseType" value="subscribe" ${isSubscribe ? 'checked' : ''} onchange="ProductPage.setSubscribe(true)">
+          <div class="radio-content">
+            <span class="radio-title">Subscribe & Save ${product.subscribeDiscount}%</span>
+            <span class="radio-price">${WowStore.formatPrice(product.subscribePrice)}</span>
+          </div>
+        </label>
+        ${isSubscribe ? `
+          <div class="subscribe-frequency" style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px dashed var(--color-border);">
+            <label style="display: block; font-size: var(--fs-xs); margin-bottom: var(--space-2); color: var(--color-text-secondary);">Deliver every:</label>
+            <select class="form-select" onchange="ProductPage.setFrequency(this.value)">
+              <option value="2weeks" ${frequency === '2weeks' ? 'selected' : ''}>2 weeks</option>
+              <option value="4weeks" ${frequency === '4weeks' ? 'selected' : ''}>4 weeks (Most Common)</option>
+              <option value="6weeks" ${frequency === '6weeks' ? 'selected' : ''}>6 weeks</option>
+              <option value="8weeks" ${frequency === '8weeks' ? 'selected' : ''}>8 weeks</option>
+            </select>
+            <p style="font-size: var(--fs-xs); color: var(--color-text-muted); margin-top: var(--space-2);"><span class="highlight-icon">✨</span> You save ${WowStore.formatPrice((product.price - product.subscribePrice) * 12)} per year!</p>
+          </div>
+        ` : ''}
+      </div>` : '';
 
     const videoSrc = WowStore.getProductVideo ? WowStore.getProductVideo(product) : null;
 
@@ -162,9 +190,16 @@ const ProductPage = (() => {
           <span>📦</span> <span>${product.weight}</span>
         </div>
 
-        <div class="product-add-section" style="align-items: center;">
-          <div id="shopify-buy-button-container" style="flex: 1;"></div>
-          <button class="product-wishlist-btn ${isWished ? 'active' : ''}" onclick="ProductPage.toggleWishlist()" id="wishlist-btn" style="height: 52px;">
+        <div class="product-add-section">
+          <div class="qty-stepper">
+            <button class="qty-btn" onclick="ProductPage.changeQty(-1)">-</button>
+            <span class="qty-display" id="qty-display">${qty}</span>
+            <button class="qty-btn" onclick="ProductPage.changeQty(1)">+</button>
+          </div>
+          <button class="btn btn-primary btn-lg flex-1" id="add-to-cart-btn" onclick="ProductPage.addToCart()">
+            Add to Cart — ${WowStore.formatPrice((isSubscribe ? product.subscribePrice : product.price) * qty)}
+          </button>
+          <button class="product-wishlist-btn ${isWished ? 'active' : ''}" onclick="ProductPage.toggleWishlist()" id="wishlist-btn">
             ${isWished ? '❤️' : '🤍'}
           </button>
         </div>
@@ -176,132 +211,6 @@ const ProductPage = (() => {
         </div>
       </div>`;
 
-    if (typeof ShopifyBuy !== 'undefined') {
-      initShopifyBuyButton(product.shopifyId);
-    } else {
-      console.warn("🐾 [My Wow Pet] ShopifyBuy SDK not loaded.");
-    }
-  }
-
-  function initShopifyBuyButton(shopifyId) {
-    if (typeof ShopifyBuy === 'undefined') {
-      console.error('ShopifyBuy SDK not found.');
-      return;
-    }
-    const client = ShopifyBuy.buildClient({
-      domain: 'id0dxt-4y.myshopify.com',
-      storefrontAccessToken: 'f19dc13ce0feb0bbfa7c9a79ac89eef4',
-    });
-    ShopifyBuy.UI.onReady(client).then(function (ui) {
-      ui.createComponent('product', {
-        id: shopifyId,
-        node: document.getElementById('shopify-buy-button-container'),
-        moneyFormat: '%24%7B%7Bamount%7D%7D',
-        options: {
-          "product": {
-            "styles": {
-              "product": {
-                "max-width": "100%",
-                "margin-left": "0px",
-                "margin-bottom": "0px",
-                "width": "100%"
-              },
-              "button": {
-                "font-family": "'DM Sans', 'Inter', sans-serif",
-                "font-weight": "600",
-                "font-size": "15px",
-                "padding-top": "14px",
-                "padding-bottom": "14px",
-                "background-color": "#D4A853",
-                "color": "#FFFFFF",
-                "border-radius": "9999px",
-                ":hover": {
-                  "background-color": "#B8913A"
-                },
-                ":focus": {
-                  "background-color": "#B8913A"
-                }
-              },
-              "quantityInput": {
-                "border-radius": "9999px",
-                "border": "1px solid #E8E2D8",
-                "font-family": "'DM Sans', 'Inter', sans-serif",
-                "padding-top": "14px",
-                "padding-bottom": "14px",
-                "color": "#2C2C2C"
-              },
-              "select": {
-                "font-family": "'DM Sans', 'Inter', sans-serif",
-                "color": "#2C2C2C",
-                "border-color": "#E8E2D8",
-                "border-radius": "10px"
-              },
-              "label": {
-                "font-family": "'DM Sans', 'Inter', sans-serif",
-                "color": "#2C2C2C"
-              }
-            },
-            "contents": {
-              "img": false,
-              "title": false,
-              "price": false,
-              "options": true,
-              "quantityInput": true,
-              "button": true
-            },
-            "text": {
-              "button": "Add to cart"
-            }
-          },
-          "cart": {
-            "styles": {
-              "button": {
-                "font-family": "'DM Sans', 'Inter', sans-serif",
-                "font-weight": "600",
-                "background-color": "#D4A853",
-                "color": "#FFFFFF",
-                "border-radius": "9999px",
-                ":hover": {
-                  "background-color": "#B8913A"
-                },
-                ":focus": {
-                  "background-color": "#B8913A"
-                }
-              },
-              "footer": {
-                "background-color": "#FAF7F2"
-              },
-              "body": {
-                "background-color": "#FAF7F2"
-              },
-              "header": {
-                "background-color": "#FAF7F2"
-              },
-              "title": {
-                "font-family": "'Playfair Display', Georgia, serif"
-              }
-            },
-            "text": {
-              "total": "Subtotal",
-              "button": "Checkout"
-            }
-          },
-          "toggle": {
-            "styles": {
-              "toggle": {
-                "background-color": "#D4A853",
-                ":hover": {
-                  "background-color": "#B8913A"
-                },
-                ":focus": {
-                  "background-color": "#B8913A"
-                }
-              }
-            }
-          }
-        }
-      });
-    });
   }
 
   function switchImage(index) {

@@ -609,6 +609,13 @@ const WowStore = (() => {
     }
   ];
 
+  // ---- Shopify Configuration ----
+  const shopifyConfig = {
+    domain: '37cfda-47.myshopify.com',
+    storefrontAccessToken: '992a5ee11fbb4dc125746f131a4baacb',
+    apiVersion: '2024-04'
+  };
+
   // ---- Shopify Product ID Mappings ----
   const shopifyProductIds = {
     1: '7989696430163',
@@ -694,7 +701,7 @@ const WowStore = (() => {
   function getProductVideo(product) {
     const catVideos = productVideos[product.category];
     if (!catVideos) return 'assets/videos/hero.mp4';
-    if (product.pet && catVideos[product.pet]) return catVideos[product.pet];
+    if (product.petType && catVideos[product.petType]) return catVideos[product.petType];
     return catVideos.default || 'assets/videos/hero.mp4';
   }
 
@@ -1218,6 +1225,7 @@ const WowStore = (() => {
 
   // ---- Public API ----
   return {
+    shopifyConfig,
     products,
     categories,
     productCategories,

@@ -184,8 +184,8 @@ const WowFirebase = (() => {
       let mergedData = {};
 
       if (!doc.exists) {
-        // First login: Upload guest data to cloud
-        mergedData = {
+        // First login: Upload guest data to cloud (only allowed user fields)
+        const firestoreData = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -199,15 +199,19 @@ const WowFirebase = (() => {
           },
           pets: guestPets,
           cart: guestCart,
-          orders: guestOrders,
-          loyalty: guestLoyalty,
           wishlist: guestWishlist,
-          subscriptions: guestSubs,
           gameHighScore: guestGame,
           streak: guestStreak
         };
-        await userRef.set(mergedData);
+        await userRef.set(firestoreData);
         console.log("🐾 [WowPetStore] New user document created in Firestore with guest history.");
+
+        mergedData = {
+          ...firestoreData,
+          orders: guestOrders,
+          loyalty: guestLoyalty,
+          subscriptions: guestSubs
+        };
       } else {
         // Return login: Fetch cloud document, merge with guest data
         const cloudData = doc.data();
@@ -250,7 +254,7 @@ const WowFirebase = (() => {
         // Merge streak (take maximum streak)
         const streak = (cloudData.streak?.current || 0) >= (guestStreak.current || 0) ? (cloudData.streak || { current: 0, lastVisit: '', history: [] }) : guestStreak;
 
-        // Build final profile
+        // Build final profile for local state
         mergedData = {
           ...cloudData,
           cart,
@@ -263,8 +267,18 @@ const WowFirebase = (() => {
           subscriptions: cloudData.subscriptions || guestSubs
         };
 
+        // Build data to update in Firestore (omit orders, loyalty, and subscriptions to comply with security rules)
+        const firestoreUpdate = {
+          cart,
+          wishlist,
+          pets,
+          gameHighScore,
+          streak,
+          profile: cloudData.profile || {}
+        };
+
         // Save merged back to Firestore
-        await userRef.update(mergedData);
+        await userRef.update(firestoreUpdate);
         console.log("🐾 [WowPetStore] Merged local guest data with cloud user data.");
       }
 
@@ -349,9 +363,6 @@ const WowFirebase = (() => {
         cart: JSON.parse(localStorage.getItem('wow_cart')) || [],
         pets: JSON.parse(localStorage.getItem('wow_pets')) || [],
         wishlist: JSON.parse(localStorage.getItem('wow_wishlist')) || [],
-        loyalty: JSON.parse(localStorage.getItem('wow_loyalty')) || { points: 0, history: [] },
-        subscriptions: JSON.parse(localStorage.getItem('wow_subscriptions')) || [],
-        orders: JSON.parse(localStorage.getItem('wow_orders')) || [],
         gameHighScore: JSON.parse(localStorage.getItem('wow_game_high')) || { score: 0, correct: 0, played: 0 },
         streak: JSON.parse(localStorage.getItem('wow_streak')) || { current: 0, lastVisit: '', history: [] },
         profile: JSON.parse(localStorage.getItem('wow_profile_info')) || {}
