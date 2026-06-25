@@ -23,15 +23,15 @@ module.exports = defineConfig({
     timeout: 10_000,
   },
 
-  /* Run tests in parallel in CI, serial locally for easier debugging */
-  fullyParallel: true,
-  workers: isCI ? 2 : 1,
+  /* Run tests sequentially to avoid triggering Shopify bot verification */
+  fullyParallel: false,
+  workers: 1,
 
   /* Fail the build on CI if test.only is left in source */
   forbidOnly: isCI,
 
-  /* Retry flaky tests in CI */
-  retries: isCI ? 2 : 0,
+  /* Retry flaky tests to handle transient Shopify storefront latency */
+  retries: 2,
 
   /* Reporters */
   reporter: isCI

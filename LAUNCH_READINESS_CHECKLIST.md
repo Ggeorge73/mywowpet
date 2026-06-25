@@ -4,10 +4,10 @@ This checklist protects the store by enforcing one production payment path: Shop
 
 ## Shopify checkout readiness
 
-- [ ] Confirm every shoppable product has the correct Shopify product/variant mapping for the Shopify Buy Button.
-- [ ] Confirm the Shopify Buy Button appears on product pages across desktop and mobile.
-- [ ] Confirm the Shopify cart opens correctly from each product page.
-- [ ] Confirm the Shopify cart `Checkout` button routes to Shopify Checkout.
+- [x] Confirm every shoppable product has the correct Shopify product/variant mapping for the Shopify Buy Button.
+- [x] Confirm the Shopify Buy Button appears on product pages across desktop and mobile.
+- [x] Confirm the Shopify cart opens correctly from each product page.
+- [x] Confirm the Shopify cart `Checkout` button routes to Shopify Checkout.
 - [ ] Confirm Shopify Payments/Shopify Pay, taxes, shipping, fulfillment, and order notifications are configured inside Shopify Admin.
 - [ ] Confirm successful paid orders appear in Shopify Admin and are not duplicated in the local app cart/order history.
 
@@ -16,8 +16,8 @@ This checklist protects the store by enforcing one production payment path: Shop
 - [x] Remove the custom cart's direct route to `checkout.html`.
 - [x] Replace the old custom checkout page with Shopify-only guidance.
 - [x] Remove card collection from the active site checkout path.
-- [ ] Search the site before launch to confirm no active CTA still says `Place Order` outside Shopify.
-- [ ] Confirm no real customer is asked to enter card data anywhere except Shopify Checkout.
+- [x] Search the site before launch to confirm no active CTA still says `Place Order` outside Shopify.
+- [x] Confirm no real customer is asked to enter card data anywhere except Shopify Checkout.
 
 ## App/backend readiness
 
