@@ -107,6 +107,7 @@ jobs:
       - name: Deploy to Shopify Live Theme
         env:
           SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+          SHOPIFY_CLI_TOKEN: ${{ secrets.SHOPIFY_CLI_TOKEN }}
         run: |
           shopify theme push \
             --path . \
