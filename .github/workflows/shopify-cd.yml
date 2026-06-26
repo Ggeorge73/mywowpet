@@ -57,6 +57,12 @@ jobs:
       - name: Install Shopify CLI
         run: npm install -g @shopify/cli @shopify/theme
 
+      - name: Install Static File Server
+        run: npm install -g serve
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
       - name: Run Shopify Theme Check
         run: shopify theme check
 
