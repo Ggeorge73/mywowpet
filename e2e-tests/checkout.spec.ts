@@ -78,8 +78,8 @@ test.describe('Shop & Product Flow', () => {
     await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
     const firstProduct = page.locator('#product-grid a[href*="product.html"]').first();
     await expect(firstProduct).toBeVisible({ timeout: 15_000 });
-    const href = await firstProduct.getAttribute('href');
-    await page.goto(href || '/product.html?id=1', { waitUntil: 'domcontentloaded' });
+    await firstProduct.click();
+    await page.waitForURL('**/product*');
 
     const addBtn = page.locator('#add-to-cart-btn');
     await expect(addBtn).toBeVisible({ timeout: 15_000 });
@@ -90,8 +90,8 @@ test.describe('Shop & Product Flow', () => {
     await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
     const firstProduct = page.locator('#product-grid a[href*="product.html"]').first();
     await expect(firstProduct).toBeVisible({ timeout: 15_000 });
-    const href = await firstProduct.getAttribute('href');
-    await page.goto(href || '/product.html?id=1', { waitUntil: 'domcontentloaded' });
+    await firstProduct.click();
+    await page.waitForURL('**/product*');
 
     const addBtn = page.locator('#add-to-cart-btn');
     await expect(addBtn).toBeVisible({ timeout: 15_000 });
