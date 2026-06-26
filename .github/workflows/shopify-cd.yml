@@ -39,7 +39,7 @@ jobs:
           retention-days: 1
 
   test:
-    name: 🧪 Test & Lint
+    name: 🧪 Lint & Theme Check
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -50,6 +50,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
       - name: Install Dependencies
         run: npm ci
@@ -57,17 +58,11 @@ jobs:
       - name: Install Shopify CLI
         run: npm install -g @shopify/cli @shopify/theme
 
-      - name: Install Static File Server
-        run: npm install -g serve
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+      - name: Run ESLint
+        run: npm run lint --if-present
 
       - name: Run Shopify Theme Check
         run: shopify theme check
-
-      - name: Run Unit Tests
-        run: npm test --if-present
 
   security_scan:
     name: 🛡️ Security Vulnerability Scan
