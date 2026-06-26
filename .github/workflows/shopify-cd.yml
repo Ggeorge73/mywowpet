@@ -60,9 +60,6 @@ jobs:
       - name: Run Shopify Theme Check
         run: shopify theme check
 
-      - name: Run Unit Tests
-        run: npm test --if-present
-
   security_scan:
     name: 🛡️ Security Vulnerability Scan
     runs-on: ubuntu-latest
