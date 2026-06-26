@@ -16,6 +16,12 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
+  /* Start a local static file server if no BASE_URL is set */
+  webServer: process.env.BASE_URL ? undefined : {
+    command: 'npx serve . -l 3000',
+    port: 3000,
+    reuseExistingServer: !process.env.CI,
+  },
   projects: [
     {
       name: 'chromium',

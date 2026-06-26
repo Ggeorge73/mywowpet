@@ -301,8 +301,13 @@ const PetCheckPage = (() => {
       const negations = ["no", "not", "prevent", "don't", "dont", "never", "didn't", "didnt", "free", "without", "clear", "safe"];
       
       const hasNegation = negations.some(neg => {
-        const regex = new RegExp(`\\b${neg.replace(/[.*+?^${}()|[\]\]/g, '\$&')}\\b`, 'i');
-        return regex.test(prefix);
+        // Safe word-boundary check without dynamic RegExp (avoids ReDoS)
+        const lowerPrefix = prefix.toLowerCase();
+        const idx = lowerPrefix.indexOf(neg);
+        if (idx === -1) return false;
+        const before = idx === 0 || /\W/.test(lowerPrefix[idx - 1]);
+        const after = (idx + neg.length) >= lowerPrefix.length || /\W/.test(lowerPrefix[idx + neg.length]);
+        return before && after;
       });
 
       return !hasNegation;

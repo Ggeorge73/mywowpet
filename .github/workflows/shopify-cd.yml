@@ -51,6 +51,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Install Dependencies
+        run: npm ci
+
       - name: Install Shopify CLI
         run: npm install -g @shopify/cli @shopify/theme
 
