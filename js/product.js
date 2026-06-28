@@ -10,8 +10,10 @@ const ProductPage = (() => {
   let autoOpenReviewForm = false;
 
   async function init() {
+    console.error('=== DEBUG ===', window.location.href, window.location.search);
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
+    console.error('=== DEBUG ID ===', id);
     product = WowStore.getProduct(id);
 
     if (product && typeof WowFirebase !== 'undefined') {

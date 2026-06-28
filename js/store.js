@@ -691,18 +691,18 @@ const WowStore = (() => {
 
   // Product video mapping (category-based)
   const productVideos = {
-    'food': { dog: 'assets/videos/dog_happy.mp4', cat: 'assets/videos/cat_playing.mp4', default: 'assets/videos/hero.mp4' },
-    'treats': { dog: 'assets/videos/dog_park.mp4', cat: 'assets/videos/cat_curious.mp4', default: 'assets/videos/corgi_ball.mp4' },
-    'toys': { dog: 'assets/videos/corgi_ball.mp4', cat: 'assets/videos/cat_playing.mp4', default: 'assets/videos/dog_running.mp4' },
-    'health': { dog: 'assets/videos/dog_happy.mp4', cat: 'assets/videos/cat_sleeping.mp4', default: 'assets/videos/puppy_cute.mp4' },
-    'accessories': { dog: 'assets/videos/dog_park.mp4', cat: 'assets/videos/cat_sleeping.mp4', default: 'assets/videos/hero.mp4' }
+    'food': { dog: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/dog_happy.mp4', cat: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/cat_playing.mp4', default: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero.mp4' },
+    'treats': { dog: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/dog_park.mp4', cat: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/cat_curious.mp4', default: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/corgi_ball.mp4' },
+    'toys': { dog: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/corgi_ball.mp4', cat: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/cat_playing.mp4', default: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/dog_running.mp4' },
+    'health': { dog: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/dog_happy.mp4', cat: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/cat_sleeping.mp4', default: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/puppy_cute.mp4' },
+    'accessories': { dog: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/dog_park.mp4', cat: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/cat_sleeping.mp4', default: 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero.mp4' }
   };
 
   function getProductVideo(product) {
     const catVideos = productVideos[product.category];
-    if (!catVideos) return 'assets/videos/hero.mp4';
+    if (!catVideos) return 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero.mp4';
     if (product.petType && catVideos[product.petType]) return catVideos[product.petType];
-    return catVideos.default || 'assets/videos/hero.mp4';
+    return catVideos.default || 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero.mp4';
   }
 
   // ---- Reviews ----

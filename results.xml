@@ -1,2 +1,634 @@
-<testsuites id="" name="" tests="0" failures="0" skipped="0" errors="0" time="0.038889999999999876">
+<testsuites id="" name="" tests="22" failures="2" skipped="0" errors="12" time="358.058852">
+<testsuite name="checkout.spec.ts" timestamp="2026-06-26T05:08:35.695Z" hostname="chromium" tests="11" failures="1" skipped="0" time="485.041" errors="8">
+<testcase name="Landing Page Health › homepage responds without a server error" classname="checkout.spec.ts" time="60.312">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-202fe-onds-without-a-server-error-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-202fe-onds-without-a-server-error-chromium\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded while running &quot;beforeEach&quot; hook." type="Error">
+<![CDATA[  [chromium] › checkout.spec.ts:22:3 › Landing Page Health › homepage responds without a server error 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      15 |
+      16 | test.describe('Landing Page Health', () => {
+    > 17 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+      19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+      20 |   });
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:17:8
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/index.html", waiting until "domcontentloaded"
+
+
+      16 | test.describe('Landing Page Health', () => {
+      17 |   test.beforeEach(async ({ page }) => {
+    > 18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+         |                ^
+      19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+      20 |   });
+      21 |
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:18:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\checkout-Landing-Page-Heal-202fe-onds-without-a-server-error-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\checkout-Landing-Page-Heal-202fe-onds-without-a-server-error-chromium\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Landing Page Health › page title mentions the brand" classname="checkout.spec.ts" time="60.114">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Landing-Page-Health-page-title-mentions-the-brand-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\checkout-Landing-Page-Health-page-title-mentions-the-brand-chromium\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded while running &quot;beforeEach&quot; hook." type="Error">
+<![CDATA[  [chromium] › checkout.spec.ts:27:3 › Landing Page Health › page title mentions the brand ─────────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      15 |
+      16 | test.describe('Landing Page Health', () => {
+    > 17 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+      19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+      20 |   });
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:17:8
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/index.html", waiting until "domcontentloaded"
+
+
+      16 | test.describe('Landing Page Health', () => {
+      17 |   test.beforeEach(async ({ page }) => {
+    > 18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+         |                ^
+      19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+      20 |   });
+      21 |
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:18:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\checkout-Landing-Page-Health-page-title-mentions-the-brand-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\checkout-Landing-Page-Health-page-title-mentions-the-brand-chromium\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Landing Page Health › navigation is injected and contains links" classname="checkout.spec.ts" time="60.048">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-bb2df-injected-and-contains-links-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-bb2df-injected-and-contains-links-chromium\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded while running &quot;beforeEach&quot; hook." type="Error">
+<![CDATA[  [chromium] › checkout.spec.ts:33:3 › Landing Page Health › navigation is injected and contains links 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      15 |
+      16 | test.describe('Landing Page Health', () => {
+    > 17 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+      19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+      20 |   });
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:17:8
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\checkout-Landing-Page-Heal-bb2df-injected-and-contains-links-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\checkout-Landing-Page-Heal-bb2df-injected-and-contains-links-chromium\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Landing Page Health › footer is injected with content" classname="checkout.spec.ts" time="60.083">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Landing-Page-Health-footer-is-injected-with-content-chromium\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded while running &quot;beforeEach&quot; hook." type="Error">
+<![CDATA[  [chromium] › checkout.spec.ts:40:3 › Landing Page Health › footer is injected with content ───────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      15 |
+      16 | test.describe('Landing Page Health', () => {
+    > 17 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+      19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+      20 |   });
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:17:8
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    Error: locator.waitFor: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('body') to be visible
+
+
+      17 |   test.beforeEach(async ({ page }) => {
+      18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    > 19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+         |                                ^
+      20 |   });
+      21 |
+      22 |   test('homepage responds without a server error', async ({ page }) => {
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:19:32
+
+    Error Context: ..\test-results\checkout-Landing-Page-Health-footer-is-injected-with-content-chromium\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Landing Page Health › hero section renders above the fold" classname="checkout.spec.ts" time="41.247">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-7c6d5-tion-renders-above-the-fold-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-7c6d5-tion-renders-above-the-fold-chromium\error-context.md]]
+]]>
+</system-out>
+<error message="Tearing down &quot;context&quot; exceeded the test timeout of 30000ms." type="Error">
+<![CDATA[  [chromium] › checkout.spec.ts:47:3 › Landing Page Health › hero section renders above the fold ───
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> C:\Users\gbeng\AppData\Local\ms-playwright\chromium_headless_shell-1228\chrome-headless-shell-win64\chrome-headless-shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\Users\gbeng\AppData\Local\Temp\playwright_chromiumdev_profile-wpB6BH --remote-debugging-pipe --no-startup-window
+    <launched> pid=34968
+    [pid=34968][err] [0626/011028.611:INFO:CONSOLE:355] "[HeroVideo] Initialized. Starting with: assets/videos/hero_dog.mp4", source: http://localhost:3000/index.html (355)
+    [pid=34968][err] [0626/011035.635:INFO:CONSOLE:364] "[HeroVideo] Loading next: assets/videos/hero_cat.mp4", source: http://localhost:3000/index.html (364)
+    [pid=34968][err] [0626/011038.648:INFO:CONSOLE:423] "[HeroVideo] canplaythrough timeout, forcing crossfade", source: http://localhost:3000/index.html (423)
+    [pid=34968][err] [0626/011038.649:INFO:CONSOLE:373] "[HeroVideo] Bottom ready, playing and crossfading", source: http://localhost:3000/index.html (373)
+    [pid=34968][err] [0626/011039.487:INFO:CONSOLE:456] "🐾 [My Wow Pet] Failed to load Firebase assets, setting up fallback mock auth service: Error: Script load timeout: /js/firebase-db.js", source: http://localhost:3000/js/app.js (456)
+    [pid=34968][err] [0626/011040.633:INFO:CONSOLE:382] "[HeroVideo] Fade complete, swapping layers", source: http://localhost:3000/index.html (382)
+    [pid=34968][err] [0626/011042.609:INFO:CONSOLE:364] "[HeroVideo] Loading next: assets/videos/hero_bunny.mp4", source: http://localhost:3000/index.html (364)
+    [pid=34968][err] [0626/011045.696:INFO:CONSOLE:423] "[HeroVideo] canplaythrough timeout, forcing crossfade", source: http://localhost:3000/index.html (423)
+    [pid=34968][err] [0626/011045.696:INFO:CONSOLE:373] "[HeroVideo] Bottom ready, playing and crossfading", source: http://localhost:3000/index.html (373)
+    [pid=34968][err] [0626/011047.612:INFO:CONSOLE:382] "[HeroVideo] Fade complete, swapping layers", source: http://localhost:3000/index.html (382)
+    [pid=34968][err] [0626/011049.644:INFO:CONSOLE:364] "[HeroVideo] Loading next: assets/videos/hero_bird.mp4", source: http://localhost:3000/index.html (364)
+    [pid=34968][err] [0626/011053.085:INFO:CONSOLE:423] "[HeroVideo] canplaythrough timeout, forcing crossfade", source: http://localhost:3000/index.html (423)
+    [pid=34968][err] [0626/011053.086:INFO:CONSOLE:373] "[HeroVideo] Bottom ready, playing and crossfading", source: http://localhost:3000/index.html (373)
+    [pid=34968][err] [0626/011055.362:INFO:CONSOLE:382] "[HeroVideo] Fade complete, swapping layers", source: http://localhost:3000/index.html (382)
+    [pid=34968][err] [0626/011056.628:INFO:CONSOLE:364] "[HeroVideo] Loading next: assets/videos/hero_dog.mp4", source: http://localhost:3000/index.html (364)
+    [pid=34968][err] [0626/011059.645:INFO:CONSOLE:423] "[HeroVideo] canplaythrough timeout, forcing crossfade", source: http://localhost:3000/index.html (423)
+    [pid=34968][err] [0626/011059.646:INFO:CONSOLE:373] "[HeroVideo] Bottom ready, playing and crossfading", source: http://localhost:3000/index.html (373)
+    [pid=34968][err] [0626/011101.515:INFO:CONSOLE:382] "[HeroVideo] Fade complete, swapping layers", source: http://localhost:3000/index.html (382)
+    [pid=34968][err] [0626/011107.607:INFO:CONSOLE:364] "[HeroVideo] Loading next: assets/videos/hero_cat.mp4", source: http://localhost:3000/index.html (364)
+    [pid=34968][err] [0626/011107.649:INFO:CONSOLE:19] "Uncaught SyntaxError: Unexpected identifier 'f'", source: http://localhost:3000/js/firebase-db.js (19)
+    [pid=34968] <gracefully close start>
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\checkout-Landing-Page-Heal-7c6d5-tion-renders-above-the-fold-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\checkout-Landing-Page-Heal-7c6d5-tion-renders-above-the-fold-chromium\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Landing Page Health › no significant console errors on load" classname="checkout.spec.ts" time="60.074">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-df10f-cant-console-errors-on-load-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-df10f-cant-console-errors-on-load-chromium\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › checkout.spec.ts:54:3 › Landing Page Health › no significant console errors on load ─
+
+    Test timeout of 30000ms exceeded.
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\checkout-Landing-Page-Heal-df10f-cant-console-errors-on-load-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\checkout-Landing-Page-Heal-df10f-cant-console-errors-on-load-chromium\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Shop &amp; Product Flow › shop page renders a product grid" classname="checkout.spec.ts" time="44.312">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-shop-page-renders-a-product-grid-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-shop-page-renders-a-product-grid-chromium\error-context.md]]
+]]>
+</system-out>
+<error message="Tearing down &quot;context&quot; exceeded the test timeout of 30000ms." type="Error">
+<![CDATA[  [chromium] › checkout.spec.ts:67:3 › Shop & Product Flow › shop page renders a product grid ──────
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> C:\Users\gbeng\AppData\Local\ms-playwright\chromium_headless_shell-1228\chrome-headless-shell-win64\chrome-headless-shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\Users\gbeng\AppData\Local\Temp\playwright_chromiumdev_profile-G4V4z7 --remote-debugging-pipe --no-startup-window
+    <launched> pid=5676
+    [pid=5676][err] [0626/011023.689:ERROR:gpu\ipc\client\command_buffer_proxy_impl.cc:285] ContextResult::kTransientFailure: Failed to send GpuControl.CreateCommandBuffer.
+    [pid=5676][err] [0626/011043.619:INFO:CONSOLE:456] "🐾 [My Wow Pet] Failed to load Firebase assets, setting up fallback mock auth service: Error: Script load timeout: /js/firebase-db.js", source: http://localhost:3000/js/app.js (456)
+    [pid=5676] <gracefully close start>
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\checkout-Shop-Product-Flow-shop-page-renders-a-product-grid-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\checkout-Shop-Product-Flow-shop-page-renders-a-product-grid-chromium\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Shop &amp; Product Flow › product page shows an enabled Add to Cart button" classname="checkout.spec.ts" time="60.121">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-ef70e--enabled-Add-to-Cart-button-chromium\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › checkout.spec.ts:76:3 › Shop & Product Flow › product page shows an enabled Add to Cart button 
+
+    Test timeout of 30000ms exceeded.
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    Error Context: ..\test-results\checkout-Shop-Product-Flow-ef70e--enabled-Add-to-Cart-button-chromium\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Shop &amp; Product Flow › adding to cart updates the persisted cart count" classname="checkout.spec.ts" time="25.88">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-chromium\video.webm]]
+
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-chromium\error-context.md]]
+]]>
+</system-out>
+<failure message="expect(received).toBeGreaterThanOrEqual(expected)" type="expect.toBeGreaterThanOrEqual">
+<![CDATA[  [chromium] › checkout.spec.ts:89:3 › Shop & Product Flow › adding to cart updates the persisted cart count 
+
+    Error: expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 1
+    Received:    0
+
+    Call Log:
+    - Timeout 15000ms exceeded while waiting on the predicate
+
+      107 |         } catch { return 0; }
+      108 |       });
+    > 109 |     }, { timeout: 15_000 }).toBeGreaterThanOrEqual(1);
+          |                             ^
+      110 |   });
+      111 |
+      112 |   test('cart page loads its container', async ({ page }) => {
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:109:29
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-chromium\error-context.md
+]]>
+</failure>
+</testcase>
+<testcase name="Shop &amp; Product Flow › cart page loads its container" classname="checkout.spec.ts" time="9.273">
+</testcase>
+<testcase name="Resilience › unknown route does not throw a 500" classname="checkout.spec.ts" time="3.577">
+</testcase>
+</testsuite>
+<testsuite name="checkout.spec.ts" timestamp="2026-06-26T05:08:35.695Z" hostname="Mobile Safari" tests="11" failures="1" skipped="0" time="397.205" errors="4">
+<testcase name="Landing Page Health › homepage responds without a server error" classname="checkout.spec.ts" time="42.044">
+</testcase>
+<testcase name="Landing Page Health › page title mentions the brand" classname="checkout.spec.ts" time="19.736">
+</testcase>
+<testcase name="Landing Page Health › navigation is injected and contains links" classname="checkout.spec.ts" time="29.185">
+</testcase>
+<testcase name="Landing Page Health › footer is injected with content" classname="checkout.spec.ts" time="60.012">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Landing-Page-Health-footer-is-injected-with-content-Mobile-Safari\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded while running &quot;beforeEach&quot; hook." type="Error">
+<![CDATA[  [Mobile Safari] › checkout.spec.ts:40:3 › Landing Page Health › footer is injected with content ──
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      15 |
+      16 | test.describe('Landing Page Health', () => {
+    > 17 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+      19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+      20 |   });
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:17:8
+
+    TimeoutError: locator.waitFor: Timeout 15000ms exceeded.
+    Call log:
+      - waiting for locator('body') to be visible
+
+
+      17 |   test.beforeEach(async ({ page }) => {
+      18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    > 19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+         |                                ^
+      20 |   });
+      21 |
+      22 |   test('homepage responds without a server error', async ({ page }) => {
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:19:32
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    Error: browserContext.close: Test timeout of 30000ms exceeded.
+    Browser logs:
+
+    <launching> C:\Users\gbeng\AppData\Local\ms-playwright\webkit-2311\Playwright.exe --inspector-pipe --disable-accelerated-compositing --headless --no-startup-window
+    <launched> pid=22524
+    [pid=22524][err] [WebKitWin:Media:-] MediaSessionManagerInterface::dumpSessionStates(0)  Sessions:
+    [pid=22524][err] (2CCA1F21AB8237A9): Video, Autoplaying, 
+    [pid=22524][err] (1C1EF8DA1A2D8B06): Video, Autoplaying, 
+    [pid=22524][err] (8ED3005B142F7433): Video, Autoplaying, 
+    [pid=22524][err] (7A0593290CAC2632): Video, Autoplaying, 
+    [pid=22524][err] (1D77B06384AC53C7): Video, Autoplaying, 
+    [pid=22524][err] (8035D506E9CF2D0F): Video, Autoplaying, 
+    [pid=22524][err] (80D49FAD033BA2C): Video, Autoplaying, 
+    [pid=22524][err] (6A73E5251BB88176): Video, Autoplaying, 
+    [pid=22524][err] (821541285CDA54F1): Video, Autoplaying, 
+    [pid=22524][err] (B642028792C907E8): Video, Autoplaying, 
+    [pid=22524][err] (9759A00D6A2E41EB): Video, Autoplaying, 
+    [pid=22524][err] (2FF760B595839E47): Video, Autoplaying, 
+    [pid=22524][err] (F669BD4572D6B894): Video, Autoplaying, 
+    [pid=22524][err] (30F602BA01394CDA): Video, Autoplaying, 
+    [pid=22524][err] 
+    [pid=22524][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 12251050308998240285
+    [pid=22524][err] [WebKitWin:Media:-] MediaSessionManagerInterface::setCurrentSession(0) 12251050308998240285, size = 15
+    [pid=22524][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 12251050308998240285 returning true
+    [pid=22524][err] [WebKitWin:Media:-] MediaSessionManagerInterface::dumpSessionStates(0)  Sessions:
+    [pid=22524][err] (4A5AEDDA2FB5B2E0): Video, Autoplaying, 
+    [pid=22524][err] (144A6E869B8C654C): Video, Autoplaying, 
+    [pid=22524][err] (6D40858458BD02C6): Video, Autoplaying, 
+    [pid=22524][err] (6F4DA33921A37194): Video, Autoplaying, 
+    [pid=22524][err] (3F42618B63AD5CDD): Video, Autoplaying, 
+    [pid=22524][err] (A1F165409731230F): Video, Autoplaying, 
+    [pid=22524][err] (A26F0E4BD30C468B): Video, Autoplaying, 
+    [pid=22524][err] (6E251D91A63CFC8E): Video, Autoplaying, 
+    [pid=22524][err] (162CAF5AD53D6A0F): Video, Autoplaying, 
+    [pid=22524][err] (9A385F473644DBD2): Video, Autoplaying, 
+    [pid=22524][err] (38DD12BFCEBEDCA1): Video, Autoplaying, 
+    [pid=22524][err] (7BA27F170F5D709A): Video, Autoplaying, 
+    [pid=22524][err] (3808A19C70C4941D): Video, Autoplaying, 
+    [pid=22524][err] (9FF8B66897BB2AFA): Video, Autoplaying, 
+    [pid=22524][err] 
+    [pid=22524][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 5357856228069716704
+    [pid=22524][err] [WebKitWin:Media:-] MediaSessionManagerInterface::setCurrentSession(0) 5357856228069716704, size = 14
+    [pid=22524][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 5357856228069716704 returning true
+    [pid=22524] <gracefully close start>
+
+    Error Context: ..\test-results\checkout-Landing-Page-Health-footer-is-injected-with-content-Mobile-Safari\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Landing Page Health › hero section renders above the fold" classname="checkout.spec.ts" time="60.097">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-7c6d5-tion-renders-above-the-fold-Mobile-Safari\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded while running &quot;beforeEach&quot; hook." type="Error">
+<![CDATA[  [Mobile Safari] › checkout.spec.ts:47:3 › Landing Page Health › hero section renders above the fold 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      15 |
+      16 | test.describe('Landing Page Health', () => {
+    > 17 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+      19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+      20 |   });
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:17:8
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    Error: browserContext.close: Test timeout of 30000ms exceeded.
+    Browser logs:
+
+    <launching> C:\Users\gbeng\AppData\Local\ms-playwright\webkit-2311\Playwright.exe --inspector-pipe --disable-accelerated-compositing --headless --no-startup-window
+    <launched> pid=31760
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::dumpSessionStates(0)  Sessions:
+    [pid=31760][err] (E26862240ACF2416): Video, Autoplaying, 
+    [pid=31760][err] (8F43DE272DF7ED16): Video, Autoplaying, 
+    [pid=31760][err] (CDE76A9FB3D47C41): Video, Autoplaying, 
+    [pid=31760][err] (BF1BCEBADE2ADCDF): Video, Autoplaying, 
+    [pid=31760][err] (990F5613FA5BA0FB): Video, Autoplaying, 
+    [pid=31760][err] (F71CA9E521E1D44E): Video, Autoplaying, 
+    [pid=31760][err] (AD8147925759187): Video, Autoplaying, 
+    [pid=31760][err] (B97ADFDC2434EB46): Video, Autoplaying, 
+    [pid=31760][err] (90903CDAE6B944B0): Video, Autoplaying, 
+    [pid=31760][err] (76B55CA7F5686238): Video, Autoplaying, 
+    [pid=31760][err] (AA2E1452107CD3FA): Video, Autoplaying, 
+    [pid=31760][err] (FA2E3792163821F4): Video, Autoplaying, 
+    [pid=31760][err] (4439FC1A5AA093DF): Video, Autoplaying, 
+    [pid=31760][err] (CA1C5E3F42D43009): Video, Autoplaying, 
+    [pid=31760][err] 
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 8133514983336307470
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::setCurrentSession(0) 8133514983336307470, size = 15
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 8133514983336307470 returning true
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 17806293828297151566
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::setCurrentSession(0) 17806293828297151566, size = 15
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 17806293828297151566 returning true
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::dumpSessionStates(0)  Sessions:
+    [pid=31760][err] 
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 7510289883277522416
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::setCurrentSession(0) 7510289883277522416, size = 14
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 7510289883277522416 returning true
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::dumpSessionStates(0)  Sessions:
+    [pid=31760][err] (6839E8DB8CF775F0): Video, Playing, 
+    [pid=31760][err] (D7CC110991E74DC8): Video, Autoplaying, 
+    [pid=31760][err] (CC4718476020EC9F): Video, Autoplaying, 
+    [pid=31760][err] (7E3204FF83503412): Video, Autoplaying, 
+    [pid=31760][err] (17CE09819F4DBE3B): Video, Autoplaying, 
+    [pid=31760][err] (45EBC252FCF9EE64): Video, Autoplaying, 
+    [pid=31760][err] (5B2204604781B1F7): Video, Autoplaying, 
+    [pid=31760][err] (622A5658D9DA5E7A): Video, Autoplaying, 
+    [pid=31760][err] (E8CBAB4E8E200985): Video, Autoplaying, 
+    [pid=31760][err] (4C1849995BAF5DEE): Video, Autoplaying, 
+    [pid=31760][err] (FAA92D5B484E8114): Video, Autoplaying, 
+    [pid=31760][err] (D1568F496FFE2661): Video, Autoplaying, 
+    [pid=31760][err] (988DA94445C2C2E7): Video, Autoplaying, 
+    [pid=31760][err] (F12E254123033A11): Video, Autoplaying, 
+    [pid=31760][err] 
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 5038334269831376484
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::setCurrentSession(0) 5038334269831376484, size = 15
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 5038334269831376484 returning true
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 9440894308210419064
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::setCurrentSession(0) 9440894308210419064, size = 15
+    [pid=31760][err] [WebKitWin:Media:-] MediaSessionManagerInterface::sessionWillBeginPlayback(0) 9440894308210419064 returning true
+    [pid=31760] <gracefully close start>
+
+    Error Context: ..\test-results\checkout-Landing-Page-Heal-7c6d5-tion-renders-above-the-fold-Mobile-Safari\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Landing Page Health › no significant console errors on load" classname="checkout.spec.ts" time="60.302">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-df10f-cant-console-errors-on-load-Mobile-Safari\video.webm]]
+
+[[ATTACHMENT|test-results\checkout-Landing-Page-Heal-df10f-cant-console-errors-on-load-Mobile-Safari\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded while running &quot;beforeEach&quot; hook." type="Error">
+<![CDATA[  [Mobile Safari] › checkout.spec.ts:54:3 › Landing Page Health › no significant console errors on load 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      15 |
+      16 | test.describe('Landing Page Health', () => {
+    > 17 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      18 |     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+      19 |     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
+      20 |   });
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:17:8
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\test-results\checkout-Landing-Page-Heal-df10f-cant-console-errors-on-load-Mobile-Safari\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\checkout-Landing-Page-Heal-df10f-cant-console-errors-on-load-Mobile-Safari\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Shop &amp; Product Flow › shop page renders a product grid" classname="checkout.spec.ts" time="29.415">
+</testcase>
+<testcase name="Shop &amp; Product Flow › product page shows an enabled Add to Cart button" classname="checkout.spec.ts" time="45.199">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-ef70e--enabled-Add-to-Cart-button-Mobile-Safari\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-ef70e--enabled-Add-to-Cart-button-Mobile-Safari\video.webm]]
+
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-ef70e--enabled-Add-to-Cart-button-Mobile-Safari\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [Mobile Safari] › checkout.spec.ts:76:3 › Shop & Product Flow › product page shows an enabled Add to Cart button 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  locator('#add-to-cart-btn')
+    Expected: enabled
+    Received: undefined
+
+    Call log:
+      - Expect "toBeEnabled" with timeout 5000ms
+      - waiting for locator('#add-to-cart-btn')
+
+
+      84 |     const addBtn = page.locator('#add-to-cart-btn');
+      85 |     await expect(addBtn).toBeVisible({ timeout: 15_000 });
+    > 86 |     await expect(addBtn).toBeEnabled();
+         |                          ^
+      87 |   });
+      88 |
+      89 |   test('adding to cart updates the persisted cart count', async ({ page }) => {
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:86:26
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\checkout-Shop-Product-Flow-ef70e--enabled-Add-to-Cart-button-Mobile-Safari\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\test-results\checkout-Shop-Product-Flow-ef70e--enabled-Add-to-Cart-button-Mobile-Safari\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\checkout-Shop-Product-Flow-ef70e--enabled-Add-to-Cart-button-Mobile-Safari\error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="Shop &amp; Product Flow › adding to cart updates the persisted cart count" classname="checkout.spec.ts" time="32.757">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-Mobile-Safari\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-Mobile-Safari\video.webm]]
+
+[[ATTACHMENT|test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-Mobile-Safari\error-context.md]]
+]]>
+</system-out>
+<failure message="expect(received).toBeGreaterThanOrEqual(expected)" type="expect.toBeGreaterThanOrEqual">
+<![CDATA[  [Mobile Safari] › checkout.spec.ts:89:3 › Shop & Product Flow › adding to cart updates the persisted cart count 
+
+    Error: expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 1
+    Received:    0
+
+    Call Log:
+    - Test timeout of 30000ms exceeded
+
+      107 |         } catch { return 0; }
+      108 |       });
+    > 109 |     }, { timeout: 15_000 }).toBeGreaterThanOrEqual(1);
+          |                             ^
+      110 |   });
+      111 |
+      112 |   test('cart page loads its container', async ({ page }) => {
+        at C:\Users\gbeng\.gemini\antigravity\scratch\wowpetstore\e2e-tests\checkout.spec.ts:109:29
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-Mobile-Safari\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-Mobile-Safari\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\checkout-Shop-Product-Flow-bc663-es-the-persisted-cart-count-Mobile-Safari\error-context.md
+]]>
+</failure>
+</testcase>
+<testcase name="Shop &amp; Product Flow › cart page loads its container" classname="checkout.spec.ts" time="12.314">
+</testcase>
+<testcase name="Resilience › unknown route does not throw a 500" classname="checkout.spec.ts" time="6.144">
+</testcase>
+</testsuite>
 </testsuites>

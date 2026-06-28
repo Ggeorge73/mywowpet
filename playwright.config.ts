@@ -11,15 +11,15 @@ export default defineConfig({
     ['junit', { outputFile: 'results.xml' }]
   ],
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    baseURL: process.env.BASE_URL || 'http://127.0.0.1:5000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
-  /* Start a local static file server if no BASE_URL is set */
+  /* Start a local Firebase Emulator if no BASE_URL is set */
   webServer: process.env.BASE_URL ? undefined : {
-    command: 'npx serve . -l 3000',
-    port: 3000,
+    command: 'npx firebase emulators:start --only hosting --project default',
+    port: 5000,
     reuseExistingServer: !process.env.CI,
   },
   projects: [

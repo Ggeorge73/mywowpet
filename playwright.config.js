@@ -47,7 +47,7 @@ module.exports = defineConfig({
 
   /* Shared settings applied to every project */
   use: {
-    baseURL: process.env.STOREFRONT_URL || 'https://mywowpet.com',
+    baseURL: process.env.STOREFRONT_URL || 'http://127.0.0.1:5000',
 
     /* Collect trace on first retry for easier debugging */
     trace: 'on-first-retry',
@@ -95,15 +95,11 @@ module.exports = defineConfig({
     },
   ],
 
-  /*
-   * Web server config — commented out because we are testing a live site.
-   * Uncomment and adjust if running against a local dev server.
-   *
-   * webServer: {
-   *   command: 'npm run dev',
-   *   url: 'http://localhost:3000',
-   *   reuseExistingServer: !isCI,
-   *   timeout: 120_000,
-   * },
-   */
+  /* Start a local Firebase Emulator if no STOREFRONT_URL is set */
+  webServer: process.env.STOREFRONT_URL ? undefined : {
+    command: 'npx firebase emulators:start --only hosting',
+    port: 5000,
+    reuseExistingServer: !isCI,
+    timeout: 120_000,
+  },
 });
