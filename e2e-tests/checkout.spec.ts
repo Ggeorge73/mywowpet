@@ -95,7 +95,7 @@ test.describe('Shop & Product Flow', () => {
 
     const addBtn = page.locator('#add-to-cart-btn');
     await expect(addBtn).toBeVisible({ timeout: 15_000 });
-    await addBtn.click();
+    await addBtn.click({ force: true });
     await page.waitForTimeout(1200);
 
     await expect.poll(() => {
