@@ -1274,3 +1274,4 @@ const WowStore = (() => {
     triggerSync
   };
 })();
+window.WowStore = WowStore;

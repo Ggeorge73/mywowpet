@@ -401,7 +401,7 @@ const WowApp = (() => {
   }
 
   // ---- Script Loader Helpers ----
-  function loadScript(src, timeoutMs = 8000) {
+  function loadScript(src, timeoutMs = 2000) {
     return new Promise((resolve, reject) => {
       const baseSrc = src.startsWith('/') ? src.substring(1) : src;
       if (document.querySelector(`script[src="${src}"], script[src="${baseSrc}"], script[src="/${baseSrc}"]`)) {
