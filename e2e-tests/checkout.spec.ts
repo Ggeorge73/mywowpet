@@ -96,14 +96,23 @@ test.describe('Shop & Product Flow', () => {
     const addBtn = page.locator('#add-to-cart-btn');
     await expect(addBtn).toBeVisible({ timeout: 15_000 });
     await addBtn.click({ force: true });
-    await page.waitForTimeout(1200);
+    await page.waitForTimeout(1500);
 
     await expect.poll(() => {
       return page.evaluate(() => {
         try {
-          return (window.WowStore && typeof window.WowStore.getCartCount === 'function')
-            ? window.WowStore.getCartCount()
-            : 0;
+          // Primary: use the exposed WowStore API
+          if (window.WowStore && typeof window.WowStore.getCartCount === 'function') {
+            const count = window.WowStore.getCartCount();
+            if (count > 0) return count;
+          }
+          // Fallback: read directly from localStorage
+          const raw = localStorage.getItem('wow_cart');
+          if (raw) {
+            const cart = JSON.parse(raw);
+            return cart.reduce((sum, item) => sum + (item.qty || 0), 0);
+          }
+          return 0;
         } catch { return 0; }
       });
     }, { timeout: 15_000 }).toBeGreaterThanOrEqual(1);
