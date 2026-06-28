@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Get help with your My Wow Pet orders, shipping, returns, and account questions in our comprehensive Help Center.">
+  <title>Help Center | My Wow Pet</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/pet-cursor.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#D4A853">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="My Wow Pet">
+  <link rel="apple-touch-icon" href="assets/images/icon-192x192.png">
+  <style>
+    .faq-section {
+      margin-bottom: var(--space-8);
+    }
+    .faq-title {
+      font-size: var(--fs-lg);
+      margin-bottom: var(--space-4);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    details {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-3);
+      padding: var(--space-4);
+      transition: all var(--transition-fast);
+    }
+    details:hover {
+      border-color: var(--color-primary-light);
+      box-shadow: var(--shadow-sm);
+    }
+    summary {
+      font-weight: 600;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--color-text);
+    }
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    summary::after {
+      content: '+';
+      font-size: 1.2em;
+      color: var(--color-primary);
+      transition: transform var(--transition-fast);
+    }
+    details[open] summary::after {
+      content: '−';
+    }
+    details[open] summary {
+      margin-bottom: var(--space-3);
+      color: var(--color-primary);
+    }
+    .faq-content {
+      color: var(--color-text-secondary);
+      line-height: var(--lh-relaxed);
+    }
+    .help-header {
+      text-align: center;
+      margin-bottom: var(--space-10);
+    }
+    .contact-box {
+      background: linear-gradient(135deg, rgba(212,168,83,0.1), transparent);
+      border: 1px solid var(--color-primary-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      text-align: center;
+      margin-top: var(--space-12);
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-slot"></div>
+
+  <div class="page-body">
+    <div class="container section" style="padding-top: var(--space-8); max-width: 800px;">
+      
+      <div class="help-header fade-in">
+        <span class="section-label">Support</span>
+        <h1 class="section-title">Help Center</h1>
+        <p class="section-subtitle">How can we help you and your furry friend today?</p>
+      </div>
+
+      <!-- Ordering -->
+      <div class="faq-section slide-up" style="animation-delay: 0.1s;">
+        <h2 class="faq-title">🛒 Ordering & Payments</h2>
+        <details>
+          <summary>What payment methods do you accept?</summary>
+          <div class="faq-content">We accept all major credit cards (Visa, Mastercard, American Express, Discover), PayPal, and Apple Pay for a seamless checkout experience.</div>
+        </details>
+        <details>
+          <summary>Can I modify or cancel my order?</summary>
+          <div class="faq-content">We process orders quickly to ensure fast delivery! You can modify or cancel your order within 1 hour of placing it by contacting our support team. After that, the order will be shipped and you can utilize our easy return process.</div>
+        </details>
+        <details>
+          <summary>Where is my order confirmation email?</summary>
+          <div class="faq-content">Order confirmations are sent immediately after checkout. If you haven't received yours within 5 minutes, please check your spam/junk folder. Still not there? Contact us and we'll resend it.</div>
+        </details>
+      </div>
+
+      <!-- Shipping -->
+      <div class="faq-section slide-up" style="animation-delay: 0.2s;">
+        <h2 class="faq-title">📦 Shipping & Delivery</h2>
+        <details>
+          <summary>How much is shipping?</summary>
+          <div class="faq-content">We offer <strong>FREE standard shipping on all orders over $49!</strong> For orders under $49, standard shipping is a flat rate of $5.99. Express options are also available at checkout.</div>
+        </details>
+        <details>
+          <summary>How long will it take to get my order?</summary>
+          <div class="faq-content">Orders are processed within 1-2 business days. Standard shipping takes 5-7 business days, while Express takes 2-3 business days.</div>
+        </details>
+        <details>
+          <summary>Do you ship internationally?</summary>
+          <div class="faq-content">Currently, we only ship within the United States (including APO/FPO addresses). We are working hard to bring My Wow Pet to international furry friends soon!</div>
+        </details>
+      </div>
+
+      <!-- Returns -->
+      <div class="faq-section slide-up" style="animation-delay: 0.3s;">
+        <h2 class="faq-title">↩️ Returns & Exchanges</h2>
+        <details>
+          <summary>What is your return policy?</summary>
+          <div class="faq-content">We offer a 30-Day Happiness Guarantee! Unopened items can be returned within 30 days for a full refund. For health and safety reasons, we cannot accept returns on opened food or treats.</div>
+        </details>
+        <details>
+          <summary>How do I start a return?</summary>
+          <div class="faq-content">Simply head to our <a href="returns.html" style="color:var(--color-primary);">Returns page</a> or contact our support team with your order number. We'll provide you with a prepaid return label.</div>
+        </details>
+        <details>
+          <summary>How long do refunds take?</summary>
+          <div class="faq-content">Once we receive your return, we process it within 2 business days. It may take 5-7 business days for the refund to reflect on your original payment method depending on your bank.</div>
+        </details>
+      </div>
+
+      <!-- Account -->
+      <div class="faq-section slide-up" style="animation-delay: 0.4s;">
+        <h2 class="faq-title">👤 Account & Subscribe</h2>
+        <details>
+          <summary>How does Subscribe & Save work?</summary>
+          <div class="faq-content">Never run out of your pet's favorites! Select "Subscribe & Save" on any product to get a 10% discount on every delivery. You can choose your delivery frequency (every 2, 4, or 6 weeks) and cancel or pause anytime from your account.</div>
+        </details>
+        <details>
+          <summary>I forgot my password. How do I reset it?</summary>
+          <div class="faq-content">Click "Login" at the top of the page, then click "Forgot Password?". Enter your email, and we'll send you a secure link to reset your password.</div>
+        </details>
+      </div>
+
+      <!-- Still Need Help -->
+      <div class="contact-box slide-up" style="animation-delay: 0.5s;">
+        <h3>Still need help?</h3>
+        <p style="color: var(--color-text-secondary); margin-bottom: var(--space-4);">Our pet care specialists are ready to assist you and your furry friend.</p>
+        <a href="contact.html" class="btn btn-primary">Contact Support</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="footer-slot"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/animations.js"></script>
+  <script>WowApp.init('support');</script>
+  <script src="js/pet-cursor.js"></script>
+</body>
+</html>

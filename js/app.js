@@ -163,10 +163,10 @@ const WowApp = (() => {
             <div class="footer-logo">🐾 My Wow <span class="logo-accent">Pet</span></div>
             <p class="footer-desc">Premium pet products curated for the modern pet parent. Because your fur babies deserve the absolute best.</p>
             <div class="footer-social">
-              <a href="#" aria-label="Facebook">📘</a>
-              <a href="#" aria-label="Instagram">📸</a>
-              <a href="#" aria-label="Twitter">🐦</a>
-              <a href="#" aria-label="TikTok">🎵</a>
+              <a href="https://facebook.com/mywowpet" target="_blank" rel="noopener" aria-label="Facebook">📘</a>
+              <a href="https://instagram.com/mywowpet" target="_blank" rel="noopener" aria-label="Instagram">📸</a>
+              <a href="https://twitter.com/mywowpet" target="_blank" rel="noopener" aria-label="Twitter">🐦</a>
+              <a href="https://tiktok.com/@mywowpet" target="_blank" rel="noopener" aria-label="TikTok">🎵</a>
             </div>
           </div>
           <div class="footer-column">
@@ -182,11 +182,11 @@ const WowApp = (() => {
           <div class="footer-column">
             <h4>Support</h4>
             <div class="footer-links">
-              <a href="#">Help Center</a>
-              <a href="#">Shipping Info</a>
-              <a href="#">Returns</a>
-              <a href="#">Track Order</a>
-              <a href="#">Contact Us</a>
+              <a href="help.html">Help Center</a>
+              <a href="shipping.html">Shipping Info</a>
+              <a href="returns.html">Returns</a>
+              <a href="tracking.html">Track Order</a>
+              <a href="contact.html">Contact Us</a>
             </div>
           </div>
           <div class="footer-column">
@@ -231,7 +231,6 @@ const WowApp = (() => {
         <div class="nav-links">
           <a href="shop.html" class="nav-link ${activePage === 'shop' ? 'active' : ''}">Shop</a>
           <a href="check.html" class="nav-link ${activePage === 'check' ? 'active' : ''}">🩺 Pet-Check AI</a>
-          <a href="journey.html" class="nav-link ${activePage === 'journey' ? 'active' : ''}">🪐 Journey</a>
           <a href="game.html" class="nav-link ${activePage === 'game' ? 'active' : ''}">🧠 Play & Learn</a>
           <a href="subscribe.html" class="nav-link ${activePage === 'subscribe' ? 'active' : ''}">Subscribe & Save</a>
           <a href="profile.html" class="nav-link ${activePage === 'profile' ? 'active' : ''}">My Pets</a>
@@ -267,7 +266,6 @@ const WowApp = (() => {
       <a href="shop.html?pet=small-pet" class="mobile-nav-link"><span class="link-icon">🐹</span> Small Pets</a>
       <a href="shop.html?pet=bird" class="mobile-nav-link"><span class="link-icon">🦜</span> Birds</a>
       <a href="check.html" class="mobile-nav-link"><span class="link-icon">🩺</span> Pet-Check AI</a>
-      <a href="journey.html" class="mobile-nav-link"><span class="link-icon">🪐</span> Solar Journey</a>
       <a href="game.html" class="mobile-nav-link"><span class="link-icon">🧠</span> Play & Learn</a>
       <a href="subscribe.html" class="mobile-nav-link"><span class="link-icon">🔄</span> Subscribe & Save</a>
       <a href="profile.html" id="mobile-profile-link" class="mobile-nav-link"><span class="link-icon">👤</span> My Profile</a>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track your My Wow Pet order in real-time.">
+  <title>Track Order | My Wow Pet</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/pet-cursor.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#D4A853">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="My Wow Pet">
+  <link rel="apple-touch-icon" href="assets/images/icon-192x192.png">
+  <style>
+    .tracking-container {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8);
+      max-width: 600px;
+      margin: 0 auto var(--space-12);
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+    .tracking-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: var(--space-2);
+      font-weight: 500;
+    }
+    .form-group input {
+      width: 100%;
+      padding: var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-size: var(--fs-md);
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(212,168,83,0.2);
+    }
+    .how-it-works {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+      max-width: 800px;
+      margin: 0 auto var(--space-10);
+    }
+    @media (min-width: 768px) {
+      .how-it-works {
+        flex-direction: row;
+        text-align: center;
+      }
+    }
+    .step {
+      flex: 1;
+      padding: var(--space-4);
+    }
+    .step-icon {
+      font-size: 3rem;
+      margin-bottom: var(--space-3);
+      display: inline-block;
+    }
+    .partners {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-6);
+      margin-top: var(--space-6);
+      filter: grayscale(100%);
+      opacity: 0.6;
+    }
+    .partners span {
+      font-weight: bold;
+      font-size: var(--fs-lg);
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-slot"></div>
+
+  <div class="page-body">
+    <div class="container section" style="padding-top: var(--space-8);">
+      
+      <div class="tracking-container slide-up">
+        <h1 style="margin-bottom: var(--space-2);">📦 Track Your Order</h1>
+        <p style="color: var(--color-text-secondary);">Enter your order details below to see real-time shipping updates.</p>
+        
+        <form class="tracking-form" onsubmit="event.preventDefault(); WowApp.showToast('Looking up your order... Please check your email for tracking details.', '📦'); this.reset();">
+          <div class="form-group">
+            <label for="order_number">Order Number</label>
+            <input type="text" id="order_number" required placeholder="e.g. #WOW-1042">
+          </div>
+          <div class="form-group">
+            <label for="order_email">Email Address</label>
+            <input type="email" id="order_email" required placeholder="The email used at checkout">
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: var(--space-2); padding: var(--space-3);">Track Order</button>
+        </form>
+      </div>
+
+      <div class="how-it-works slide-up" style="animation-delay: 0.1s;">
+        <div class="step">
+          <span class="step-icon">🧾</span>
+          <h4>1. Find Your Number</h4>
+          <p style="color: var(--color-text-secondary); font-size: var(--fs-sm);">Locate your order number in your confirmation email.</p>
+        </div>
+        <div class="step">
+          <span class="step-icon">🔍</span>
+          <h4>2. We Locate It</h4>
+          <p style="color: var(--color-text-secondary); font-size: var(--fs-sm);">Our system connects securely with our shipping partners.</p>
+        </div>
+        <div class="step">
+          <span class="step-icon">🚚</span>
+          <h4>3. Get Updates</h4>
+          <p style="color: var(--color-text-secondary); font-size: var(--fs-sm);">View real-time location and estimated delivery date.</p>
+        </div>
+      </div>
+
+      <div class="text-center slide-up" style="animation-delay: 0.2s;">
+        <p style="color: var(--color-text-secondary); margin-bottom: var(--space-2);">We proudly ship with trusted partners:</p>
+        <div class="partners">
+          <span>USPS</span>
+          <span>UPS</span>
+          <span>FedEx</span>
+        </div>
+        
+        <div style="margin-top: var(--space-10); padding-top: var(--space-8); border-top: 1px solid var(--color-border);">
+          <p style="margin-bottom: var(--space-4);">Can't find your order number?</p>
+          <a href="contact.html" class="btn btn-outline">Contact Support</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="footer-slot"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/animations.js"></script>
+  <script>WowApp.init('support');</script>
+  <script src="js/pet-cursor.js"></script>
+</body>
+</html>
