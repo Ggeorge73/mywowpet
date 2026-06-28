@@ -16,9 +16,9 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
-  /* Start a local Firebase Emulator if no BASE_URL is set */
+  /* Start a local static server if no BASE_URL is set */
   webServer: process.env.BASE_URL ? undefined : {
-    command: 'npx firebase emulators:start --only hosting --project default',
+    command: 'npx serve . -p 5000',
     port: 5000,
     reuseExistingServer: !process.env.CI,
   },
