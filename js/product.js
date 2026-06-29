@@ -284,7 +284,7 @@ const ProductPage = (() => {
   function addToCart() {
     const cart = WowStore.addToCart(product.id, qty, isSubscribe, frequency);
     if (!cart) {
-      WowApp.showToast('This product is not available for Shopify checkout yet.', 'Unavailable');
+      WowApp.showToast('This product is not available for secure checkout yet.', 'Unavailable');
       return;
     }
     WowApp.updateCartBadge();
@@ -585,7 +585,7 @@ const ProductPage = (() => {
   function addBundle(ids) {
     const added = ids.map(id => WowStore.addToCart(id, 1, false)).filter(Boolean);
     if (!added.length) {
-      WowApp.showToast('Bundle products are not available for Shopify checkout yet.', 'Unavailable');
+      WowApp.showToast('Bundle products are not available for secure checkout yet.', 'Unavailable');
       return;
     }
     WowApp.updateCartBadge();

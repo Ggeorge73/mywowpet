@@ -150,7 +150,7 @@ const WowApp = (() => {
     if (!product) return;
     const cart = WowStore.addToCart(productId, 1, false);
     if (!cart) {
-      showToast('This product is not available for Shopify checkout yet.', 'Unavailable');
+      showToast('This product is not available for secure checkout yet.', 'Unavailable');
       return;
     }
     updateCartBadge();

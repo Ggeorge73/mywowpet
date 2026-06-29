@@ -86,7 +86,7 @@ const CartPage = (() => {
     document.getElementById('order-summary').innerHTML = `
       <h3>Cart Summary</h3>
       <div style="margin-bottom: var(--space-4); padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid rgba(34, 197, 94, 0.35); background: rgba(34, 197, 94, 0.10); font-size: var(--fs-sm); line-height: var(--lh-relaxed);">
-        <strong>Shopify checkout:</strong> Final pricing, discounts, taxes, shipping, payment, and order creation are handled by Shopify Checkout.
+        <strong>Secure checkout:</strong> Final pricing, discounts, taxes, shipping, payment, and order creation are confirmed securely before payment.
       </div>
       <div class="summary-row">
         <span>Estimated Subtotal</span>
@@ -114,10 +114,10 @@ const CartPage = (() => {
         <input type="text" id="promo-input" placeholder="Promo code" value="${activeCode || ''}">
         <button onclick="CartPage.applyPromo()">Apply</button>
       </div>
-      ${appliedPromo ? `<div style="font-size: var(--fs-xs); color: var(--color-secondary); margin-bottom: var(--space-4);">Code will be sent to Shopify checkout: ${appliedPromo.description}</div>` : ''}
+      ${appliedPromo ? `<div style="font-size: var(--fs-xs); color: var(--color-secondary); margin-bottom: var(--space-4);">Code will be applied during secure checkout: ${appliedPromo.description}</div>` : ''}
 
-      ${checkoutDisabled ? `<div style="font-size: var(--fs-sm); color: var(--color-error); margin-bottom: var(--space-4);">One or more items is missing a Shopify variant and cannot be checked out yet.</div>` : ''}
-      <button id="checkout-btn" class="btn btn-primary btn-block btn-lg" onclick="CartPage.startShopifyCheckout()" ${checkoutDisabled ? 'disabled' : ''}>Checkout with Shopify</button>
+      ${checkoutDisabled ? `<div style="font-size: var(--fs-sm); color: var(--color-error); margin-bottom: var(--space-4);">One or more items cannot be checked out yet.</div>` : ''}
+      <button id="checkout-btn" class="btn btn-primary btn-block btn-lg" onclick="CartPage.startShopifyCheckout()" ${checkoutDisabled ? 'disabled' : ''}>Proceed to Secure Checkout</button>
       <a href="shop.html" class="btn btn-secondary btn-block btn-lg" style="margin-top: var(--space-3);">Continue Shopping</a>
 
       <div style="text-align: center; margin-top: var(--space-4); padding: var(--space-3); background: rgba(var(--color-primary-rgb), 0.06); border-radius: var(--radius-md);">
@@ -145,7 +145,7 @@ const CartPage = (() => {
     if (!code) return;
     const promo = WowStore.validatePromo(code);
     if (promo) {
-      WowApp.showToast(`Promo code will be sent to Shopify checkout: ${promo.description}`, '🎉');
+      WowApp.showToast(`Promo code will be applied during secure checkout: ${promo.description}`, '🎉');
       renderSummary();
     } else {
       WowApp.showToast('Invalid promo code', '❌');
@@ -157,14 +157,14 @@ const CartPage = (() => {
     const originalText = btn ? btn.textContent : '';
     if (btn) {
       btn.disabled = true;
-      btn.textContent = 'Preparing Shopify Checkout...';
+      btn.textContent = 'Preparing Secure Checkout...';
     }
 
     try {
       const cart = WowStore.getCart();
       const missing = WowStore.getMissingShopifyCartItems(cart);
       if (missing.length) {
-        throw new Error('One or more cart items is missing its Shopify variant mapping.');
+        throw new Error('One or more cart items cannot be prepared for secure checkout.');
       }
 
       const activeCode = localStorage.getItem('wow_applied_promo');
@@ -177,8 +177,8 @@ const CartPage = (() => {
       localStorage.setItem('wow_shopify_cart_id', shopifyCart.id);
       window.location.href = shopifyCart.checkoutUrl;
     } catch (err) {
-      console.error('Shopify checkout failed:', err);
-      WowApp.showToast(err.message || 'Shopify checkout could not be started.', '❌');
+      console.error('[My Wow Pet] Secure checkout handoff failed:', err);
+      WowApp.showToast(err.message || 'Secure checkout could not be started.', '❌');
       if (btn) {
         btn.disabled = false;
         btn.textContent = originalText;
