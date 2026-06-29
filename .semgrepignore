@@ -1,0 +1,5 @@
+# Local Chrome DevTools Protocol helper scripts.
+# These intentionally use HTTP loopback endpoints such as 127.0.0.1:9222
+# because Chrome's local debugging API does not serve HTTPS.
+debug_shopify_checkout.js
+test_site.js
