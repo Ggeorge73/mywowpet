@@ -609,14 +609,14 @@ const WowStore = (() => {
     }
   ];
 
-  // ---- Shopify Configuration ----
+  // ---- Shopify Storefront API ----
   const shopifyConfig = {
-    domain: '37cfda-47.myshopify.com',
-    storefrontAccessToken: '992a5ee11fbb4dc125746f131a4baacb',
-    apiVersion: '2024-04'
+    domain: 'id0dxt-4y.myshopify.com',
+    storefrontAccessToken: 'f19dc13ce0feb0bbfa7c9a79ac89eef4',
+    apiVersion: '2026-04'
   };
 
-  // ---- Shopify Product ID Mappings ----
+  // Product IDs are used for product lookup; variant IDs are required for carts.
   const shopifyProductIds = {
     1: '7989696430163',
     2: '7989696462931',
@@ -644,8 +644,37 @@ const WowStore = (() => {
     24: '7989698330707'
   };
 
+  const shopifyVariantIds = {
+    1: '45593123192915',
+    2: '45593123225683',
+    3: '45593123323987',
+    4: '45593123487827',
+    5: '45593123651667',
+    6: '45593125060691',
+    7: '45593125126227',
+    8: '45593125158995',
+    9: '45593125191763',
+    10: '45593125814355',
+    11: '45593125879891',
+    12: '45593125912659',
+    13: '45593125945427',
+    14: '45593125978195',
+    15: '45593126043731',
+    16: '45593126338643',
+    17: '45593126371411',
+    18: '45593126404179',
+    19: '45593139413075',
+    20: '45593139970131',
+    21: '45593140002899',
+    22: '45593140461651',
+    23: '45593143902291',
+    24: '45593143967827'
+  };
+
   products.forEach(p => {
-    p.shopifyId = shopifyProductIds[p.id] || '7989696430163'; // Fallback to Wilderness Salmon
+    p.shopifyProductId = shopifyProductIds[p.id] || null;
+    p.shopifyVariantId = shopifyVariantIds[p.id] || null;
+    p.shopifyId = p.shopifyProductId;
   });
 
   // ---- Product image colors (gradient placeholders) ----
@@ -956,7 +985,8 @@ const WowStore = (() => {
   }
 
   function formatPrice(price) {
-    return '$' + price.toFixed(2);
+    const value = Number(price || 0);
+    return '$' + value.toFixed(2);
   }
 
   function renderStars(rating) {
@@ -972,6 +1002,165 @@ const WowStore = (() => {
     }
     html += '</div>';
     return html;
+  }
+
+  function toShopifyGid(type, id) {
+    if (!id) return null;
+    const value = String(id);
+    return value.startsWith('gid://') ? value : `gid://shopify/${type}/${value}`;
+  }
+
+  function getShopifyProductGid(productOrId) {
+    const product = typeof productOrId === 'object' ? productOrId : getProduct(productOrId);
+    return product ? toShopifyGid('Product', product.shopifyProductId) : null;
+  }
+
+  function getShopifyVariantGid(productOrId) {
+    const product = typeof productOrId === 'object' ? productOrId : getProduct(productOrId);
+    return product ? toShopifyGid('ProductVariant', product.shopifyVariantId) : null;
+  }
+
+  async function shopifyRequest(query, variables = {}) {
+    const response = await fetch(`https://${shopifyConfig.domain}/api/${shopifyConfig.apiVersion}/graphql.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': shopifyConfig.storefrontAccessToken
+      },
+      body: JSON.stringify({ query, variables })
+    });
+
+    const payload = await response.json();
+    if (!response.ok || payload.errors) {
+      const message = payload.errors?.map(error => error.message).join('; ') || `Shopify request failed with status ${response.status}`;
+      throw new Error(message);
+    }
+    return payload.data;
+  }
+
+  async function syncProductFromShopify(productId) {
+    const localProduct = getProduct(productId);
+    const productGid = getShopifyProductGid(localProduct);
+    if (!localProduct || !productGid) return null;
+
+    const query = `
+      query ProductCommerceData($id: ID!) {
+        product(id: $id) {
+          id
+          title
+          availableForSale
+          variants(first: 1) {
+            nodes {
+              id
+              title
+              availableForSale
+              price {
+                amount
+                currencyCode
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const data = await shopifyRequest(query, { id: productGid });
+    const shopifyProduct = data.product;
+    const variant = shopifyProduct?.variants?.nodes?.[0];
+    if (!shopifyProduct || !variant) return null;
+
+    localProduct.shopifyTitle = shopifyProduct.title;
+    localProduct.shopifyVariantId = variant.id.replace('gid://shopify/ProductVariant/', '');
+    localProduct.inStock = Boolean(shopifyProduct.availableForSale && variant.availableForSale);
+    localProduct.price = parseFloat(variant.price.amount);
+    localProduct.currencyCode = variant.price.currencyCode;
+    return shopifyProduct;
+  }
+
+  function getMissingShopifyCartItems(cart = getCart()) {
+    return cart
+      .map(item => ({ item, product: getProduct(item.productId) }))
+      .filter(entry => !entry.product || !getShopifyVariantGid(entry.product));
+  }
+
+  function buildShopifyCartLines(cart = getCart()) {
+    return cart
+      .map(item => {
+        const product = getProduct(item.productId);
+        const merchandiseId = getShopifyVariantGid(product);
+        if (!product || !merchandiseId) return null;
+
+        const line = {
+          merchandiseId,
+          quantity: Math.max(1, parseInt(item.qty, 10) || 1)
+        };
+
+        if (item.isSubscription && product.shopifySellingPlanId) {
+          line.sellingPlanId = toShopifyGid('SellingPlan', product.shopifySellingPlanId);
+        }
+
+        return line;
+      })
+      .filter(Boolean);
+  }
+
+  async function createShopifyCart(cart = getCart(), options = {}) {
+    const lines = buildShopifyCartLines(cart);
+    if (!lines.length) {
+      throw new Error('No Shopify-ready cart lines were found.');
+    }
+
+    const input = {
+      lines,
+      attributes: [
+        { key: 'source', value: 'my-wow-pet-custom-storefront' }
+      ]
+    };
+
+    if (options.discountCode) {
+      input.discountCodes = [options.discountCode];
+    }
+
+    if (options.email) {
+      input.buyerIdentity = { email: options.email };
+    }
+
+    const query = `
+      mutation CreateShopifyCart($input: CartInput!) {
+        cartCreate(input: $input) {
+          cart {
+            id
+            checkoutUrl
+            discountCodes {
+              code
+              applicable
+            }
+            cost {
+              subtotalAmount {
+                amount
+                currencyCode
+              }
+              totalAmount {
+                amount
+                currencyCode
+              }
+            }
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
+
+    const data = await shopifyRequest(query, { input });
+    const result = data.cartCreate;
+    if (result.userErrors?.length) {
+      throw new Error(result.userErrors.map(error => error.message).join('; '));
+    }
+
+    return result.cart;
   }
 
   // ---- Cart (localStorage) ----
@@ -998,6 +1187,11 @@ const WowStore = (() => {
   }
 
   function addToCart(productId, qty = 1, isSubscription = false, frequency = '4weeks') {
+    const product = getProduct(productId);
+    if (!product || !getShopifyVariantGid(product) || product.inStock === false) {
+      return null;
+    }
+
     const cart = getCart();
     const existing = cart.find(item => item.productId === productId && item.isSubscription === isSubscription);
     if (existing) {
@@ -1225,13 +1419,15 @@ const WowStore = (() => {
 
   // ---- Public API ----
   return {
-    shopifyConfig,
     products,
     categories,
     productCategories,
     filters,
     loyaltyTiers,
     testimonials,
+    shopifyConfig,
+    shopifyProductIds,
+    shopifyVariantIds,
     getProduct,
     getProducts,
     getProductReviews,
@@ -1246,6 +1442,14 @@ const WowStore = (() => {
     productVideos,
     formatPrice,
     renderStars,
+    toShopifyGid,
+    getShopifyProductGid,
+    getShopifyVariantGid,
+    shopifyRequest,
+    syncProductFromShopify,
+    getMissingShopifyCartItems,
+    buildShopifyCartLines,
+    createShopifyCart,
     getCart,
     addToCart,
     updateCartQty,

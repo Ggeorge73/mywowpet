@@ -79,9 +79,14 @@ const CartPage = (() => {
     }
 
     const pointsEarned = Math.floor(totals.total * 4);
+    const missingShopifyItems = WowStore.getMissingShopifyCartItems(cart);
+    const checkoutDisabled = missingShopifyItems.length > 0;
 
     document.getElementById('order-summary').innerHTML = `
-      <h3>Order Summary</h3>
+      <h3>Cart Summary</h3>
+      <div style="margin-bottom: var(--space-4); padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid rgba(34, 197, 94, 0.35); background: rgba(34, 197, 94, 0.10); font-size: var(--fs-sm); line-height: var(--lh-relaxed);">
+        <strong>Shopify checkout:</strong> Final pricing, discounts, taxes, shipping, payment, and order creation are handled by Shopify Checkout.
+      </div>
       <div class="summary-row">
         <span>Estimated Subtotal</span>
         <span>${WowStore.formatPrice(totals.subtotal)}</span>
@@ -108,9 +113,10 @@ const CartPage = (() => {
         <input type="text" id="promo-input" placeholder="Promo code" value="${activeCode || ''}">
         <button onclick="CartPage.applyPromo()">Apply</button>
       </div>
-      ${appliedPromo ? `<div style="font-size: var(--fs-xs); color: var(--color-secondary); margin-bottom: var(--space-4);">✓ Code applied locally: ${appliedPromo.description}</div>` : ''}
+      ${appliedPromo ? `<div style="font-size: var(--fs-xs); color: var(--color-secondary); margin-bottom: var(--space-4);">Code will be sent to Shopify checkout: ${appliedPromo.description}</div>` : ''}
 
-      <button id="checkout-btn" class="btn btn-primary btn-block btn-lg" onclick="CartPage.startShopifyCheckout()">Proceed to Secure Checkout</button>
+      ${checkoutDisabled ? `<div style="font-size: var(--fs-sm); color: var(--color-error); margin-bottom: var(--space-4);">One or more items is missing a Shopify variant and cannot be checked out yet.</div>` : ''}
+      <button id="checkout-btn" class="btn btn-primary btn-block btn-lg" onclick="CartPage.startShopifyCheckout()" ${checkoutDisabled ? 'disabled' : ''}>Checkout with Shopify</button>
       <a href="shop.html" class="btn btn-secondary btn-block btn-lg" style="margin-top: var(--space-3);">Continue Shopping</a>
 
       <div style="text-align: center; margin-top: var(--space-4); padding: var(--space-3); background: rgba(var(--color-primary-rgb), 0.06); border-radius: var(--radius-md);">
@@ -138,7 +144,7 @@ const CartPage = (() => {
     if (!code) return;
     const promo = WowStore.validatePromo(code);
     if (promo) {
-      WowApp.showToast(`Promo code applied locally: ${promo.description}`, '🎉');
+      WowApp.showToast(`Promo code will be sent to Shopify checkout: ${promo.description}`, '🎉');
       renderSummary();
     } else {
       WowApp.showToast('Invalid promo code', '❌');
@@ -147,66 +153,35 @@ const CartPage = (() => {
 
   async function startShopifyCheckout() {
     const btn = document.getElementById('checkout-btn');
-    const originalText = btn.textContent;
-    btn.textContent = "Preparing Secure Checkout...";
-    btn.disabled = true;
+    const originalText = btn ? btn.textContent : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Preparing Shopify Checkout...';
+    }
 
     try {
-      const cartItems = WowStore.getCart();
-      const shopifyLines = cartItems.map(item => {
-        const product = WowStore.getProduct(item.productId);
-        return {
-          merchandiseId: `gid://shopify/ProductVariant/${product.shopifyId}`,
-          quantity: item.qty
-        };
-      });
-
-      const query = `
-        mutation cartCreate($input: CartInput!) {
-          cartCreate(input: $input) {
-            cart {
-              id
-              checkoutUrl
-            }
-            userErrors {
-              field
-              message
-            }
-          }
-        }
-      `;
-
-      const variables = {
-        input: { lines: shopifyLines }
-      };
-
-      const response = await fetch(`https://${WowStore.shopifyConfig.domain}/api/${WowStore.shopifyConfig.apiVersion}/graphql.json`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Shopify-Storefront-Access-Token': WowStore.shopifyConfig.storefrontAccessToken
-        },
-        body: JSON.stringify({ query, variables })
-      });
-
-      const json = await response.json();
-      
-      if (json.errors || json.data.cartCreate.userErrors.length > 0) {
-        console.error("Shopify Cart API Error:", json.errors || json.data.cartCreate.userErrors);
-        WowApp.showToast("Checkout error. Please try again.", "❌");
-        btn.textContent = originalText;
-        btn.disabled = false;
-        return;
+      const cart = WowStore.getCart();
+      const missing = WowStore.getMissingShopifyCartItems(cart);
+      if (missing.length) {
+        throw new Error('One or more cart items is missing its Shopify variant mapping.');
       }
 
-      const checkoutUrl = json.data.cartCreate.cart.checkoutUrl;
-      window.location.href = checkoutUrl;
+      const activeCode = localStorage.getItem('wow_applied_promo');
+      const user = typeof WowFirebase !== 'undefined' && WowFirebase.getCurrentUser ? WowFirebase.getCurrentUser() : null;
+      const shopifyCart = await WowStore.createShopifyCart(cart, {
+        discountCode: activeCode || null,
+        email: user?.email || localStorage.getItem('wow_checkout_email') || null
+      });
 
+      localStorage.setItem('wow_shopify_cart_id', shopifyCart.id);
+      window.location.href = shopifyCart.checkoutUrl;
     } catch (err) {
-      console.error("Checkout Request Failed:", err);
-      WowApp.showToast("Network error. Please try again.", "❌");
-      btn.textContent = originalText;
-      btn.disabled = false;
+      console.error('Shopify checkout failed:', err);
+      WowApp.showToast(err.message || 'Shopify checkout could not be started.', '❌');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
     }
   }
 

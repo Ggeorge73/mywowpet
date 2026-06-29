@@ -366,7 +366,13 @@ const ProfilePage = (() => {
   }
 
   function reorder(items) {
-    items.forEach(item => WowStore.addToCart(item.productId, item.qty, false));
+    const added = items
+      .map(item => WowStore.addToCart(item.productId, item.qty, false))
+      .filter(Boolean);
+    if (!added.length) {
+      WowApp.showToast('These items are not available for Shopify checkout yet.', 'Unavailable');
+      return;
+    }
     WowApp.updateCartBadge();
     WowApp.showToast('Items added to cart!', '🛒');
   }

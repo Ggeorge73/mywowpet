@@ -57,6 +57,7 @@ const ProductPage = (() => {
     document.title = `${product.name} | My Wow Pet`;
     renderBreadcrumbs();
     renderProduct();
+    syncShopifyProduct();
     renderTabs();
     renderFBT();
     renderRelated();
@@ -73,6 +74,18 @@ const ProductPage = (() => {
         WowApp.renderRecentlyViewed('recently-viewed-grid');
       }
     }, 300);
+  }
+
+  async function syncShopifyProduct() {
+    try {
+      const shopifyProduct = await WowStore.syncProductFromShopify(product.id);
+      if (!shopifyProduct) return;
+      renderProduct();
+      renderFBT();
+      renderRelated();
+    } catch (err) {
+      console.error("[My Wow Pet] Shopify product sync failed:", err);
+    }
   }
 
   function renderBreadcrumbs() {
@@ -112,35 +125,7 @@ const ProductPage = (() => {
       `<span class="product-highlight"><span class="highlight-icon">${highlightIcons[tag] || '✦'}</span> ${tag.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>`
     ).join('');
 
-    const subscribeSection = product.subscribable ? `
-      <div class="subscribe-toggle">
-        <label class="radio-label">
-          <input type="radio" name="purchaseType" value="onetime" ${!isSubscribe ? 'checked' : ''} onchange="ProductPage.setSubscribe(false)">
-          <div class="radio-content">
-            <span class="radio-title">One-time purchase</span>
-            <span class="radio-price">${WowStore.formatPrice(product.price)}</span>
-          </div>
-        </label>
-        <label class="radio-label">
-          <input type="radio" name="purchaseType" value="subscribe" ${isSubscribe ? 'checked' : ''} onchange="ProductPage.setSubscribe(true)">
-          <div class="radio-content">
-            <span class="radio-title">Subscribe & Save ${product.subscribeDiscount}%</span>
-            <span class="radio-price">${WowStore.formatPrice(product.subscribePrice)}</span>
-          </div>
-        </label>
-        ${isSubscribe ? `
-          <div class="subscribe-frequency" style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px dashed var(--color-border);">
-            <label style="display: block; font-size: var(--fs-xs); margin-bottom: var(--space-2); color: var(--color-text-secondary);">Deliver every:</label>
-            <select class="form-select" onchange="ProductPage.setFrequency(this.value)">
-              <option value="2weeks" ${frequency === '2weeks' ? 'selected' : ''}>2 weeks</option>
-              <option value="4weeks" ${frequency === '4weeks' ? 'selected' : ''}>4 weeks (Most Common)</option>
-              <option value="6weeks" ${frequency === '6weeks' ? 'selected' : ''}>6 weeks</option>
-              <option value="8weeks" ${frequency === '8weeks' ? 'selected' : ''}>8 weeks</option>
-            </select>
-            <p style="font-size: var(--fs-xs); color: var(--color-text-muted); margin-top: var(--space-2);"><span class="highlight-icon">✨</span> You save ${WowStore.formatPrice((product.price - product.subscribePrice) * 12)} per year!</p>
-          </div>
-        ` : ''}
-      </div>` : '';
+    const subscribeSection = ''; // Selling plans can be wired here once Shopify subscriptions are configured.
 
     const videoSrc = WowStore.getProductVideo ? WowStore.getProductVideo(product) : null;
 
@@ -198,8 +183,8 @@ const ProductPage = (() => {
             <span class="qty-display" id="qty-display">${qty}</span>
             <button class="qty-btn" onclick="ProductPage.changeQty(1)">+</button>
           </div>
-          <button class="btn btn-primary btn-lg flex-1" id="add-to-cart-btn" onclick="ProductPage.addToCart()">
-            Add to Cart — ${WowStore.formatPrice((isSubscribe ? product.subscribePrice : product.price) * qty)}
+          <button class="btn btn-primary btn-lg flex-1" id="add-to-cart-btn" onclick="ProductPage.addToCart()" ${product.inStock === false || !product.shopifyVariantId ? 'disabled' : ''}>
+            ${product.inStock === false || !product.shopifyVariantId ? 'Unavailable for checkout' : `Add to Cart - ${WowStore.formatPrice((isSubscribe && product.subscribePrice ? product.subscribePrice : product.price) * qty)}`}
           </button>
           <button class="product-wishlist-btn ${isWished ? 'active' : ''}" onclick="ProductPage.toggleWishlist()" id="wishlist-btn">
             ${isWished ? '❤️' : '🤍'}
@@ -282,12 +267,26 @@ const ProductPage = (() => {
   }
 
   function updateAddButton() {
+    const btn = document.getElementById('add-to-cart-btn');
+    if (!btn) return;
+
+    const unavailable = product.inStock === false || !product.shopifyVariantId;
+    btn.disabled = unavailable;
+    if (unavailable) {
+      btn.textContent = 'Unavailable for checkout';
+      return;
+    }
+
     const price = (isSubscribe && product.subscribePrice ? product.subscribePrice : product.price) * qty;
-    document.getElementById('add-to-cart-btn').textContent = `Add to Cart — ${WowStore.formatPrice(price)}`;
+    btn.textContent = `Add to Cart - ${WowStore.formatPrice(price)}`;
   }
 
   function addToCart() {
-    WowStore.addToCart(product.id, qty, isSubscribe, frequency);
+    const cart = WowStore.addToCart(product.id, qty, isSubscribe, frequency);
+    if (!cart) {
+      WowApp.showToast('This product is not available for Shopify checkout yet.', 'Unavailable');
+      return;
+    }
     WowApp.updateCartBadge();
     WowApp.showToast(`${product.name} added to cart!`, '🛒');
   }
@@ -584,7 +583,11 @@ const ProductPage = (() => {
   }
 
   function addBundle(ids) {
-    ids.forEach(id => WowStore.addToCart(id, 1, false));
+    const added = ids.map(id => WowStore.addToCart(id, 1, false)).filter(Boolean);
+    if (!added.length) {
+      WowApp.showToast('Bundle products are not available for Shopify checkout yet.', 'Unavailable');
+      return;
+    }
     WowApp.updateCartBadge();
     WowApp.showToast('Bundle added to cart!', '🛒');
   }

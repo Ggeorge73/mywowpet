@@ -181,7 +181,13 @@ const WowQuickView = (() => {
   }
 
   function addToCart(productId) {
-    WowStore.addToCart(productId, document._qvQty || 1, false);
+    const cart = WowStore.addToCart(productId, document._qvQty || 1, false);
+    if (!cart) {
+      if (typeof WowApp !== 'undefined') {
+        WowApp.showToast('This product is not available for Shopify checkout yet.', 'Unavailable');
+      }
+      return;
+    }
     if (typeof WowApp !== 'undefined') {
       WowApp.updateCartBadge();
       const p = WowStore.getProduct(productId);

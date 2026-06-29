@@ -4,10 +4,10 @@ This checklist protects the store by enforcing one production payment path: Shop
 
 ## Shopify checkout readiness
 
-- [x] Confirm every shoppable product has the correct Shopify product/variant mapping for the Shopify Buy Button.
-- [x] Confirm the Shopify Buy Button appears on product pages across desktop and mobile.
-- [x] Confirm the Shopify cart opens correctly from each product page.
-- [x] Confirm the Shopify cart `Checkout` button routes to Shopify Checkout.
+- [x] Confirm every shoppable product has the correct Shopify product/variant mapping for Storefront API cart creation.
+- [x] Confirm product pages use the custom storefront UI and add Shopify-mapped variants to the saved cart.
+- [x] Confirm the saved cart creates a Shopify cart through Storefront API.
+- [x] Confirm the Shopify cart `checkoutUrl` routes to Shopify Checkout.
 - [ ] Confirm Shopify Payments/Shopify Pay, taxes, shipping, fulfillment, and order notifications are configured inside Shopify Admin.
 - [ ] Confirm successful paid orders appear in Shopify Admin and are not duplicated in the local app cart/order history.
 

@@ -148,7 +148,11 @@ const WowApp = (() => {
   function quickAdd(productId) {
     const product = WowStore.getProduct(productId);
     if (!product) return;
-    WowStore.addToCart(productId, 1, false);
+    const cart = WowStore.addToCart(productId, 1, false);
+    if (!cart) {
+      showToast('This product is not available for Shopify checkout yet.', 'Unavailable');
+      return;
+    }
     updateCartBadge();
     showToast(`${product.name} added to cart!`, '🛒');
   }
