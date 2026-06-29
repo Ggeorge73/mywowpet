@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Read about My Wow Pet's 30-Day Happiness Guarantee and easy return process.">
+  <title>Returns & Refunds | My Wow Pet</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/pet-cursor.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#D4A853">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="My Wow Pet">
+  <link rel="apple-touch-icon" href="assets/images/icon-192x192.png">
+  <style>
+    .guarantee-hero {
+      text-align: center;
+      background: rgba(212,168,83,0.1);
+      border: 2px dashed var(--color-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8);
+      margin-bottom: var(--space-10);
+    }
+    .guarantee-hero h2 {
+      color: var(--color-primary);
+      font-size: var(--fs-xl);
+      margin-bottom: var(--space-3);
+    }
+    .policy-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+      margin-bottom: var(--space-10);
+    }
+    @media (min-width: 768px) {
+      .policy-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .policy-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+    }
+    .policy-card h3 {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+    }
+    .policy-list {
+      list-style: none;
+      padding: 0;
+      color: var(--color-text-secondary);
+    }
+    .policy-list li {
+      margin-bottom: var(--space-2);
+      position: relative;
+      padding-left: var(--space-5);
+    }
+    .policy-list.good li::before {
+      content: '✓';
+      color: #4ade80;
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+    .policy-list.bad li::before {
+      content: '✕';
+      color: #f87171;
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+    .steps-container {
+      margin-bottom: var(--space-10);
+    }
+    .step-item {
+      display: flex;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+      align-items: flex-start;
+    }
+    .step-number {
+      background: var(--color-primary);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: var(--fs-lg);
+      flex-shrink: 0;
+    }
+    .step-content h4 {
+      margin-bottom: var(--space-2);
+      font-size: var(--fs-lg);
+    }
+    .step-content p {
+      color: var(--color-text-secondary);
+      line-height: var(--lh-relaxed);
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-slot"></div>
+
+  <div class="page-body">
+    <div class="container section" style="padding-top: var(--space-8); max-width: 800px;">
+      
+      <div class="text-center fade-in" style="margin-bottom: var(--space-8);">
+        <span class="section-label">Policy</span>
+        <h1 class="section-title">Returns & Refunds</h1>
+      </div>
+
+      <div class="guarantee-hero slide-up">
+        <h2>✨ 30-Day Happiness Guarantee</h2>
+        <p style="color: var(--color-text-secondary); max-width: 600px; margin: 0 auto; line-height: var(--lh-relaxed);">We want you and your pet to be completely satisfied with every purchase. If you're not absolutely thrilled, we're here to help make it right.</p>
+      </div>
+
+      <div class="policy-grid slide-up" style="animation-delay: 0.1s;">
+        <div class="policy-card">
+          <h3 style="color: #4ade80;">👍 What Can Be Returned</h3>
+          <ul class="policy-list good">
+            <li>Unopened, unused items in original packaging</li>
+            <li>Defective or damaged products</li>
+            <li>Wrong items received</li>
+            <li>Apparel with tags still attached</li>
+          </ul>
+        </div>
+        <div class="policy-card">
+          <h3 style="color: #f87171;">👎 What Cannot Be Returned</h3>
+          <ul class="policy-list bad">
+            <li>Opened food, treats, or supplements (for health and safety reasons)</li>
+            <li>Personalized or custom items</li>
+            <li>Clearance or final sale items</li>
+            <li>Used toys or beds</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-up" style="animation-delay: 0.2s;">
+        <h2 style="margin-bottom: var(--space-6);">How to Return an Item</h2>
+        <div class="steps-container">
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Contact Support</h4>
+              <p>Reach out to our team at <a href="contact.html" style="color:var(--color-primary);">support@mywowpet.com</a> within 30 days of receiving your order. Include your order number and the reason for return.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Get Your Return Label</h4>
+              <p>We'll email you a prepaid shipping label and a Return Merchandise Authorization (RMA) number. Print the label and attach it to your package.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Ship It Back</h4>
+              <p>Drop the package off at your nearest USPS or UPS location (specified on the label) within 14 days of receiving the label.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Receive Your Refund</h4>
+              <p>Once we receive and inspect the item, we'll process your refund within 2 business days. The funds will appear on your original payment method within 5-7 business days, or instantly as store credit.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center slide-up" style="margin-top: var(--space-8); animation-delay: 0.3s; padding: var(--space-6); background: var(--color-surface); border-radius: var(--radius-lg);">
+        <h3 style="margin-bottom: var(--space-3);">Need an Exchange?</h3>
+        <p style="color: var(--color-text-secondary); margin-bottom: var(--space-4);">Got the wrong size collar or harness? The fastest way to ensure you get what you need is to return the item you have, and make a separate purchase for the new item.</p>
+        <a href="contact.html" class="btn btn-outline">Contact Us to Start</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="footer-slot"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/animations.js"></script>
+  <script>WowApp.init('support');</script>
+  <script src="js/pet-cursor.js"></script>
+</body>
+</html>

@@ -16,7 +16,7 @@ const WowFirebase = (() => {
     projectId: "wow-pet-store",
     storageBucket: "wow-pet-store.appspot.com",
     messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"f
+    appId: "YOUR_APP_ID"
   };
 
   // Check if credentials are set

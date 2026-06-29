@@ -11,15 +11,16 @@ export default defineConfig({
     ['junit', { outputFile: 'results.xml' }]
   ],
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    baseURL: process.env.BASE_URL || 'http://127.0.0.1:5000',
+    ignoreHTTPSErrors: true,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
-  /* Start a local static file server if no BASE_URL is set */
+  /* Start a local static server if no BASE_URL is set */
   webServer: process.env.BASE_URL ? undefined : {
-    command: 'npx serve . -l 3000',
-    port: 3000,
+    command: 'npx serve . -p 5000',
+    port: 5000,
     reuseExistingServer: !process.env.CI,
   },
   projects: [

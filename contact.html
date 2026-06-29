@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact My Wow Pet support. We're here to help you and your furry friend!">
+  <title>Contact Us | My Wow Pet</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/pet-cursor.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#D4A853">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="My Wow Pet">
+  <link rel="apple-touch-icon" href="assets/images/icon-192x192.png">
+  <style>
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+      margin-bottom: var(--space-12);
+    }
+    @media (min-width: 768px) {
+      .contact-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .contact-form {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+    }
+    .form-group {
+      margin-bottom: var(--space-4);
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: var(--space-2);
+      font-weight: 500;
+      color: var(--color-text);
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: inherit;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(212,168,83,0.2);
+    }
+    .info-panel {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+    .info-card {
+      background: rgba(212,168,83,0.05);
+      border-left: 4px solid var(--color-primary);
+      padding: var(--space-5);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+    .info-card h4 {
+      color: var(--color-primary);
+      margin-bottom: var(--space-2);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .info-card p {
+      color: var(--color-text-secondary);
+      line-height: var(--lh-relaxed);
+      margin: 0;
+    }
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+    .quick-links a {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-full);
+      font-size: var(--fs-sm);
+      color: var(--color-text);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+    .quick-links a:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-slot"></div>
+
+  <div class="page-body">
+    <div class="container section" style="padding-top: var(--space-8); max-width: 1000px;">
+      
+      <div class="text-center fade-in" style="margin-bottom: var(--space-10);">
+        <span class="section-label">Connect</span>
+        <h1 class="section-title">Contact Us</h1>
+        <p class="section-subtitle">We'd love to hear from you and your furry friend!</p>
+      </div>
+
+      <div class="contact-grid">
+        <!-- Form Side -->
+        <div class="slide-up" style="animation-delay: 0.1s;">
+          <form class="contact-form" onsubmit="event.preventDefault(); WowApp.showToast('Message sent! We\'ll get back to you within 24 hours.', '✉️'); this.reset();">
+            <h3 style="margin-bottom: var(--space-4);">Send us a message</h3>
+            
+            <div class="form-group">
+              <label for="name">Your Name</label>
+              <input type="text" id="name" required placeholder="John Doe">
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" required placeholder="john@example.com">
+            </div>
+            
+            <div class="form-group">
+              <label for="subject">Subject</label>
+              <select id="subject" required>
+                <option value="" disabled selected>Select an option</option>
+                <option value="general">General Inquiry</option>
+                <option value="order">Order Issue</option>
+                <option value="product">Product Question</option>
+                <option value="return">Returns & Exchanges</option>
+                <option value="feedback">Feedback</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" rows="5" required placeholder="How can we help?"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+          </form>
+        </div>
+
+        <!-- Info Side -->
+        <div class="info-panel slide-up" style="animation-delay: 0.2s;">
+          <div class="info-card">
+            <h4>✉️ Direct Contact</h4>
+            <p><strong>Email:</strong> <a href="mailto:support@mywowpet.com" style="color:var(--color-primary);">support@mywowpet.com</a></p>
+            <p style="margin-top: var(--space-2); font-size: var(--fs-sm);">We aim to respond to all inquiries within 24 hours.</p>
+          </div>
+
+          <div class="info-card">
+            <h4>🕒 Business Hours</h4>
+            <p><strong>Monday - Friday:</strong> 9:00 AM - 6:00 PM EST</p>
+            <p><strong>Saturday:</strong> 10:00 AM - 4:00 PM EST</p>
+            <p><strong>Sunday:</strong> Closed</p>
+          </div>
+
+          <div>
+            <h3 style="margin-bottom: var(--space-2); font-size: var(--fs-lg);">Quick Links</h3>
+            <p style="color: var(--color-text-secondary); margin-bottom: var(--space-3);">Find answers fast before reaching out:</p>
+            <div class="quick-links">
+              <a href="help.html">Help Center / FAQ</a>
+              <a href="tracking.html">Track Order</a>
+              <a href="shipping.html">Shipping Info</a>
+              <a href="returns.html">Return Policy</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="footer-slot"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/animations.js"></script>
+  <script>WowApp.init('support');</script>
+  <script src="js/pet-cursor.js"></script>
+</body>
+</html>

@@ -25,8 +25,8 @@
   <section class="hero" id="hero">
     <div class="hero-bg" style="position: absolute; inset: 0; overflow: hidden;">
       <!-- Video B sits below; Video A sits on top. Both always opacity:1 so browser never suspends decoding. -->
-      <video id="hero-vid-b" muted loop playsinline preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:1;"></video>
-      <video id="hero-vid-a" autoplay muted loop playsinline preload="auto" poster="assets/images/hero.jpg" src="assets/videos/hero_dog.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:2;"></video>
+      <video id="hero-vid-b" muted loop playsinline preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:1;"></video>
+      <video id="hero-vid-a" autoplay muted loop playsinline preload="metadata" poster="assets/images/hero.jpg" src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero_dog.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:2;"></video>
     </div>
     <div class="hero-overlay"></div>
     <div class="container">
@@ -80,32 +80,32 @@
       <div class="category-grid stagger" id="category-grid">
         <a href="shop.html?pet=dog" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
           <div class="category-card-icon" style="overflow:hidden;position:relative;">
-            <video muted loop playsinline preload="metadata" poster="assets/images/dog_food.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
-              <source src="assets/videos/dog_park.mp4" type="video/mp4">
+            <video muted loop playsinline preload="none" poster="assets/images/dog_food.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/dog_park.mp4" type="video/mp4">
             </video>
           </div>
           <span class="category-card-name">Dogs</span>
         </a>
         <a href="shop.html?pet=cat" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
           <div class="category-card-icon" style="overflow:hidden;position:relative;">
-            <video muted loop playsinline preload="metadata" poster="assets/images/cat_food.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
-              <source src="assets/videos/cat_playing.mp4" type="video/mp4">
+            <video muted loop playsinline preload="none" poster="assets/images/cat_food.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/cat_playing.mp4" type="video/mp4">
             </video>
           </div>
           <span class="category-card-name">Cats</span>
         </a>
         <a href="shop.html?pet=small-pet" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
           <div class="category-card-icon" style="overflow:hidden;position:relative;">
-            <video muted loop playsinline preload="metadata" poster="assets/images/small_pet.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
-              <source src="assets/videos/hamster_wheel.mp4" type="video/mp4">
+            <video muted loop playsinline preload="none" poster="assets/images/small_pet.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hamster_wheel.mp4" type="video/mp4">
             </video>
           </div>
           <span class="category-card-name">Small Pets</span>
         </a>
         <a href="shop.html?pet=bird" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
           <div class="category-card-icon" style="overflow:hidden;position:relative;">
-            <video muted loop playsinline preload="metadata" poster="assets/images/bird_pet.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
-              <source src="assets/videos/bird_colorful.mp4" type="video/mp4">
+            <video muted loop playsinline preload="none" poster="assets/images/bird_pet.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/bird_colorful.mp4" type="video/mp4">
             </video>
           </div>
           <span class="category-card-name">Birds</span>
@@ -121,24 +121,6 @@
       <h2 class="section-title fade-in">Trending Now</h2>
       <p class="section-subtitle fade-in">Our customers' top picks this month</p>
       <div class="horizontal-scroll stagger" id="trending-products"></div>
-    </div>
-  </section>
-
-  <!-- ======== SOLAR JOURNEY CTA ======== -->
-  <section class="section" id="journey-cta" style="background: linear-gradient(135deg, #0a0a2e 0%, #1a1040 50%, #050520 100%); color: white; position: relative; overflow: hidden;">
-    <div style="position: absolute; inset: 0; background: radial-gradient(circle at 30% 50%, rgba(212,168,83,0.08) 0%, transparent 50%);"></div>
-    <div class="container text-center" style="position: relative; z-index: 1;">
-      <span class="section-label fade-in" style="color: rgba(212,168,83,0.8);">New Experience</span>
-      <h2 class="section-title fade-in" style="color: white;">&#x1FA90; Explore the Solar Journey</h2>
-      <p class="section-subtitle fade-in" style="color: rgba(255,255,255,0.6); max-width: 600px; margin: 0 auto var(--space-6);">Discover our products in an immersive 3D solar system. Each planet is a product category &#x2014; click to explore, learn, and shop.</p>
-      <div class="fade-in" style="display: flex; gap: var(--space-6); justify-content: center; flex-wrap: wrap; margin-bottom: var(--space-8);">
-        <div style="display: flex; align-items: center; gap: var(--space-3);"><span style="font-size: 28px;">&#x1F969;</span><span style="color: rgba(255,255,255,0.7); font-size: var(--fs-sm);">Food</span></div>
-        <div style="display: flex; align-items: center; gap: var(--space-3);"><span style="font-size: 28px;">&#x1F9B4;</span><span style="color: rgba(255,255,255,0.7); font-size: var(--fs-sm);">Treats</span></div>
-        <div style="display: flex; align-items: center; gap: var(--space-3);"><span style="font-size: 28px;">&#x1F3BE;</span><span style="color: rgba(255,255,255,0.7); font-size: var(--fs-sm);">Toys</span></div>
-        <div style="display: flex; align-items: center; gap: var(--space-3);"><span style="font-size: 28px;">&#x1F48A;</span><span style="color: rgba(255,255,255,0.7); font-size: var(--fs-sm);">Health</span></div>
-        <div style="display: flex; align-items: center; gap: var(--space-3);"><span style="font-size: 28px;">&#x1F380;</span><span style="color: rgba(255,255,255,0.7); font-size: var(--fs-sm);">Accessories</span></div>
-      </div>
-      <a href="journey.html" class="btn btn-primary btn-lg fade-in" style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light)); min-width: 220px;">Launch Solar Journey &#x2192;</a>
     </div>
   </section>
 
@@ -214,9 +196,7 @@
           <a href="subscribe.html" class="btn btn-primary btn-lg">Start Saving Today</a>
         </div>
         <div class="split-image slide-up" style="position: relative; overflow: hidden; aspect-ratio: 4/3; border-radius: var(--radius-xl);">
-          <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
-            <source src="assets/videos/dog_happy.mp4" type="video/mp4">
-          </video>
+          <video muted loop playsinline preload="none" data-lazy-src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/dog_happy.mp4" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"></video>
           <div style="position:absolute;inset:0;background:linear-gradient(135deg, rgba(26,58,92,0.7), rgba(45,95,138,0.5));display:flex;align-items:center;justify-content:center;">
             <div style="text-align: center; color: white; padding: var(--space-8);">
               <div style="font-family: var(--font-heading); font-size: var(--fs-4xl); font-weight: var(--fw-bold); margin-bottom: var(--space-2);">15% OFF</div>
@@ -330,10 +310,10 @@
     //   5. Repeat forever.
     (function() {
       var sources = [
-        'assets/videos/hero_dog.mp4',
-        'assets/videos/hero_cat.mp4',
-        'assets/videos/hero_bunny.mp4',
-        'assets/videos/hero_bird.mp4'
+        'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero_dog.mp4',
+        'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero_cat.mp4',
+        'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero_bunny.mp4',
+        'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero_bird.mp4'
       ];
       var vidA = document.getElementById('hero-vid-a');
       var vidB = document.getElementById('hero-vid-b');
@@ -429,6 +409,25 @@
 
       // Start the cycle: crossfade every 7 seconds
       setInterval(doNextCrossfade, 7000);
+    })();
+
+    // Lazy-load videos with data-lazy-src when they scroll into view
+    (function() {
+      var lazyVideos = document.querySelectorAll('video[data-lazy-src]');
+      if (!lazyVideos.length) return;
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var video = entry.target;
+            video.src = video.getAttribute('data-lazy-src');
+            video.removeAttribute('data-lazy-src');
+            video.load();
+            video.play().catch(function(){});
+            observer.unobserve(video);
+          }
+        });
+      }, { rootMargin: '200px' });
+      lazyVideos.forEach(function(v) { observer.observe(v); });
     })();
   </script>
   <style>
