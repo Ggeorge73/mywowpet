@@ -5,6 +5,8 @@ on:
     branches: [ main, develop ]
   push:
     branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *' # Daily at 2 AM UTC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,12 +24,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0 # Required to scan all commits in the PR
 
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc # v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # Gitleaks automatically exits with code 1 if secrets are found, failing the job.
@@ -45,16 +47,16 @@ jobs:
       image: semgrep/semgrep
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Run Semgrep
         run: semgrep ci --sarif > semgrep.sarif
         env:
-          SEMGREP_RULES: p/default
+          SEMGREP_RULES: p/default p/owasp-top-ten p/javascript p/typescript
 
       - name: Upload SARIF file
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@dd903d2e4f5405488e5ef1422510ee31c8b32357 # v3
         with:
           sarif_file: semgrep.sarif
           category: semgrep
@@ -70,14 +72,14 @@ jobs:
       security-events: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Run Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
-          scanners: 'vuln'
+          scanners: 'vuln,secret,misconfig'
           ignore-unfixed: true
           format: 'sarif'
           output: 'trivy-results.sarif'
@@ -86,7 +88,7 @@ jobs:
 
       - name: Upload Trivy scan results to GitHub Security tab
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@dd903d2e4f5405488e5ef1422510ee31c8b32357 # v3
         with:
           sarif_file: 'trivy-results.sarif'
           category: trivy
