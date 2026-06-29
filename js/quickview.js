@@ -184,7 +184,7 @@ const WowQuickView = (() => {
     const cart = WowStore.addToCart(productId, document._qvQty || 1, false);
     if (!cart) {
       if (typeof WowApp !== 'undefined') {
-        WowApp.showToast('This product is not available for Shopify checkout yet.', 'Unavailable');
+        WowApp.showToast('This product is not available for secure checkout yet.', 'Unavailable');
       }
       return;
     }
