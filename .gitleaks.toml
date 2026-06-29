@@ -1,0 +1,15 @@
+title = "My Wow Pet Gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Shopify Storefront access tokens are public client-side identifiers for this custom storefront."
+condition = "AND"
+regexTarget = "line"
+paths = [
+  '''(^|/)js/store\.js$''',
+]
+regexes = [
+  '''storefrontAccessToken:\s*['"][a-f0-9]{32}['"]''',
+]
