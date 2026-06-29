@@ -6,6 +6,13 @@ on:
   push:
     branches: [ main ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   # ---------------------------------------------------------
   # 1. Secret Detection (Gitleaks)
@@ -31,17 +38,26 @@ jobs:
   sast-code-scan:
     name: SAST Code Analysis
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    container:
+      image: semgrep/semgrep
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Run Semgrep
-        uses: returntocorp/semgrep-action@v1
+        run: semgrep ci --sarif > semgrep.sarif
+        env:
+          SEMGREP_RULES: p/default
+
+      - name: Upload SARIF file
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          # Use default community rulesets for comprehensive coverage
-          config: "p/default"
-          # Fails the build if high-severity issues are found
-          generateSarif: "1"
+          sarif_file: semgrep.sarif
+          category: semgrep
 
   # ---------------------------------------------------------
   # 3. Software Composition Analysis - SCA (Trivy)
@@ -49,16 +65,28 @@ jobs:
   sca-dependency-scan:
     name: SCA Dependency Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Run Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'vuln'
           ignore-unfixed: true
-          format: 'table'
-          # CRITICAL: Exit code 1 ensures the pipeline fails if vulnerabilities are found
+          format: 'sarif'
+          output: 'trivy-results.sarif'
           exit-code: '1'
           severity: 'HIGH,CRITICAL'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: trivy

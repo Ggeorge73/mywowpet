@@ -10,10 +10,11 @@
         "test:debug": "npx playwright test --debug",
         "test:chromium": "npx playwright test --project=chromium",
         "test:report": "npx playwright show-report",
-        "lint": "eslint tests/",
+        "lint": "eslint e2e-tests/ js/",
         "shopify:deploy": "shopify theme push --store=$SHOPIFY_STORE_URL --theme=$SHOPIFY_THEME_ID"
     },
     "devDependencies": {
+        "@eslint/js": "^9.0.0",
         "@playwright/test": "^1.52.0",
         "@shopify/cli": "^4.2.0",
         "eslint": "^9.0.0"
