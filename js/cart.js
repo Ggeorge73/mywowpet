@@ -66,6 +66,7 @@ const CartPage = (() => {
   }
 
   function renderSummary() {
+    const cart = WowStore.getCart();
     const totals = WowStore.getCartTotal();
     const activeCode = localStorage.getItem('wow_applied_promo');
     const appliedPromo = activeCode ? WowStore.validatePromo(activeCode) : null;
