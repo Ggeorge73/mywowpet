@@ -69,7 +69,11 @@ jobs:
         run: npx playwright install-deps
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            unset BASE_URL
+          fi
+          npx playwright test
         env:
           BASE_URL: ${{ secrets.STAGING_URL }}
           API_TOKEN: ${{ secrets.TEST_API_TOKEN }}

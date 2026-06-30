@@ -97,32 +97,86 @@ const WowChatbot = (() => {
     const root = document.createElement("div");
     root.id = "wow-chatbot";
     root.className = "wow-chatbot";
-    root.innerHTML = `
-      <button class="wow-chat-launcher" type="button" aria-label="Open support chat" aria-expanded="false">
-        <span class="wow-chat-launcher-icon" aria-hidden="true">?</span>
-        <span class="wow-chat-launcher-text">Support</span>
-      </button>
-      <section class="wow-chat-panel" role="dialog" aria-modal="false" aria-labelledby="wow-chat-title" hidden>
-        <header class="wow-chat-header">
-          <div>
-            <p class="wow-chat-kicker">Support Agent</p>
-            <h2 id="wow-chat-title">My Wow Pet Assistant</h2>
-          </div>
-          <button class="wow-chat-close" type="button" aria-label="Close support chat">&times;</button>
-        </header>
-        <div class="wow-chat-status" aria-live="polite" hidden>
-          <span class="wow-chat-thinking-dot"></span>
-          <span>Thinking through store knowledge...</span>
-        </div>
-        <div class="wow-chat-messages" aria-live="polite"></div>
-        <div class="wow-chat-quick" aria-label="Suggested questions"></div>
-        <form class="wow-chat-form">
-          <label class="sr-only" for="wow-chat-input">Ask a question</label>
-          <textarea id="wow-chat-input" rows="1" placeholder="Ask about products, orders, returns..." required></textarea>
-          <button type="submit" aria-label="Send question">Send</button>
-        </form>
-      </section>
-    `;
+
+    const launcher = document.createElement("button");
+    launcher.className = "wow-chat-launcher";
+    launcher.type = "button";
+    launcher.setAttribute("aria-label", "Open support chat");
+    launcher.setAttribute("aria-expanded", "false");
+
+    const launcherIcon = document.createElement("span");
+    launcherIcon.className = "wow-chat-launcher-icon";
+    launcherIcon.setAttribute("aria-hidden", "true");
+    launcherIcon.textContent = "?";
+
+    const launcherText = document.createElement("span");
+    launcherText.className = "wow-chat-launcher-text";
+    launcherText.textContent = "Support";
+    launcher.append(launcherIcon, launcherText);
+
+    const panel = document.createElement("section");
+    panel.className = "wow-chat-panel";
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-modal", "false");
+    panel.setAttribute("aria-labelledby", "wow-chat-title");
+    panel.hidden = true;
+
+    const header = document.createElement("header");
+    header.className = "wow-chat-header";
+
+    const headerCopy = document.createElement("div");
+    const kicker = document.createElement("p");
+    kicker.className = "wow-chat-kicker";
+    kicker.textContent = "Support Agent";
+    const title = document.createElement("h2");
+    title.id = "wow-chat-title";
+    title.textContent = "My Wow Pet Assistant";
+    headerCopy.append(kicker, title);
+
+    const close = document.createElement("button");
+    close.className = "wow-chat-close";
+    close.type = "button";
+    close.setAttribute("aria-label", "Close support chat");
+    close.textContent = "x";
+    header.append(headerCopy, close);
+
+    const status = document.createElement("div");
+    status.className = "wow-chat-status";
+    status.setAttribute("aria-live", "polite");
+    status.hidden = true;
+    const thinkingDot = document.createElement("span");
+    thinkingDot.className = "wow-chat-thinking-dot";
+    const thinkingText = document.createElement("span");
+    thinkingText.textContent = "Thinking through store knowledge...";
+    status.append(thinkingDot, thinkingText);
+
+    const messages = document.createElement("div");
+    messages.className = "wow-chat-messages";
+    messages.setAttribute("aria-live", "polite");
+
+    const quick = document.createElement("div");
+    quick.className = "wow-chat-quick";
+    quick.setAttribute("aria-label", "Suggested questions");
+
+    const form = document.createElement("form");
+    form.className = "wow-chat-form";
+    const inputLabel = document.createElement("label");
+    inputLabel.className = "sr-only";
+    inputLabel.setAttribute("for", "wow-chat-input");
+    inputLabel.textContent = "Ask a question";
+    const input = document.createElement("textarea");
+    input.id = "wow-chat-input";
+    input.rows = 1;
+    input.placeholder = "Ask about products, orders, returns...";
+    input.required = true;
+    const send = document.createElement("button");
+    send.type = "submit";
+    send.setAttribute("aria-label", "Send question");
+    send.textContent = "Send";
+    form.append(inputLabel, input, send);
+
+    panel.append(header, status, messages, quick, form);
+    root.append(launcher, panel);
     document.body.appendChild(root);
 
     refs = {
@@ -354,19 +408,34 @@ const WowChatbot = (() => {
   function showHandoff(question, reason) {
     const wrapper = document.createElement("form");
     wrapper.className = "wow-chat-handoff";
-    wrapper.innerHTML = `
-      <div class="wow-chat-handoff-title">Send this to support</div>
-      <label>
-        Your email
-        <input type="email" name="email" placeholder="you@example.com" required>
-      </label>
-      <label>
-        Details
-        <textarea name="details" rows="4" required></textarea>
-      </label>
-      <button type="submit">Open email draft</button>
-    `;
-    wrapper.querySelector("[name='details']").value = `Question: ${question}\n\nReason: ${reason || "Needs support review"}`;
+
+    const title = document.createElement("div");
+    title.className = "wow-chat-handoff-title";
+    title.textContent = "Send this to support";
+
+    const emailLabel = document.createElement("label");
+    emailLabel.textContent = "Your email";
+    const emailInput = document.createElement("input");
+    emailInput.type = "email";
+    emailInput.name = "email";
+    emailInput.placeholder = "you@example.com";
+    emailInput.required = true;
+    emailLabel.appendChild(emailInput);
+
+    const detailsLabel = document.createElement("label");
+    detailsLabel.textContent = "Details";
+    const detailsInput = document.createElement("textarea");
+    detailsInput.name = "details";
+    detailsInput.rows = 4;
+    detailsInput.required = true;
+    detailsInput.value = `Question: ${question}\n\nReason: ${reason || "Needs support review"}`;
+    detailsLabel.appendChild(detailsInput);
+
+    const submit = document.createElement("button");
+    submit.type = "submit";
+    submit.textContent = "Open email draft";
+    wrapper.append(title, emailLabel, detailsLabel, submit);
+
     wrapper.addEventListener("submit", event => {
       event.preventDefault();
       const email = wrapper.elements.email.value.trim();
@@ -429,18 +498,30 @@ const WowChatbot = (() => {
     card.className = "wow-chat-product";
     card.href = `product.html?id=${product.id}`;
     const image = window.WowStore?.getProductImage ? WowStore.getProductImage(product) : "";
-    card.innerHTML = `
-      <span class="wow-chat-product-image">${image ? `<img src="${image}" alt="">` : ""}</span>
-      <span class="wow-chat-product-copy">
-        <strong>${escapeHtml(product.name)}</strong>
-        <span>${escapeHtml(product.brand)} - ${formatMoney(product.price)}</span>
-      </span>
-    `;
+
+    const imageWrap = document.createElement("span");
+    imageWrap.className = "wow-chat-product-image";
+    if (image) {
+      const img = document.createElement("img");
+      img.src = image;
+      img.alt = "";
+      imageWrap.appendChild(img);
+    }
+
+    const copy = document.createElement("span");
+    copy.className = "wow-chat-product-copy";
+    const name = document.createElement("strong");
+    name.textContent = product.name;
+    const meta = document.createElement("span");
+    meta.textContent = `${product.brand} - ${formatMoney(product.price)}`;
+    copy.append(name, meta);
+
+    card.append(imageWrap, copy);
     return card;
   }
 
   function renderQuick(items) {
-    refs.quick.innerHTML = "";
+    refs.quick.replaceChildren();
     (items || fallbackPrompts).slice(0, 4).forEach(item => {
       const button = document.createElement("button");
       button.type = "button";
@@ -454,7 +535,7 @@ const WowChatbot = (() => {
   }
 
   function renderHistory() {
-    refs.messages.innerHTML = "";
+    refs.messages.replaceChildren();
     conversation.forEach(renderMessage);
     renderQuick(fallbackPrompts);
   }
@@ -609,10 +690,6 @@ const WowChatbot = (() => {
 
   function tokenize(value) {
     return normalize(value).split(" ");
-  }
-
-  function escapeHtml(value) {
-    return String(value || "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
   }
 
   function escapeRegExp(value) {
