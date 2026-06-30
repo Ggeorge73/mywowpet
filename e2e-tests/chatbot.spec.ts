@@ -1,8 +1,17 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
+async function suppressInstallPrompt(page) {
+  await page.addInitScript(() => {
+    const dismissedUntil = Date.now() + 7 * 24 * 60 * 60 * 1000;
+    window.localStorage.setItem('wow_install_dismissed_until', String(dismissedUntil));
+    window.sessionStorage.setItem('wow_install_prompt_seen_session', '1');
+  });
+}
+
 test.describe('Support chatbot', () => {
   test.beforeEach(async ({ page }) => {
+    await suppressInstallPrompt(page);
     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
     await expect(page.locator('.wow-chat-launcher')).toBeVisible({ timeout: 15_000 });
