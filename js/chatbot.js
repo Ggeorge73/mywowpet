@@ -440,9 +440,7 @@ const WowChatbot = (() => {
       event.preventDefault();
       const email = wrapper.elements.email.value.trim();
       const details = wrapper.elements.details.value.trim();
-      const subject = encodeURIComponent("My Wow Pet support request");
-      const body = encodeURIComponent(`${details}\n\nCustomer email: ${email}`);
-      window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
+      openSupportEmailDraft(email, details);
       if (window.WowApp?.showToast) {
         WowApp.showToast("Email draft opened for support.", "OK");
       }
@@ -481,8 +479,10 @@ const WowChatbot = (() => {
       const links = document.createElement("div");
       links.className = "wow-chat-links";
       entry.meta.links.forEach(link => {
+        const safeHref = getSafeChatHref(link.href);
+        if (!safeHref) return;
         const anchor = document.createElement("a");
-        anchor.href = link.href;
+        anchor.setAttribute("href", safeHref);
         anchor.textContent = link.label;
         if (link.href.startsWith("mailto:")) anchor.target = "_self";
         links.appendChild(anchor);
@@ -496,14 +496,15 @@ const WowChatbot = (() => {
   function renderProductMini(product) {
     const card = document.createElement("a");
     card.className = "wow-chat-product";
-    card.href = `product.html?id=${product.id}`;
+    card.setAttribute("href", `product.html?id=${encodeURIComponent(String(product.id))}`);
     const image = window.WowStore?.getProductImage ? WowStore.getProductImage(product) : "";
 
     const imageWrap = document.createElement("span");
     imageWrap.className = "wow-chat-product-image";
-    if (image) {
+    const safeImage = getSafeAssetUrl(image);
+    if (safeImage) {
       const img = document.createElement("img");
-      img.src = image;
+      img.setAttribute("src", safeImage);
       img.alt = "";
       imageWrap.appendChild(img);
     }
@@ -661,6 +662,38 @@ const WowChatbot = (() => {
     if (category) params.set("category", category);
     const query = params.toString();
     return query ? `shop.html?${query}` : "shop.html";
+  }
+
+  function getSafeChatHref(href) {
+    const value = String(href || "");
+    if (value === `mailto:${SUPPORT_EMAIL}`) return value;
+
+    try {
+      const url = new URL(value, window.location.href);
+      if (url.origin !== window.location.origin) return "";
+      return `${url.pathname.replace(/^\//, "")}${url.search}${url.hash}`;
+    } catch {
+      return "";
+    }
+  }
+
+  function getSafeAssetUrl(src) {
+    try {
+      const url = new URL(String(src || ""), window.location.href);
+      if (url.origin !== window.location.origin) return "";
+      return `${url.pathname.replace(/^\//, "")}${url.search}`;
+    } catch {
+      return "";
+    }
+  }
+
+  function openSupportEmailDraft(email, details) {
+    const subject = encodeURIComponent("My Wow Pet support request");
+    const body = encodeURIComponent(`${details}\n\nCustomer email: ${email}`);
+    const draft = document.createElement("a");
+    draft.setAttribute("href", `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`);
+    draft.setAttribute("target", "_self");
+    draft.click();
   }
 
   function formatProductLine(product) {
