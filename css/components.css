@@ -273,6 +273,180 @@
   top: var(--nav-height);
 }
 
+/* ---- App Install Prompt ---- */
+.app-install-banner {
+  position: fixed;
+  left: max(var(--space-4), env(safe-area-inset-left));
+  right: max(var(--space-4), env(safe-area-inset-right));
+  bottom: max(var(--space-4), env(safe-area-inset-bottom));
+  z-index: 700;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-surface) 96%, var(--color-primary) 4%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px);
+  transition: opacity var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out);
+}
+
+.app-install-banner.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.app-install-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.app-install-icon img,
+.app-install-ios-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.app-install-copy {
+  min-width: 0;
+}
+
+.app-install-copy strong {
+  display: block;
+  color: var(--color-text);
+  font-family: var(--font-accent);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+}
+
+.app-install-copy span {
+  display: block;
+  margin-top: 2px;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+}
+
+.app-install-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.app-install-close {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.app-install-close:hover {
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+}
+
+.app-install-ios-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 710;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: var(--space-5);
+  background: rgba(0, 0, 0, 0.48);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-base);
+}
+
+.app-install-ios-panel.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.app-install-ios-card {
+  position: relative;
+  width: min(100%, 420px);
+  padding: var(--space-8) var(--space-6) var(--space-6);
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  text-align: center;
+  transform: translateY(20px);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.app-install-ios-panel.show .app-install-ios-card {
+  transform: translateY(0);
+}
+
+.app-install-ios-card .app-install-close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+}
+
+.app-install-ios-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-4);
+}
+
+.app-install-ios-card h3 {
+  font-size: var(--fs-xl);
+  margin-bottom: var(--space-3);
+}
+
+.app-install-ios-card p {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed);
+  margin-bottom: var(--space-5);
+}
+
+@media (max-width: 640px) {
+  .app-install-banner {
+    grid-template-columns: auto 1fr auto;
+    gap: var(--space-3);
+  }
+
+  .app-install-actions {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .app-install-actions .btn {
+    flex: 1;
+  }
+
+  .app-install-close {
+    align-self: start;
+  }
+}
+
+[data-theme="dark"] .app-install-banner {
+  background: color-mix(in srgb, var(--color-surface) 92%, var(--color-primary) 8%);
+}
+
 
 .mobile-menu .mobile-search {
   margin-bottom: var(--space-6);

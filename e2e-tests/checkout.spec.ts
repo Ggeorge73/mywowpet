@@ -1,6 +1,33 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
+async function suppressInstallPrompt(page) {
+  await page.addInitScript(() => {
+    const dismissedUntil = Date.now() + 7 * 24 * 60 * 60 * 1000;
+    window.localStorage.setItem('wow_install_dismissed_until', String(dismissedUntil));
+    window.sessionStorage.setItem('wow_install_prompt_seen_session', '1');
+  });
+}
+
+async function openPurchasableProduct(page) {
+  await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.WowStore && typeof window.WowStore.getProducts === 'function');
+
+  const productId = await page.evaluate(() => {
+    const product = window.WowStore
+      .getProducts()
+      .find((item) => item.inStock !== false && Boolean(item.shopifyVariantId));
+    return product ? String(product.id) : null;
+  });
+
+  expect(productId).toBeTruthy();
+  await page.goto(`/product.html?id=${productId}`, { waitUntil: 'domcontentloaded' });
+  if (!new URL(page.url()).searchParams.has('id')) {
+    await page.goto(`/product?id=${productId}`, { waitUntil: 'domcontentloaded' });
+  }
+  await expect(page.locator('text=Product Not Found')).toHaveCount(0);
+}
+
 /**
  * E2E smoke tests for the mywowpet.com Firebase static storefront.
  *
@@ -15,6 +42,7 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Landing Page Health', () => {
   test.beforeEach(async ({ page }) => {
+    await suppressInstallPrompt(page);
     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
   });
@@ -74,12 +102,8 @@ test.describe('Shop & Product Flow', () => {
   });
 
   test('product page shows an enabled Add to Cart button', async ({ page }) => {
-    // Derive a real product URL from the shop grid (no hard-coded id).
-    await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
-    const firstProduct = page.locator('#product-grid a[href*="product.html"]').first();
-    await expect(firstProduct).toBeVisible({ timeout: 15_000 });
-    const href = await firstProduct.getAttribute('href');
-    await page.goto('/' + href, { waitUntil: 'domcontentloaded' });
+    await suppressInstallPrompt(page);
+    await openPurchasableProduct(page);
 
     const addBtn = page.locator('#add-to-cart-btn');
     await expect(addBtn).toBeVisible({ timeout: 15_000 });
@@ -87,11 +111,8 @@ test.describe('Shop & Product Flow', () => {
   });
 
   test('adding to cart updates the persisted cart count', async ({ page }) => {
-    await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
-    const firstProduct = page.locator('#product-grid a[href*="product.html"]').first();
-    await expect(firstProduct).toBeVisible({ timeout: 15_000 });
-    const href = await firstProduct.getAttribute('href');
-    await page.goto('/' + href, { waitUntil: 'domcontentloaded' });
+    await suppressInstallPrompt(page);
+    await openPurchasableProduct(page);
 
     const addBtn = page.locator('#add-to-cart-btn');
     await expect(addBtn).toBeVisible({ timeout: 15_000 });
@@ -124,6 +145,67 @@ test.describe('Shop & Product Flow', () => {
     await expect(
       page.locator('#cart-count-text, #cart-layout, #cart-items').first()
     ).toBeAttached({ timeout: 15_000 });
+  });
+});
+
+test.describe('Shopify Checkout Handoff', () => {
+  test('cart creation includes the custom storefront return URL', async ({ page }) => {
+    let capturedBody;
+
+    await page.route('https://id0dxt-4y.myshopify.com/api/**/graphql.json', async (route) => {
+      capturedBody = JSON.parse(route.request().postData() || '{}');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: {
+            cartCreate: {
+              cart: {
+                id: 'gid://shopify/Cart/test',
+                checkoutUrl: 'https://id0dxt-4y.myshopify.com/checkouts/cn/test',
+                discountCodes: [],
+                cost: {
+                  subtotalAmount: { amount: '18.99', currencyCode: 'USD' },
+                  totalAmount: { amount: '18.99', currencyCode: 'USD' }
+                }
+              },
+              userErrors: []
+            }
+          }
+        })
+      });
+    });
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.WowStore && typeof window.WowStore.createShopifyCart === 'function');
+
+    await page.evaluate(() => window.WowStore.createShopifyCart(
+      [{ productId: 6, qty: 3 }],
+      { returnUrl: 'https://mywowpet.com/' }
+    ));
+
+    expect(capturedBody?.variables?.input?.attributes).toEqual(expect.arrayContaining([
+      { key: 'source', value: 'my-wow-pet-custom-storefront' },
+      { key: 'source_url', value: 'https://mywowpet.com/' },
+      { key: 'return_url', value: 'https://mywowpet.com/' }
+    ]));
+  });
+
+  test('checkout URL preserves Shopify checkout and adds the custom return target', async ({ page }) => {
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.WowStore && typeof window.WowStore.buildShopifyCheckoutUrl === 'function');
+
+    const checkoutUrl = await page.evaluate(() => window.WowStore.buildShopifyCheckoutUrl(
+      'https://id0dxt-4y.myshopify.com/checkouts/cn/test?existing=1',
+      'https://mywowpet.com/'
+    ));
+    const parsed = new URL(checkoutUrl);
+
+    expect(parsed.origin).toBe('https://id0dxt-4y.myshopify.com');
+    expect(parsed.pathname).toBe('/checkouts/cn/test');
+    expect(parsed.searchParams.get('existing')).toBe('1');
+    expect(parsed.searchParams.get('return_url')).toBe('https://mywowpet.com/');
+    expect(parsed.searchParams.get('return_to')).toBe('https://mywowpet.com/');
   });
 });
 

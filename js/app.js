@@ -902,6 +902,273 @@ const WowApp = (() => {
     }
   }
 
+  function initSupportChat() {
+    loadStyle("css/chatbot.css");
+    loadScript("js/chatbot.js", 10000)
+      .then(() => {
+        if (window.WowChatbot && typeof window.WowChatbot.init === "function") {
+          window.WowChatbot.init();
+        }
+      })
+      .catch(err => console.warn("[My Wow Pet] Support chat failed to load:", err));
+  }
+
+  // ---- Mobile App Install Prompt ----
+  let deferredInstallPrompt = null;
+  let installPromptInitialized = false;
+  let installPromptShownThisSession = false;
+  let pendingLeaveTarget = null;
+  let installPromptTimer = null;
+  const INSTALL_PROMPT_DELAY_MS = 15000;
+
+  function isRunningAsInstalledApp() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  function isIOSDevice() {
+    return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  }
+
+  function canShowInstallBanner() {
+    if (isRunningAsInstalledApp()) return false;
+    try {
+      if (sessionStorage.getItem('wow_install_prompt_seen_session') === '1') return false;
+    } catch (e) {}
+    try {
+      const dismissedUntil = Number(localStorage.getItem('wow_install_dismissed_until') || 0);
+      return Date.now() > dismissedUntil;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function dismissInstallBanner(days = 7) {
+    hideInstallBanner();
+    try {
+      localStorage.setItem('wow_install_dismissed_until', String(Date.now() + days * 24 * 60 * 60 * 1000));
+    } catch (e) {}
+  }
+
+  function continuePendingLeave() {
+    const target = pendingLeaveTarget;
+    pendingLeaveTarget = null;
+    dismissInstallBanner();
+    if (!target) return;
+
+    if (target.target && target.target !== '_self') {
+      window.open(target.href, target.target, 'noopener');
+      return;
+    }
+    window.location.href = target.href;
+  }
+
+  function hideInstallBanner() {
+    const banner = document.getElementById('app-install-banner');
+    if (banner) banner.classList.remove('show');
+    const panel = document.getElementById('app-install-ios-panel');
+    if (panel) panel.classList.remove('show');
+  }
+
+  function ensureInstallBanner() {
+    if (document.getElementById('app-install-banner')) return;
+
+    const banner = document.createElement('div');
+    banner.className = 'app-install-banner';
+    banner.id = 'app-install-banner';
+    banner.setAttribute('role', 'dialog');
+    banner.setAttribute('aria-live', 'polite');
+    banner.innerHTML = `
+      <div class="app-install-icon" aria-hidden="true">
+        <img src="assets/images/icon-192x192.png" alt="">
+      </div>
+      <div class="app-install-copy">
+        <strong id="app-install-title">Download My Wow Pet</strong>
+        <span id="app-install-message">Install the app for faster shopping, cart access, pet profiles, and the nutrition game.</span>
+      </div>
+      <div class="app-install-actions">
+        <button type="button" class="btn btn-primary btn-sm" id="app-install-primary">Install</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="app-install-later">Not now</button>
+      </div>
+      <button type="button" class="app-install-close" id="app-install-close" aria-label="Close install prompt">&#x2715;</button>
+    `;
+    document.body.appendChild(banner);
+
+    const panel = document.createElement('div');
+    panel.className = 'app-install-ios-panel';
+    panel.id = 'app-install-ios-panel';
+    panel.innerHTML = `
+      <div class="app-install-ios-card">
+        <button type="button" class="app-install-close" id="app-install-ios-close" aria-label="Close install instructions">&#x2715;</button>
+        <img src="assets/images/icon-192x192.png" alt="" class="app-install-ios-icon">
+        <h3 id="app-install-help-title">Add My Wow Pet to your Home Screen</h3>
+        <p id="app-install-help-message">Tap the browser Share button, then choose <strong>Add to Home Screen</strong>. It will open like an app and keep the same store features.</p>
+        <button type="button" class="btn btn-primary btn-block" id="app-install-ios-done">Got it</button>
+      </div>
+    `;
+    document.body.appendChild(panel);
+
+    document.getElementById('app-install-close')?.addEventListener('click', () => {
+      pendingLeaveTarget = null;
+      dismissInstallBanner();
+    });
+    document.getElementById('app-install-later')?.addEventListener('click', () => {
+      if (pendingLeaveTarget) {
+        continuePendingLeave();
+      } else {
+        dismissInstallBanner();
+      }
+    });
+    document.getElementById('app-install-ios-close')?.addEventListener('click', () => {
+      pendingLeaveTarget = null;
+      dismissInstallBanner();
+    });
+    document.getElementById('app-install-ios-done')?.addEventListener('click', () => {
+      pendingLeaveTarget = null;
+      dismissInstallBanner();
+    });
+    document.getElementById('app-install-primary')?.addEventListener('click', handleInstallClick);
+  }
+
+  function showInstallBanner(reason = 'default') {
+    if (!canShowInstallBanner()) return;
+    ensureInstallBanner();
+    installPromptShownThisSession = true;
+    try {
+      sessionStorage.setItem('wow_install_prompt_seen_session', '1');
+    } catch (e) {}
+    const title = document.getElementById('app-install-title');
+    const message = document.getElementById('app-install-message');
+    const later = document.getElementById('app-install-later');
+    if (title && message && later) {
+      title.textContent = reason === 'exit' ? 'Before you go, download My Wow Pet' : 'Download My Wow Pet';
+      message.textContent = reason === 'exit'
+        ? 'Add the app to your phone so your cart, pet profiles, and favorite products are easy to find later.'
+        : 'Install the app for faster shopping, cart access, pet profiles, and the nutrition game.';
+      later.textContent = pendingLeaveTarget ? 'Continue' : 'Not now';
+    }
+    requestAnimationFrame(() => {
+      document.getElementById('app-install-banner')?.classList.add('show');
+    });
+  }
+
+  async function handleInstallClick() {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      if (choice.outcome === 'accepted') {
+        hideInstallBanner();
+      }
+      return;
+    }
+
+    showManualInstallHelp();
+  }
+
+  function showManualInstallHelp() {
+    ensureInstallBanner();
+    const title = document.getElementById('app-install-help-title');
+    const message = document.getElementById('app-install-help-message');
+
+    if (isIOSDevice()) {
+      if (title) title.textContent = 'Add My Wow Pet to your Home Screen';
+      if (message) message.innerHTML = 'Tap the browser Share button, then choose <strong>Add to Home Screen</strong>. It will open like an app and keep the same store features.';
+    } else {
+      if (title) title.textContent = 'Install My Wow Pet from your browser';
+      if (message) message.innerHTML = 'Open your browser menu, then choose <strong>Install app</strong> or <strong>Add to Home Screen</strong>. Your cart, pet profiles, and store pages will be right on your phone.';
+    }
+    document.getElementById('app-install-ios-panel')?.classList.add('show');
+  }
+
+  function isSiteUrl(url) {
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      return url.origin === window.location.origin;
+    }
+    if (url.protocol === 'file:') return url.pathname.includes('/mywowpet-review/');
+    return false;
+  }
+
+  function shouldInterceptLeaveClick(event, link) {
+    if (!link || installPromptShownThisSession || !canShowInstallBanner()) return false;
+    if (event.defaultPrevented || event.button !== 0) return false;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
+    if (link.hasAttribute('download')) return false;
+
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript:')) return false;
+
+    try {
+      const url = new URL(href, window.location.href);
+      if (isSiteUrl(url)) return false;
+      return ['http:', 'https:', 'mailto:', 'tel:'].includes(url.protocol);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function initExitInstallPromptSignals() {
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest?.('a[href]');
+      if (!shouldInterceptLeaveClick(event, link)) return;
+
+      event.preventDefault();
+      const url = new URL(link.getAttribute('href'), window.location.href);
+      pendingLeaveTarget = {
+        href: url.href,
+        target: link.getAttribute('target') || '_self'
+      };
+      showInstallBanner('exit');
+    }, true);
+
+    document.addEventListener('mouseout', (event) => {
+      if (installPromptShownThisSession || pendingLeaveTarget || !canShowInstallBanner()) return;
+      if (event.relatedTarget || event.clientY > 8) return;
+      showInstallBanner('exit');
+    });
+  }
+
+  function initTimedInstallPrompt() {
+    if (installPromptTimer) return;
+    let sessionStartedAt = Date.now();
+    try {
+      const savedStart = Number(sessionStorage.getItem('wow_install_session_started_at') || 0);
+      if (savedStart > 0) {
+        sessionStartedAt = savedStart;
+      } else {
+        sessionStorage.setItem('wow_install_session_started_at', String(sessionStartedAt));
+      }
+    } catch (e) {}
+
+    const elapsed = Math.max(0, Date.now() - sessionStartedAt);
+    const delay = Math.max(0, INSTALL_PROMPT_DELAY_MS - elapsed);
+
+    installPromptTimer = window.setTimeout(() => {
+      if (!installPromptShownThisSession && !pendingLeaveTarget) {
+        showInstallBanner('default');
+      }
+      installPromptTimer = null;
+    }, delay);
+  }
+
+  function initInstallPrompt() {
+    if (installPromptInitialized || isRunningAsInstalledApp()) return;
+    installPromptInitialized = true;
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      hideInstallBanner();
+      try { localStorage.setItem('wow_install_dismissed_until', String(Date.now() + 365 * 24 * 60 * 60 * 1000)); } catch (e) {}
+    });
+
+    initExitInstallPromptSignals();
+    initTimedInstallPrompt();
+  }
+
   // ---- Init ----
   function init(activePage = '') {
     // Inject nav & footer
@@ -932,6 +1199,10 @@ const WowApp = (() => {
 
     // Load Firebase assets dynamically
     loadFirebaseAssets();
+
+    initSupportChat();
+
+    initInstallPrompt();
   }
 
   return {
@@ -951,15 +1222,22 @@ const WowApp = (() => {
     handleAuthSubmit,
     handleSocialAuth,
     handlePasswordReset,
-    toggleForgotPassword
+    toggleForgotPassword,
+    initInstallPrompt
   };
 })();
 
 // ---- Register Service Worker for PWA ----
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('sw.js', { scope: './' })
       .then(reg => console.log('SW registered:', reg.scope))
       .catch(err => console.warn('SW registration failed:', err));
   });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => WowApp.initInstallPrompt());
+} else {
+  WowApp.initInstallPrompt();
 }
