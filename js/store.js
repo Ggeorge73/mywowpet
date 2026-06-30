@@ -613,7 +613,8 @@ const WowStore = (() => {
   const shopifyConfig = {
     domain: 'id0dxt-4y.myshopify.com',
     storefrontAccessToken: 'f19dc13ce0feb0bbfa7c9a79ac89eef4',
-    apiVersion: '2026-04'
+    apiVersion: '2026-04',
+    canonicalStorefrontUrl: 'https://mywowpet.com'
   };
 
   // Product IDs are used for product lookup; variant IDs are required for carts.
@@ -1104,16 +1105,49 @@ const WowStore = (() => {
       .filter(Boolean);
   }
 
+  function getCustomStorefrontUrl(path = '/') {
+    const fallbackOrigin = shopifyConfig.canonicalStorefrontUrl.replace(/\/+$/, '');
+    let origin = fallbackOrigin;
+
+    try {
+      const hostname = window.location.hostname;
+      const isLocalPreview = ['localhost', '127.0.0.1', ''].includes(hostname);
+      const isShopifyHosted = hostname.endsWith('.myshopify.com');
+
+      if (window.location.protocol.startsWith('http') && !isLocalPreview && !isShopifyHosted) {
+        origin = window.location.origin;
+      }
+    } catch (err) {
+      origin = fallbackOrigin;
+    }
+
+    try {
+      return new URL(path || '/', `${origin}/`).toString();
+    } catch (err) {
+      return `${fallbackOrigin}/`;
+    }
+  }
+
+  function buildShopifyCheckoutUrl(checkoutUrl, returnUrl = getCustomStorefrontUrl('/')) {
+    const url = new URL(checkoutUrl);
+    url.searchParams.set('return_url', returnUrl);
+    url.searchParams.set('return_to', returnUrl);
+    return url.toString();
+  }
+
   async function createShopifyCart(cart = getCart(), options = {}) {
     const lines = buildShopifyCartLines(cart);
     if (!lines.length) {
       throw new Error('No Shopify-ready cart lines were found.');
     }
 
+    const returnUrl = options.returnUrl || getCustomStorefrontUrl('/');
     const input = {
       lines,
       attributes: [
-        { key: 'source', value: 'my-wow-pet-custom-storefront' }
+        { key: 'source', value: 'my-wow-pet-custom-storefront' },
+        { key: 'source_url', value: returnUrl },
+        { key: 'return_url', value: returnUrl }
       ]
     };
 
@@ -1449,6 +1483,8 @@ const WowStore = (() => {
     syncProductFromShopify,
     getMissingShopifyCartItems,
     buildShopifyCartLines,
+    getCustomStorefrontUrl,
+    buildShopifyCheckoutUrl,
     createShopifyCart,
     getCart,
     addToCart,

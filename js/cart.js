@@ -169,13 +169,15 @@ const CartPage = (() => {
 
       const activeCode = localStorage.getItem('wow_applied_promo');
       const user = typeof WowFirebase !== 'undefined' && WowFirebase.getCurrentUser ? WowFirebase.getCurrentUser() : null;
+      const returnUrl = WowStore.getCustomStorefrontUrl('/');
       const shopifyCart = await WowStore.createShopifyCart(cart, {
         discountCode: activeCode || null,
-        email: user?.email || localStorage.getItem('wow_checkout_email') || null
+        email: user?.email || localStorage.getItem('wow_checkout_email') || null,
+        returnUrl
       });
 
       localStorage.setItem('wow_shopify_cart_id', shopifyCart.id);
-      window.location.href = shopifyCart.checkoutUrl;
+      window.location.href = WowStore.buildShopifyCheckoutUrl(shopifyCart.checkoutUrl, returnUrl);
     } catch (err) {
       console.error('[My Wow Pet] Secure checkout handoff failed:', err);
       WowApp.showToast(err.message || 'Secure checkout could not be started.', '❌');

@@ -2,24 +2,64 @@
   "name": "My Wow Pet",
   "short_name": "My Wow Pet",
   "description": "Premium pet products curated for the modern pet parent. Shop food, treats, toys & more.",
-  "start_url": "/",
+  "id": "my-wow-pet",
+  "start_url": "index.html",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#FAF7F2",
   "theme_color": "#D4A853",
   "orientation": "any",
-  "scope": "/",
+  "scope": "./",
   "icons": [
     {
       "src": "assets/images/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "assets/images/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Shop Products",
+      "short_name": "Shop",
+      "description": "Browse pet food, treats, toys, and accessories.",
+      "url": "shop.html",
+      "icons": [
+        {
+          "src": "assets/images/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "View Cart",
+      "short_name": "Cart",
+      "description": "Review the items in your cart.",
+      "url": "cart.html",
+      "icons": [
+        {
+          "src": "assets/images/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Pet Nutrition Game",
+      "short_name": "Game",
+      "description": "Play Pet Nutrition IQ.",
+      "url": "game.html",
+      "icons": [
+        {
+          "src": "assets/images/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "categories": ["shopping", "lifestyle"],

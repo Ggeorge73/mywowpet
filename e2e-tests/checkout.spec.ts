@@ -127,6 +127,67 @@ test.describe('Shop & Product Flow', () => {
   });
 });
 
+test.describe('Shopify Checkout Handoff', () => {
+  test('cart creation includes the custom storefront return URL', async ({ page }) => {
+    let capturedBody;
+
+    await page.route('https://id0dxt-4y.myshopify.com/api/**/graphql.json', async (route) => {
+      capturedBody = JSON.parse(route.request().postData() || '{}');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: {
+            cartCreate: {
+              cart: {
+                id: 'gid://shopify/Cart/test',
+                checkoutUrl: 'https://id0dxt-4y.myshopify.com/checkouts/cn/test',
+                discountCodes: [],
+                cost: {
+                  subtotalAmount: { amount: '18.99', currencyCode: 'USD' },
+                  totalAmount: { amount: '18.99', currencyCode: 'USD' }
+                }
+              },
+              userErrors: []
+            }
+          }
+        })
+      });
+    });
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.WowStore && typeof window.WowStore.createShopifyCart === 'function');
+
+    await page.evaluate(() => window.WowStore.createShopifyCart(
+      [{ productId: 6, qty: 3 }],
+      { returnUrl: 'https://mywowpet.com/' }
+    ));
+
+    expect(capturedBody?.variables?.input?.attributes).toEqual(expect.arrayContaining([
+      { key: 'source', value: 'my-wow-pet-custom-storefront' },
+      { key: 'source_url', value: 'https://mywowpet.com/' },
+      { key: 'return_url', value: 'https://mywowpet.com/' }
+    ]));
+  });
+
+  test('checkout URL preserves Shopify checkout and adds the custom return target', async ({ page }) => {
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.WowStore && typeof window.WowStore.buildShopifyCheckoutUrl === 'function');
+
+    const checkoutUrl = await page.evaluate(() => window.WowStore.buildShopifyCheckoutUrl(
+      'https://id0dxt-4y.myshopify.com/checkouts/cn/test?existing=1',
+      'https://mywowpet.com/'
+    ));
+    const parsed = new URL(checkoutUrl);
+
+    expect(parsed.origin).toBe('https://id0dxt-4y.myshopify.com');
+    expect(parsed.pathname).toBe('/checkouts/cn/test');
+    expect(parsed.searchParams.get('existing')).toBe('1');
+    expect(parsed.searchParams.get('return_url')).toBe('https://mywowpet.com/');
+    expect(parsed.searchParams.get('return_to')).toBe('https://mywowpet.com/');
+  });
+});
+
 test.describe('Resilience', () => {
   test('unknown route does not throw a 500', async ({ page }) => {
     const res = await page

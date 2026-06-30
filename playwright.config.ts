@@ -19,7 +19,7 @@ export default defineConfig({
   },
   /* Start a local static server if no BASE_URL is set */
   webServer: process.env.BASE_URL ? undefined : {
-    command: 'npx serve . -p 5000',
+    command: 'node scripts/static-server.cjs 5000',
     port: 5000,
     reuseExistingServer: !process.env.CI,
   },
@@ -31,6 +31,10 @@ export default defineConfig({
     {
       name: 'Mobile Safari',
       use: { ...devices['iPhone 12'] },
+    },
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
     },
   ],
 });

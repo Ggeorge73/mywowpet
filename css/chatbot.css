@@ -1,0 +1,448 @@
+/* ============================================
+   My Wow Pet - Support Chatbot
+   ============================================ */
+
+.wow-chatbot {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 650;
+  font-family: var(--font-body);
+}
+
+.wow-chat-launcher {
+  min-width: 128px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 16px;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.35);
+  border-radius: 8px;
+  background: var(--color-secondary);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-accent);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.wow-chat-launcher:hover,
+.wow-chatbot.open .wow-chat-launcher {
+  background: var(--color-secondary-dark);
+  transform: translateY(-1px);
+}
+
+.wow-chat-launcher-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--fw-bold);
+}
+
+.wow-chat-panel {
+  position: absolute;
+  right: 0;
+  bottom: 62px;
+  width: min(380px, calc(100vw - 28px));
+  height: min(620px, calc(100vh - 118px));
+  display: grid;
+  grid-template-rows: auto auto 1fr auto auto;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xl);
+}
+
+.wow-chat-panel[hidden] {
+  display: none;
+}
+
+.wow-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary-dark));
+  color: var(--color-text-inverse);
+}
+
+.wow-chat-kicker {
+  margin: 0 0 2px;
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+}
+
+.wow-chat-header h2 {
+  margin: 0;
+  color: var(--color-text-inverse);
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.wow-chat-close {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--color-text-inverse);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.wow-chat-close:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.wow-chat-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-xs);
+}
+
+.wow-chat-status[hidden] {
+  display: none;
+}
+
+.wow-chat-thinking-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  animation: wow-chat-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes wow-chat-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.wow-chat-messages {
+  min-height: 0;
+  padding: 14px;
+  overflow-y: auto;
+  background: var(--color-bg);
+}
+
+.wow-chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.wow-chat-message.user {
+  align-items: flex-end;
+}
+
+.wow-chat-message.bot {
+  align-items: flex-start;
+}
+
+.wow-chat-bubble {
+  max-width: 92%;
+  padding: 11px 12px;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  box-shadow: var(--shadow-xs);
+}
+
+.wow-chat-message.user .wow-chat-bubble {
+  background: var(--color-secondary);
+  color: var(--color-text-inverse);
+}
+
+.wow-chat-message.bot .wow-chat-bubble {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-light);
+}
+
+.wow-chat-products {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.wow-chat-product {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.wow-chat-product:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.wow-chat-product-image {
+  width: 48px;
+  height: 48px;
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--color-bg-alt);
+}
+
+.wow-chat-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wow-chat-product-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.wow-chat-product-copy strong {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: var(--fs-xs);
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wow-chat-product-copy span {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.wow-chat-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wow-chat-links a,
+.wow-chat-quick button,
+.wow-chat-handoff button,
+.wow-chat-form button {
+  border-radius: 8px;
+  font-family: var(--font-accent);
+  font-weight: var(--fw-semibold);
+}
+
+.wow-chat-links a {
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-primary-dark);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.wow-chat-links a:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-alt);
+}
+
+.wow-chat-quick {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  border-top: 1px solid var(--color-border-light);
+  background: var(--color-surface);
+  scrollbar-width: none;
+}
+
+.wow-chat-quick::-webkit-scrollbar {
+  display: none;
+}
+
+.wow-chat-quick button {
+  flex: 0 0 auto;
+  max-width: 190px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.wow-chat-quick button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.wow-chat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--color-border-light);
+  background: var(--color-surface);
+}
+
+.wow-chat-form textarea {
+  min-height: 42px;
+  max-height: 120px;
+  resize: none;
+  padding: 10px 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+}
+
+.wow-chat-form textarea:focus,
+.wow-chat-handoff input:focus,
+.wow-chat-handoff textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.14);
+}
+
+.wow-chat-form button {
+  min-width: 68px;
+  height: 42px;
+  padding: 0 14px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.wow-chat-form button:hover {
+  background: var(--color-primary-dark);
+}
+
+.wow-chat-form button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.wow-chat-handoff {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0 14px;
+  padding: 12px;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-surface) 92%, var(--color-primary) 8%);
+}
+
+.wow-chat-handoff-title {
+  color: var(--color-text);
+  font-family: var(--font-accent);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+}
+
+.wow-chat-handoff label {
+  display: grid;
+  gap: 5px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.wow-chat-handoff input,
+.wow-chat-handoff textarea {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--fs-sm);
+}
+
+.wow-chat-handoff button {
+  min-height: 40px;
+  padding: 0 12px;
+  background: var(--color-secondary);
+  color: var(--color-text-inverse);
+}
+
+.wow-chat-handoff button:hover {
+  background: var(--color-secondary-dark);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 520px) {
+  .wow-chatbot {
+    right: 12px;
+    left: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .wow-chat-launcher {
+    margin-left: auto;
+  }
+
+  .wow-chat-panel {
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: min(640px, calc(100vh - 92px));
+    bottom: 60px;
+  }
+
+  .wow-chat-bubble {
+    max-width: 96%;
+  }
+}
+
+[data-theme="dark"] .wow-chat-panel,
+[data-theme="dark"] .wow-chat-product,
+[data-theme="dark"] .wow-chat-message.bot .wow-chat-bubble,
+[data-theme="dark"] .wow-chat-links a,
+[data-theme="dark"] .wow-chat-quick,
+[data-theme="dark"] .wow-chat-form {
+  background: var(--color-surface);
+}
+
+[data-theme="dark"] .wow-chat-messages,
+[data-theme="dark"] .wow-chat-form textarea,
+[data-theme="dark"] .wow-chat-quick button {
+  background: var(--color-bg-alt);
+}

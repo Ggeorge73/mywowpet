@@ -15,4 +15,8 @@ desktop.ini
 *.log
 *.tmp
 .firebase/
+.chrome-smoke-profile/
+test-results/
+playwright-report/
+results.xml
 
