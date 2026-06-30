@@ -714,7 +714,7 @@ const WowChatbot = (() => {
     const normalizedTerm = normalize(term);
     if (!normalizedTerm) return false;
     if (normalizedTerm.includes(" ")) return text.includes(normalizedTerm);
-    return new RegExp(`(^|[^a-z0-9])${escapeRegExp(normalizedTerm)}([^a-z0-9]|$)`).test(text);
+    return text.split(/[^a-z0-9-]+/).includes(normalizedTerm);
   }
 
   function normalize(value) {
@@ -723,10 +723,6 @@ const WowChatbot = (() => {
 
   function tokenize(value) {
     return normalize(value).split(" ");
-  }
-
-  function escapeRegExp(value) {
-    return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
   function scrollToBottom() {
