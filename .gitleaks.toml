@@ -9,6 +9,7 @@ condition = "AND"
 regexTarget = "line"
 paths = [
   '''(^|/)js/store\.js$''',
+  '''(^|/)js/product\.js$''',
 ]
 regexes = [
   '''storefrontAccessToken:\s*['"][a-f0-9]{32}['"]''',
