@@ -14,3 +14,10 @@ paths = [
 regexes = [
   '''storefrontAccessToken:\s*['"][a-f0-9]{32}['"]''',
 ]
+
+[[allowlists]]
+description = "Historical Shopify Storefront token commits (verified public, false positives)"
+fingerprints = [
+"fa867f40425796739067c75e854e100ff6023ab4:js/store.js:generic-api-key:615","4106b925c67dae545e812edf019d587c6140dbd6:js/store.js:generic-api-key:615",
+"e62c317d659d6f4c03118f343a299f6432797a7b:js/product.js:generic-api-key:193",
+]
