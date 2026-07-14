@@ -440,21 +440,108 @@ const WowApp = (() => {
     document.head.appendChild(l);
   }
 
+  function getAuthSecurity() {
+    if (window.WOWPET_SECURITY) return window.WOWPET_SECURITY;
+    const host = window.location.hostname;
+    const params = new URLSearchParams(window.location.search);
+    const explicitDevMode = params.get('devAuth') === 'true';
+    const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
+    const isProductionLike = !isLocalHost && !explicitDevMode;
+
+    return {
+      isProductionLike,
+      allowMockAuth: !isProductionLike
+    };
+  }
+
+  function clearMockAuthStorage() {
+    try {
+      localStorage.removeItem('wow_mock_auth_user');
+      localStorage.removeItem('wow_mock_user');
+      localStorage.removeItem('wow_mock_database');
+    } catch (e) {}
+  }
+
+  function showAuthUnavailable() {
+    const message = 'Account service is temporarily unavailable. Please continue as a guest or try again later.';
+    if (typeof window.WowPetAuthUnavailable === 'function') {
+      window.WowPetAuthUnavailable();
+    } else {
+      showToast(message, 'Account', 5000);
+    }
+  }
+
+  function unavailableAuthMethod() {
+    showAuthUnavailable();
+    return Promise.reject(new Error('Account service is temporarily unavailable.'));
+  }
+
+  function installUnavailableAuthService() {
+    clearMockAuthStorage();
+    window.WowFirebase = {
+      ...(window.WowFirebase || {}),
+      init: () => {},
+      signInWithEmail: unavailableAuthMethod,
+      signUpWithEmail: unavailableAuthMethod,
+      signInWithGoogle: unavailableAuthMethod,
+      signInWithFacebook: unavailableAuthMethod,
+      signInWithApple: unavailableAuthMethod,
+      sendPasswordReset: unavailableAuthMethod,
+      logout: () => {
+        clearMockAuthStorage();
+        window.dispatchEvent(new CustomEvent('userLoggedOut'));
+        return Promise.resolve();
+      },
+      onAuthStateChanged: (callback) => {
+        if (typeof callback === 'function') callback(null);
+      },
+      getCurrentUser: () => null,
+      isMockMode: () => true,
+      syncUserData: () => Promise.resolve(),
+      syncMockDataLocally: () => {},
+      writeOrderToRootDb: () => Promise.resolve(),
+      writeReview: () => Promise.resolve(),
+      fetchReviews: () => Promise.resolve([])
+    };
+  }
+
+  function enforceAuthAvailability() {
+    const security = getAuthSecurity();
+    if (!security.allowMockAuth && window.WowFirebase?.isMockMode?.()) {
+      installUnavailableAuthService();
+    }
+    if (typeof window.WowPetEnforceProductionAuthGuard === 'function') {
+      window.WowPetEnforceProductionAuthGuard();
+    }
+  }
+
   async function loadFirebaseAssets() {
     loadStyle("/css/auth-modal.css");
     injectAuthModal(); // Inject auth modal synchronously before scripts load!
+
+    if (!getAuthSecurity().allowMockAuth) {
+      installUnavailableAuthService();
+      setupAuthListeners();
+    }
     
     try {
-      await loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js");
+      await loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js", 10000);
       await Promise.all([
-        loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"),
-        loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js")
+        loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js", 10000),
+        loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js", 10000)
       ]);
       await loadScript("/js/firebase-db.js");
       
-      WowFirebase.init();
+      window.WowFirebase.init();
+      enforceAuthAvailability();
       setupAuthListeners();
     } catch (err) {
+      if (!getAuthSecurity().allowMockAuth) {
+        console.warn("[My Wow Pet] Firebase auth is unavailable and mock auth is disabled on this host:", err);
+        installUnavailableAuthService();
+        setupAuthListeners();
+        return;
+      }
       console.warn("🐾 [My Wow Pet] Failed to load Firebase assets, setting up fallback mock auth service:", err);
       setupMockAuthService();
     }
@@ -528,46 +615,13 @@ const WowApp = (() => {
           });
         },
         signInWithGoogle: () => {
-          return new Promise((resolve) => {
-            setTimeout(() => {
-              mockUser = {
-                uid: 'mock_google_' + Math.random().toString(36).substring(2, 9),
-                email: 'google.parent@gmail.com',
-                displayName: 'Google Pet Parent'
-              };
-              localStorage.setItem('wow_mock_auth_user', JSON.stringify(mockUser));
-              triggerAuthChange();
-              resolve({ user: mockUser });
-            }, 500);
-          });
+          return unavailableAuthMethod();
         },
         signInWithFacebook: () => {
-          return new Promise((resolve) => {
-            setTimeout(() => {
-              mockUser = {
-                uid: 'mock_fb_' + Math.random().toString(36).substring(2, 9),
-                email: 'fb.parent@facebook.com',
-                displayName: 'FB Pet Parent'
-              };
-              localStorage.setItem('wow_mock_auth_user', JSON.stringify(mockUser));
-              triggerAuthChange();
-              resolve({ user: mockUser });
-            }, 500);
-          });
+          return unavailableAuthMethod();
         },
         signInWithApple: () => {
-          return new Promise((resolve) => {
-            setTimeout(() => {
-              mockUser = {
-                uid: 'mock_apple_' + Math.random().toString(36).substring(2, 9),
-                email: 'apple.parent@apple.com',
-                displayName: 'Apple Pet Parent'
-              };
-              localStorage.setItem('wow_mock_auth_user', JSON.stringify(mockUser));
-              triggerAuthChange();
-              resolve({ user: mockUser });
-            }, 500);
-          });
+          return unavailableAuthMethod();
         },
         logout: () => {
           mockUser = null;
@@ -587,6 +641,7 @@ const WowApp = (() => {
         fetchReviews: () => Promise.resolve([])
       };
     })();
+    enforceAuthAvailability();
     setupAuthListeners();
   }
 
@@ -777,13 +832,13 @@ const WowApp = (() => {
       if (action === 'signin') {
         const email = document.getElementById('signin-email').value;
         const password = document.getElementById('signin-password').value;
-        await WowFirebase.signInWithEmail(email, password);
+        await window.WowFirebase.signInWithEmail(email, password);
         showToast('Successfully signed in!', '🎉');
       } else if (action === 'signup') {
         const name = document.getElementById('signup-name').value;
         const email = document.getElementById('signup-email').value;
         const password = document.getElementById('signup-password').value;
-        await WowFirebase.signUpWithEmail(email, password, name);
+        await window.WowFirebase.signUpWithEmail(email, password, name);
         showToast(`Welcome to the pack, ${name}! 🎉`, '🐾');
       }
       closeAuthModal();
@@ -813,7 +868,7 @@ const WowApp = (() => {
     }
     
     try {
-      await WowFirebase.sendPasswordReset(email);
+      await window.WowFirebase.sendPasswordReset(email);
       showToast('Password reset link sent to your email!', '✉️');
       toggleForgotPassword(false);
     } catch (err) {
@@ -835,13 +890,19 @@ const WowApp = (() => {
     try {
       let result;
       if (provider === 'google') {
-        result = await WowFirebase.signInWithGoogle();
+        result = await window.WowFirebase.signInWithGoogle();
       } else if (provider === 'facebook') {
-        result = await WowFirebase.signInWithFacebook();
+        result = await window.WowFirebase.signInWithFacebook();
       } else if (provider === 'apple') {
-        result = await WowFirebase.signInWithApple();
+        result = await window.WowFirebase.signInWithApple();
       }
       const name = result?.user?.displayName || 'Pet Parent';
+      const isNewUser = Boolean(result?.additionalUserInfo?.isNewUser);
+      if (isNewUser) {
+        showToast(`Welcome to the pack, ${name}!`, 'Account');
+        closeAuthModal();
+        return;
+      }
       showToast(`Welcome back, ${name}! 🎉`, '🐾');
       closeAuthModal();
     } catch (err) {
@@ -851,7 +912,7 @@ const WowApp = (() => {
   }
 
   function setupAuthListeners() {
-    WowFirebase.onAuthStateChanged((user) => {
+    window.WowFirebase.onAuthStateChanged((user) => {
       updateNavProfileSlot(user);
     });
   }
@@ -874,6 +935,10 @@ const WowApp = (() => {
             </div>
           </div>
         `;
+        const logoutButton = slot.querySelector('button[onclick="WowFirebase.logout()"]');
+        if (logoutButton) {
+          logoutButton.onclick = () => window.WowFirebase.logout();
+        }
       } else {
         slot.innerHTML = `
           <a href="#" onclick="event.preventDefault(); WowApp.showAuthModal();" class="nav-action-btn" title="Sign In">👤</a>

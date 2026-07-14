@@ -12,6 +12,8 @@ test.describe('Mobile account registration', () => {
       'Registration mobile coverage runs on iOS Safari and Android Chrome projects.'
     );
 
+    await page.route('https://www.gstatic.com/firebasejs/**', route => route.abort());
+
     const runId = Date.now().toString(36);
     const email = `mobile-${testInfo.project.name.toLowerCase().replace(/\W+/g, '-')}-${runId}@example.com`;
     const fullName = `Mobile Tester ${testInfo.project.name}`;

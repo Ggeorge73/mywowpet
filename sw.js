@@ -3,7 +3,7 @@
    Caches core shell for installable app loading
    ============================================ */
 
-const CACHE_NAME = 'mywowpet-v6';
+const CACHE_NAME = 'mywowpet-v8';
 const CORE_ASSETS = [
   './',
   'index.html',

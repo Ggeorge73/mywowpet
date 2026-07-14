@@ -9,14 +9,15 @@ const WowFirebase = (() => {
   let currentUser = null;
   let authStateCallback = null;
 
-  // IMPORTANT: Replace these placeholders with your real Firebase Web App credentials!
+  // Firebase Web App config. These values identify the public client app; access is enforced by Auth and Firestore rules.
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
+    apiKey: "AIzaSyDjG3ymeHrdajvn7N0L7wZAv5onhgxKpdU",
     authDomain: "wow-pet-store.firebaseapp.com",
     projectId: "wow-pet-store",
-    storageBucket: "wow-pet-store.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    storageBucket: "wow-pet-store.firebasestorage.app",
+    messagingSenderId: "31785910803",
+    appId: "1:31785910803:web:0221850bdaafec40b175e6",
+    measurementId: "G-B4RVHM673J"
   };
 
   // Check if credentials are set
@@ -82,6 +83,14 @@ const WowFirebase = (() => {
     if (authStateCallback) authStateCallback(currentUser);
   }
 
+  function rejectUnavailableSocialAuth() {
+    return Promise.reject(new Error('Account service is temporarily unavailable.'));
+  }
+
+  function getPrimaryProviderId(firebaseUser) {
+    return firebaseUser?.providerData?.find(provider => provider?.providerId)?.providerId || '';
+  }
+
   // ---- Auth Actions ----
 
   async function signInWithEmail(email, password) {
@@ -108,15 +117,18 @@ const WowFirebase = (() => {
 
   async function signInWithGoogle() {
     if (isMock) {
-      return simulateSocialSignIn('Google', 'google-user@example.com', 'Google Pet Lover');
+      return rejectUnavailableSocialAuth();
     }
     const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
+    provider.setCustomParameters({ prompt: 'select_account' });
     return auth.signInWithPopup(provider);
   }
 
   async function signInWithFacebook() {
     if (isMock) {
-      return simulateSocialSignIn('Facebook', 'fb-user@example.com', 'Facebook Pet Lover');
+      return rejectUnavailableSocialAuth();
     }
     const provider = new firebase.auth.FacebookAuthProvider();
     return auth.signInWithPopup(provider);
@@ -124,7 +136,7 @@ const WowFirebase = (() => {
 
   async function signInWithApple() {
     if (isMock) {
-      return simulateSocialSignIn('Apple', 'apple-user@example.com', 'Apple Pet Lover');
+      return rejectUnavailableSocialAuth();
     }
     const provider = new firebase.auth.OAuthProvider('apple.com');
     return auth.signInWithPopup(provider);
@@ -191,6 +203,8 @@ const WowFirebase = (() => {
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           profile: {
             name: firebaseUser.displayName || localStorage.getItem('wow_guest_name') || 'Pet Parent',
+            photoURL: firebaseUser.photoURL || '',
+            provider: getPrimaryProviderId(firebaseUser) || 'password',
             phone: '',
             address: '',
             city: '',
@@ -215,6 +229,13 @@ const WowFirebase = (() => {
       } else {
         // Return login: Fetch cloud document, merge with guest data
         const cloudData = doc.data();
+        const cloudProfile = cloudData.profile || {};
+        const providerProfile = {
+          ...cloudProfile,
+          name: firebaseUser.displayName || cloudProfile.name || 'Pet Parent',
+          photoURL: firebaseUser.photoURL || cloudProfile.photoURL || '',
+          provider: getPrimaryProviderId(firebaseUser) || cloudProfile.provider || 'password'
+        };
         
         // Merge carts (combine quantities of same products)
         const cart = [...(cloudData.cart || [])];
@@ -264,7 +285,8 @@ const WowFirebase = (() => {
           gameHighScore,
           streak,
           orders: cloudData.orders || guestOrders,
-          subscriptions: cloudData.subscriptions || guestSubs
+          subscriptions: cloudData.subscriptions || guestSubs,
+          profile: providerProfile
         };
 
         // Build data to update in Firestore (omit orders, loyalty, and subscriptions to comply with security rules)
@@ -274,7 +296,7 @@ const WowFirebase = (() => {
           pets,
           gameHighScore,
           streak,
-          profile: cloudData.profile || {}
+          profile: providerProfile
         };
 
         // Save merged back to Firestore
@@ -455,40 +477,6 @@ const WowFirebase = (() => {
     return Promise.resolve({ user: currentUser });
   }
 
-  function simulateSocialSignIn(providerName, email, defaultName) {
-    const mockUsers = JSON.parse(localStorage.getItem('wow_mock_database') || '{}');
-    let user = mockUsers[email.toLowerCase()];
-
-    if (!user) {
-      const uid = 'mock_' + providerName.toLowerCase() + '_' + Math.floor(Math.random() * 1000000);
-      user = {
-        uid,
-        email,
-        name: defaultName,
-        data: {
-          cart: JSON.parse(localStorage.getItem('wow_cart')) || [],
-          pets: JSON.parse(localStorage.getItem('wow_pets')) || [],
-          wishlist: JSON.parse(localStorage.getItem('wow_wishlist')) || [],
-          loyalty: JSON.parse(localStorage.getItem('wow_loyalty')) || { points: 0, history: [] },
-          subscriptions: JSON.parse(localStorage.getItem('wow_subscriptions')) || [],
-          orders: JSON.parse(localStorage.getItem('wow_orders')) || [],
-          gameHighScore: JSON.parse(localStorage.getItem('wow_game_high')) || { score: 0, correct: 0, played: 0 },
-          streak: JSON.parse(localStorage.getItem('wow_streak')) || { current: 0, lastVisit: '', history: [] },
-          profile: { name: defaultName, phone: '', address: '', city: '', state: '', zip: '' }
-        }
-      };
-      mockUsers[email.toLowerCase()] = user;
-      localStorage.setItem('wow_mock_database', JSON.stringify(mockUsers));
-    }
-
-    currentUser = { uid: user.uid, email: user.email, displayName: user.name };
-    localStorage.setItem('wow_mock_user', JSON.stringify(currentUser));
-    
-    replaceLocalState(user.data);
-    triggerMockAuthChange();
-    return Promise.resolve({ user: currentUser });
-  }
-
   // Allows mock mode to update simulated database document
   function syncMockDataLocally() {
     if (!currentUser) return;
@@ -583,3 +571,7 @@ const WowFirebase = (() => {
     fetchReviews
   };
 })();
+
+if (typeof window !== 'undefined') {
+  window.WowFirebase = WowFirebase;
+}
