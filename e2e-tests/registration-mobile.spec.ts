@@ -13,6 +13,12 @@ test.describe('Mobile account registration', () => {
     );
 
     await page.route('https://www.gstatic.com/firebasejs/**', route => route.abort());
+    await page.addInitScript(() => {
+      window.WOWPET_SECURITY = {
+        isProductionLike: false,
+        allowMockAuth: true
+      };
+    });
 
     const runId = Date.now().toString(36);
     const email = `mobile-${testInfo.project.name.toLowerCase().replace(/\W+/g, '-')}-${runId}@example.com`;

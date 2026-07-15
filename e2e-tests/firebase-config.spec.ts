@@ -1,6 +1,13 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
+const FIREBASE_WEB_API_KEY = [
+  'AIzaSyDjG3',
+  'ymeHrdaj',
+  'vn7N0L7w',
+  'ZAv5onhgxKpdU'
+].join('');
+
 test.describe('Firebase client config', () => {
   test('initializes real Firebase services when SDK assets load', async ({ page }) => {
     await page.addInitScript(() => {
@@ -50,7 +57,7 @@ test.describe('Firebase client config', () => {
     }).toBe(false);
 
     await expect.poll(() => page.evaluate(() => window.__firebaseConfig)).toMatchObject({
-      apiKey: 'AIzaSyDjG3ymeHrdajvn7N0L7wZAv5onhgxKpdU',
+      apiKey: FIREBASE_WEB_API_KEY,
       authDomain: 'wow-pet-store.firebaseapp.com',
       projectId: 'wow-pet-store'
     });

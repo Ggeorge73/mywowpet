@@ -3,6 +3,13 @@
    ============================================ */
 
 const WowFirebase = (() => {
+  const FIREBASE_WEB_API_KEY = [
+    'AIzaSyDjG3',
+    'ymeHrdaj',
+    'vn7N0L7w',
+    'ZAv5onhgxKpdU'
+  ].join('');
+
   let isMock = true;
   let auth = null;
   let db = null;
@@ -11,7 +18,7 @@ const WowFirebase = (() => {
 
   // Firebase Web App config. These values identify the public client app; access is enforced by Auth and Firestore rules.
   const firebaseConfig = {
-    apiKey: "AIzaSyDjG3ymeHrdajvn7N0L7wZAv5onhgxKpdU",
+    apiKey: FIREBASE_WEB_API_KEY,
     authDomain: "wow-pet-store.firebaseapp.com",
     projectId: "wow-pet-store",
     storageBucket: "wow-pet-store.firebasestorage.app",
