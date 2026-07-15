@@ -15,6 +15,7 @@ const WowFirebase = (() => {
   let db = null;
   let currentUser = null;
   let authStateCallback = null;
+  let pendingExplicitLogout = false;
 
   // Firebase Web App config. These values identify the public client app; access is enforced by Auth and Firestore rules.
   const firebaseConfig = {
@@ -61,7 +62,12 @@ const WowFirebase = (() => {
         } else {
           currentUser = null;
           console.log("🐾 [WowPetStore] User signed out.");
-          handleUserLogout();
+          if (pendingExplicitLogout) {
+            pendingExplicitLogout = false;
+            handleUserLogout();
+          } else {
+            window.dispatchEvent(new CustomEvent('userLoggedOut'));
+          }
         }
         if (authStateCallback) authStateCallback(currentUser);
       });
@@ -157,7 +163,11 @@ const WowFirebase = (() => {
       triggerMockAuthChange();
       return Promise.resolve();
     }
-    return auth.signOut();
+    pendingExplicitLogout = true;
+    return auth.signOut().catch(err => {
+      pendingExplicitLogout = false;
+      throw err;
+    });
   }
 
   async function sendPasswordReset(email) {
