@@ -1,8 +1,17 @@
 // @ts-check
+const fs = require('fs');
+const path = require('path');
 const { test, expect } = require('@playwright/test');
 
 test.describe('Coming-soon early access', () => {
   test.beforeEach(async ({ page }) => {
+    await page.route('**/index.html', route => {
+      const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8')
+        .replace(/\s+integrity="[^"]+"/g, '')
+        .replace(/\s+crossorigin="anonymous"/g, '');
+      return route.fulfill({ contentType: 'text/html', body: html });
+    });
+
     await page.route('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js', route => route.fulfill({
       contentType: 'application/javascript',
       body: `
