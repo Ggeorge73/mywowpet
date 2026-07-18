@@ -45,7 +45,7 @@ test.describe('Firebase client config', () => {
       `
     }));
 
-    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#auth-modal')).toBeAttached({ timeout: 20_000 });
 
     await page.waitForFunction(() => {

@@ -34,7 +34,7 @@ async function openPurchasableProduct(page) {
  * IMPORTANT: This site is a static Firebase-hosted app (index.html, shop.html,
  * product.html?id=, cart.html ...) — NOT a Shopify Liquid theme. Cart state is
  * persisted client-side via window.WowStore (localStorage). Tests target the
- * real DOM (#nav-slot, #footer-slot, #product-grid, #add-to-cart-btn).
+ * real DOM (#early-access-form, #product-grid, #add-to-cart-btn).
  *
  * Base URL comes from STOREFRONT_URL (default https://wow-pet-store.web.app), set in
  * playwright.config.js.
@@ -58,25 +58,22 @@ test.describe('Landing Page Health', () => {
     expect(title.toLowerCase()).toContain('wow');
   });
 
-  test('navigation is injected and contains links', async ({ page }) => {
-    const nav = page.locator('#nav-slot');
-    await expect(nav).toBeAttached({ timeout: 10_000 });
-    // #nav-slot is populated client-side by app.js
-    await expect(nav.locator('a').first()).toBeVisible({ timeout: 15_000 });
+  test('launch brand and opening status are visible', async ({ page }) => {
+    await expect(page.locator('.brand')).toContainText('My Wow Pet');
+    await expect(page.locator('.opening-note')).toContainText('Opening soon');
   });
 
-  test('footer is injected with content', async ({ page }) => {
-    const footer = page.locator('#footer-slot');
-    await expect(footer).toBeAttached({ timeout: 10_000 });
-    await page.waitForTimeout(1500);
-    expect(((await footer.textContent()) || '').length).toBeGreaterThan(10);
+  test('launch offer and signup form are ready', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: /good stuff is almost here/i })).toBeVisible();
+    await expect(page.locator('#early-access-form')).toBeVisible();
+    await expect(page.locator('#signup-email')).toHaveAttribute('type', 'email');
+    await expect(page.getByRole('button', { name: /save my spot/i })).toBeVisible();
   });
 
-  test('hero section renders above the fold', async ({ page }) => {
-    const hero = page
-      .locator('[class*="hero"], [class*="banner"], section video, section:first-of-type')
-      .first();
-    await expect(hero).toBeVisible({ timeout: 15_000 });
+  test('pet portrait renders with meaningful alt text', async ({ page }) => {
+    const portrait = page.locator('.pet-portrait img');
+    await expect(portrait).toBeVisible({ timeout: 15_000 });
+    await expect(portrait).toHaveAttribute('alt', /golden retriever and tabby cat/i);
   });
 
   test('no significant console errors on load', async ({ page }) => {
@@ -176,7 +173,7 @@ test.describe('Shopify Checkout Handoff', () => {
       });
     });
 
-    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.WowStore && typeof window.WowStore.createShopifyCart === 'function');
 
     await page.evaluate(() => window.WowStore.createShopifyCart(
@@ -192,7 +189,7 @@ test.describe('Shopify Checkout Handoff', () => {
   });
 
   test('checkout URL preserves Shopify checkout and adds the custom return target', async ({ page }) => {
-    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.WowStore && typeof window.WowStore.buildShopifyCheckoutUrl === 'function');
 
     const checkoutUrl = await page.evaluate(() => window.WowStore.buildShopifyCheckoutUrl(

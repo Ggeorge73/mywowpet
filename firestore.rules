@@ -66,6 +66,35 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    match /launchSignups/{signupId} {
+      allow read, update, delete: if false;
+      allow create: if request.resource.data.keys().hasOnly([
+          'email',
+          'petType',
+          'consent',
+          'source',
+          'offer',
+          'createdAt'
+        ])
+        && request.resource.data.email is string
+        && request.resource.data.email.size() >= 5
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && request.resource.data.petType in [
+          'not-specified',
+          'dog',
+          'cat',
+          'dog-and-cat',
+          'small-pet',
+          'bird',
+          'other'
+        ]
+        && request.resource.data.consent == true
+        && request.resource.data.source == 'coming-soon'
+        && request.resource.data.offer == 'launch-15'
+        && request.resource.data.createdAt == request.time;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

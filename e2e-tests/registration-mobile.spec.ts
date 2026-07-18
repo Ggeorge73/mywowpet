@@ -24,7 +24,7 @@ test.describe('Mobile account registration', () => {
     const email = `mobile-${testInfo.project.name.toLowerCase().replace(/\W+/g, '-')}-${runId}@example.com`;
     const fullName = `Mobile Tester ${testInfo.project.name}`;
 
-    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
     await expect(page.locator('#nav-profile-slot')).toBeAttached({ timeout: 15_000 });
     await expect(page.locator('#auth-modal')).toBeAttached({ timeout: 20_000 });

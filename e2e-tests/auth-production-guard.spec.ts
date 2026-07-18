@@ -83,7 +83,7 @@ test.describe('Production auth guard', () => {
       `
     }));
 
-    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.WowFirebase?.isMockMode?.() === false, null, { timeout: 20_000 });
 
     await page.locator('#nav-profile-slot .nav-action-btn').click();
@@ -134,7 +134,7 @@ test.describe('Production auth guard', () => {
       });
     });
 
-    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#auth-modal')).toBeAttached({ timeout: 20_000 });
 
     await page.waitForFunction(() => {
@@ -166,7 +166,7 @@ test.describe('Production auth guard', () => {
 
     await page.route('https://www.gstatic.com/firebasejs/**', route => route.abort());
 
-    await page.goto('/index.html?devAuth=true', { waitUntil: 'domcontentloaded' });
+    await page.goto('/shop.html?devAuth=true', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#auth-modal')).toBeAttached({ timeout: 20_000 });
 
     await page.waitForFunction(() => {
