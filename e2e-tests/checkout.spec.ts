@@ -43,6 +43,7 @@ async function openPurchasableProduct(page) {
 test.describe('Landing Page Health', () => {
   test.beforeEach(async ({ page }) => {
     await suppressInstallPrompt(page);
+    await page.route('**/videos/*.mp4', route => route.fulfill({ status: 204, body: '' }));
     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
     await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
   });
@@ -70,10 +71,12 @@ test.describe('Landing Page Health', () => {
     await expect(page.getByRole('button', { name: /save my spot/i })).toBeVisible();
   });
 
-  test('pet portrait renders with meaningful alt text', async ({ page }) => {
-    const portrait = page.locator('.pet-portrait img');
+  test('pet portrait renders a happy motion video', async ({ page }) => {
+    const portrait = page.locator('.pet-portrait video');
     await expect(portrait).toBeVisible({ timeout: 15_000 });
-    await expect(portrait).toHaveAttribute('alt', /golden retriever and tabby cat/i);
+    await expect(portrait).toHaveAttribute('autoplay', '');
+    await expect(portrait).toHaveAttribute('muted', '');
+    await expect(portrait.locator('source')).toHaveAttribute('src', /\/videos\/hero\.mp4$/);
   });
 
   test('no significant console errors on load', async ({ page }) => {
