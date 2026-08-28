@@ -4,20 +4,25 @@
     "description": "E2E testing and CI/CD pipeline for mywowpet.com Shopify storefront",
     "private": true,
     "scripts": {
-        "test": "npx playwright test",
+        "test": "npm run test:unit && npm run test:e2e",
+        "test:unit": "vitest run",
+        "test:unit:watch": "vitest",
+        "test:e2e": "npx playwright test",
         "test:headed": "npx playwright test --headed",
         "test:ui": "npx playwright test --ui",
         "test:debug": "npx playwright test --debug",
         "test:chromium": "npx playwright test --project=chromium",
         "test:report": "npx playwright show-report",
-        "lint": "eslint e2e-tests/ js/",
+        "lint": "eslint e2e-tests/ js/ unit-tests/ vitest.config.js",
         "shopify:deploy": "shopify theme push --store=$SHOPIFY_STORE_URL --theme=$SHOPIFY_THEME_ID"
     },
     "devDependencies": {
         "@eslint/js": "^9.0.0",
         "@playwright/test": "^1.52.0",
         "@shopify/cli": "^4.2.0",
-        "eslint": "^9.0.0"
+        "eslint": "^9.0.0",
+        "jsdom": "^25.0.1",
+        "vitest": "^3.2.7"
     },
     "engines": {
         "node": ">=18.0.0"
