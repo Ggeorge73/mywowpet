@@ -82,6 +82,30 @@ export default [
     },
   },
   {
+    files: ["unit-tests/**/*.js", "vitest.config.js"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        // Vitest globals, plus the jsdom environment the store module is loaded into.
+        describe: "readonly",
+        it: "readonly",
+        expect: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+        window: "readonly",
+        localStorage: "readonly",
+        console: "readonly",
+      },
+    },
+    rules: {
+      "no-unused-vars": "warn",
+      // load-store.js evaluates js/store.js as a browser script on purpose; that is
+      // the mechanism that lets the tests exercise the real module unmodified.
+      "no-new-func": "off",
+    },
+  },
+  {
     ignores: [
       "node_modules/",
       "playwright-report/",

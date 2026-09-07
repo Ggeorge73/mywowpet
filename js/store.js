@@ -816,11 +816,18 @@ const WowStore = (() => {
     { name: "Platinum", icon: "💎", minPoints: 3000, multiplier: 2 }
   ];
 
+  // ---- Pricing constants ----
+  // Named so tests can pin them and so a change is visible in review rather than
+  // buried as a literal inside getCartTotal.
+  const FREE_SHIPPING_THRESHOLD = 49;
+  const SHIPPING_FLAT_RATE = 5.99;
+  const TAX_RATE = 0.08;
+
   // ---- Promo Codes ----
   const promoCodes = {
     "WELCOME15": { discount: 0.15, type: "percent", description: "15% off your first order" },
     "PET10": { discount: 0.10, type: "percent", description: "10% off" },
-    "FREESHIP": { discount: 5.99, type: "fixed", description: "Free shipping" },
+    "FREESHIP": { discount: 0, type: "shipping", description: "Free shipping" },
     "PETIQ10": { discount: 0.10, type: "percent", description: "10% off — Pet Nutrition IQ Silver" },
     "PETIQ15": { discount: 0.15, type: "percent", description: "15% off — Pet Nutrition IQ Gold" },
     "PETIQ25": { discount: 0.25, type: "percent", description: "25% off — Pet Nutrition IQ Perfect Score" },
@@ -829,10 +836,37 @@ const WowStore = (() => {
     "STREAK30": { discount: 0.25, type: "percent", description: "25% off — 30-Day Streak Reward" }
   };
 
+  // ---- Storage helpers ----
+  // JSON.parse only proves the stored value was parseable, not that it is still
+  // the shape we wrote. A stale schema, an aborted sync, or a third-party write
+  // can leave valid JSON of the wrong type behind; returning that as-is throws in
+  // every downstream consumer (getCartCount, cart rendering, the Firestore sync)
+  // and leaves the user with a permanently broken cart. Anything that is not an
+  // array is treated as absent.
+  function readList(key, fallback = []) {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(key));
+      return Array.isArray(parsed) ? parsed : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  // Object-shaped stores need the mirror-image guard: an array or a primitive is
+  // parseable but has none of the fields callers read, so it must not pass through.
+  function readRecord(key, fallback) {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(key));
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return fallback;
+      return parsed;
+    } catch {
+      return fallback;
+    }
+  }
+
   // ---- Game High Score (localStorage) ----
   function getGameHighScore() {
-    try { return JSON.parse(localStorage.getItem('wow_game_high')) || { score: 0, correct: 0, played: 0 }; }
-    catch { return { score: 0, correct: 0, played: 0 }; }
+    return readRecord('wow_game_high', { score: 0, correct: 0, played: 0 });
   }
 
   function setGameHighScore(score, correct) {
@@ -913,7 +947,7 @@ const WowStore = (() => {
     const staticFiltered = reviews.filter(r => r.productId === parseInt(productId));
     let custom = [];
     try {
-      custom = JSON.parse(localStorage.getItem('wow_custom_reviews')) || [];
+      custom = readList('wow_custom_reviews');
     } catch (e) {
       custom = [];
     }
@@ -934,7 +968,7 @@ const WowStore = (() => {
   function addReview(productId, review) {
     let custom = [];
     try {
-      custom = JSON.parse(localStorage.getItem('wow_custom_reviews')) || [];
+      custom = readList('wow_custom_reviews');
     } catch (e) {
       custom = [];
     }
@@ -1199,9 +1233,7 @@ const WowStore = (() => {
 
   // ---- Cart (localStorage) ----
   function getCart() {
-    try {
-      return JSON.parse(localStorage.getItem('wow_cart')) || [];
-    } catch { return []; }
+    return readList('wow_cart');
   }
 
   function triggerSync() {
@@ -1275,15 +1307,22 @@ const WowStore = (() => {
     });
 
     const activeCode = localStorage.getItem('wow_applied_promo');
+    const promo = activeCode ? promoCodes[activeCode] : null;
     let promoDiscount = 0;
-    if (activeCode && promoCodes[activeCode]) {
-      const promo = promoCodes[activeCode];
-      promoDiscount = promo.type === 'percent' ? (subtotal * promo.discount) : promo.discount;
+    if (promo) {
+      if (promo.type === 'percent') promoDiscount = subtotal * promo.discount;
+      else if (promo.type === 'fixed') promoDiscount = promo.discount;
+      // 'shipping' promos waive the shipping line instead of discounting the
+      // subtotal, so they leave promoDiscount at 0.
     }
 
     const discountedSubtotal = Math.max(0, subtotal - promoDiscount);
-    const shipping = discountedSubtotal >= 49 ? 0 : 5.99;
-    const tax = discountedSubtotal * 0.08;
+    // A shipping promo must waive shipping outright. Modelling it as a subtotal
+    // discount used to push carts just over the threshold back under it, so a code
+    // labelled "Free shipping" added a shipping charge.
+    const shippingWaived = promo?.type === 'shipping' || discountedSubtotal >= FREE_SHIPPING_THRESHOLD;
+    const shipping = shippingWaived ? 0 : SHIPPING_FLAT_RATE;
+    const tax = discountedSubtotal * TAX_RATE;
 
     return { 
       subtotal, 
@@ -1291,6 +1330,9 @@ const WowStore = (() => {
       shipping, 
       tax, 
       promoDiscount, 
+      // Lets the cart UI acknowledge a shipping promo, which reduces the shipping
+      // line rather than promoDiscount and would otherwise render as nothing.
+      freeShippingFromPromo: promo?.type === 'shipping',
       total: discountedSubtotal + shipping + tax 
     };
   }
@@ -1301,9 +1343,7 @@ const WowStore = (() => {
 
   // ---- Pet Profiles (localStorage) ----
   function getPets() {
-    try {
-      return JSON.parse(localStorage.getItem('wow_pets')) || [];
-    } catch { return []; }
+    return readList('wow_pets');
   }
 
   function savePet(pet) {
@@ -1329,14 +1369,17 @@ const WowStore = (() => {
 
   // ---- Loyalty Points (localStorage) ----
   function getLoyalty() {
-    try {
-      return JSON.parse(localStorage.getItem('wow_loyalty')) || { points: 750, history: [
-        { date: '2024-03-15', description: 'Purchase — Order #1042', points: 320 },
-        { date: '2024-03-01', description: 'Welcome Bonus', points: 200 },
-        { date: '2024-02-20', description: 'Purchase — Order #1038', points: 180 },
-        { date: '2024-02-10', description: 'Review Bonus', points: 50 }
-      ]};
-    } catch { return { points: 750, history: [] }; }
+    const loyalty = readRecord('wow_loyalty', { points: 750, history: [
+      { date: '2024-03-15', description: 'Purchase — Order #1042', points: 320 },
+      { date: '2024-03-01', description: 'Welcome Bonus', points: 200 },
+      { date: '2024-02-20', description: 'Purchase — Order #1038', points: 180 },
+      { date: '2024-02-10', description: 'Review Bonus', points: 50 }
+    ]});
+    // addLoyaltyPoints unshifts into history, so it has to be an array even
+    // when a partial record was written.
+    if (!Array.isArray(loyalty.history)) loyalty.history = [];
+    if (typeof loyalty.points !== 'number' || !Number.isFinite(loyalty.points)) loyalty.points = 0;
+    return loyalty;
   }
 
   function addLoyaltyPoints(points, description) {
@@ -1369,8 +1412,7 @@ const WowStore = (() => {
 
   // ---- Wishlist (localStorage) ----
   function getWishlist() {
-    try { return JSON.parse(localStorage.getItem('wow_wishlist')) || []; }
-    catch { return []; }
+    return readList('wow_wishlist');
   }
 
   function toggleWishlist(productId) {
@@ -1391,12 +1433,10 @@ const WowStore = (() => {
 
   // ---- Subscriptions (localStorage) ----
   function getSubscriptions() {
-    try {
-      return JSON.parse(localStorage.getItem('wow_subscriptions')) || [
-        { id: 1, productId: 1, frequency: '4weeks', status: 'active', nextDelivery: '2024-04-15', startDate: '2024-01-15' },
-        { id: 2, productId: 4, frequency: '4weeks', status: 'active', nextDelivery: '2024-04-12', startDate: '2024-02-12' }
-      ];
-    } catch { return []; }
+    return readList('wow_subscriptions', [
+      { id: 1, productId: 1, frequency: '4weeks', status: 'active', nextDelivery: '2024-04-15', startDate: '2024-01-15' },
+      { id: 2, productId: 4, frequency: '4weeks', status: 'active', nextDelivery: '2024-04-12', startDate: '2024-02-12' }
+    ]);
   }
 
   function saveSubscriptions(subs) {
@@ -1406,32 +1446,30 @@ const WowStore = (() => {
 
   // ---- Order History (localStorage) ----
   function getOrders() {
-    try {
-      return JSON.parse(localStorage.getItem('wow_orders')) || [
-        {
-          id: '#WOW-1042',
-          date: '2024-03-15',
-          status: 'delivered',
-          items: [
-            { productId: 1, qty: 1, price: 46.74, isSubscription: true },
-            { productId: 6, qty: 2, price: 18.99 }
-          ],
-          total: 84.72,
-          pointsEarned: 320
-        },
-        {
-          id: '#WOW-1038',
-          date: '2024-02-20',
-          status: 'delivered',
-          items: [
-            { productId: 4, qty: 1, price: 33.14, isSubscription: true },
-            { productId: 11, qty: 1, price: 12.99 }
-          ],
-          total: 46.13,
-          pointsEarned: 180
-        }
-      ];
-    } catch { return []; }
+    return readList('wow_orders', [
+      {
+        id: '#WOW-1042',
+        date: '2024-03-15',
+        status: 'delivered',
+        items: [
+          { productId: 1, qty: 1, price: 46.74, isSubscription: true },
+          { productId: 6, qty: 2, price: 18.99 }
+        ],
+        total: 84.72,
+        pointsEarned: 320
+      },
+      {
+        id: '#WOW-1038',
+        date: '2024-02-20',
+        status: 'delivered',
+        items: [
+          { productId: 4, qty: 1, price: 33.14, isSubscription: true },
+          { productId: 11, qty: 1, price: 12.99 }
+        ],
+        total: 46.13,
+        pointsEarned: 180
+      }
+    ]);
   }
 
   function addOrder(order) {
@@ -1509,6 +1547,9 @@ const WowStore = (() => {
     addOrder,
     validatePromo,
     productColors,
+    FREE_SHIPPING_THRESHOLD,
+    SHIPPING_FLAT_RATE,
+    TAX_RATE,
     getGameHighScore,
     setGameHighScore,
     triggerSync

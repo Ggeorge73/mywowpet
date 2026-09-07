@@ -72,10 +72,13 @@ const CartPage = (() => {
     const appliedPromo = activeCode ? WowStore.validatePromo(activeCode) : null;
     let promoHtml = '';
 
-    if (appliedPromo && totals.promoDiscount > 0) {
+    if (appliedPromo && (totals.promoDiscount > 0 || totals.freeShippingFromPromo)) {
+      const promoValue = totals.freeShippingFromPromo
+        ? 'FREE SHIPPING'
+        : `-${WowStore.formatPrice(totals.promoDiscount)}`;
       promoHtml = `<div class="summary-row savings">
         <span>${appliedPromo.description}</span>
-        <span>-${WowStore.formatPrice(totals.promoDiscount)}</span>
+        <span>${promoValue}</span>
       </div>`;
     }
 
@@ -124,7 +127,7 @@ const CartPage = (() => {
         <span style="font-size: var(--fs-sm); color: var(--color-primary-dark);">⭐ Estimated loyalty points: <strong>${pointsEarned}</strong></span>
       </div>
 
-      ${totals.shipping > 0 ? `<div style="text-align: center; margin-top: var(--space-3); font-size: var(--fs-xs); color: var(--color-text-muted);">Add ${WowStore.formatPrice(49 - totals.subtotal)} more for estimated free shipping.</div>` : ''}
+      ${totals.shipping > 0 && !totals.freeShippingFromPromo ? `<div style="text-align: center; margin-top: var(--space-3); font-size: var(--fs-xs); color: var(--color-text-muted);">Add ${WowStore.formatPrice(Math.max(0, WowStore.FREE_SHIPPING_THRESHOLD - totals.subtotal))} more for estimated free shipping.</div>` : ''}
     `;
   }
 
