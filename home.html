@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="My Wow Pet &#x2014; Premium pet products curated for the modern pet parent. Shop food, treats, toys, health, and accessories for dogs, cats, small pets, and birds.">
+  <title>My Wow Pet &#x2014; Premium Pet Products for Modern Pet Parents</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/pet-cursor.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#D4A853">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="My Wow Pet">
+  <link rel="apple-touch-icon" href="assets/images/icon-192x192.png">
+</head>
+<body>
+  <!--
+    Store home page. Pre-launch this lives at /home.html while index.html is the
+    coming-soon page; see scripts/launch-cutover.md for the launch-day swap.
+    Keep it free of invented social proof: no ratings, review counts, customer
+    counts, testimonials, or discounts that Shopify does not honour.
+  -->
+  <div id="nav-slot"></div>
+
+  <!-- ======== HERO ======== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg" style="position: absolute; inset: 0; overflow: hidden;">
+      <!-- Video B sits below; Video A sits on top. Both always opacity:1 so browser never suspends decoding. -->
+      <video id="hero-vid-b" muted loop playsinline preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:1;"></video>
+      <video id="hero-vid-a" autoplay muted loop playsinline preload="metadata" poster="assets/images/hero.jpg" src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero_dog.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:2;"></video>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="container">
+      <div class="hero-content slide-up">
+        <span class="hero-label">&#x2726; Premium Pet Care</span>
+        <h1>Everything Your Pet Deserves</h1>
+        <p class="hero-subtitle">Curated, high-quality products delivered to your door. Because your fur babies deserve nothing but the best.</p>
+        <div class="hero-actions">
+          <a href="shop.html" class="btn btn-primary btn-lg">Shop Now</a>
+          <a href="help.html" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.5); color: white;">How It Works</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== TRUST BAR ======== -->
+  <section class="trust-bar">
+    <div class="container">
+      <div class="trust-item">
+        <span class="trust-item-icon">&#x1F69A;</span>
+        <span class="trust-item-text" id="trust-free-shipping">Free Shipping $49+</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-item-icon">&#x1F504;</span>
+        <span class="trust-item-text">30-Day Returns</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-item-icon">&#x1F512;</span>
+        <span class="trust-item-text">Secure Checkout</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-item-icon">&#x1F4AC;</span>
+        <span class="trust-item-text">Real Human Support</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== SHOP BY PET ======== -->
+  <section class="section" id="shop-by-pet">
+    <div class="container text-center">
+      <span class="section-label fade-in">Browse</span>
+      <h2 class="section-title fade-in">Shop by Pet</h2>
+      <p class="section-subtitle fade-in">Find the perfect products tailored to your pet's needs</p>
+      <div class="category-grid stagger" id="category-grid">
+        <a href="shop.html?pet=dog" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
+          <div class="category-card-icon" style="overflow:hidden;position:relative;">
+            <video muted loop playsinline preload="none" poster="assets/images/dog_food.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/dog_park.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="category-card-name">Dogs</span>
+        </a>
+        <a href="shop.html?pet=cat" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
+          <div class="category-card-icon" style="overflow:hidden;position:relative;">
+            <video muted loop playsinline preload="none" poster="assets/images/cat_food.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/cat_playing.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="category-card-name">Cats</span>
+        </a>
+        <a href="shop.html?pet=small-pet" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
+          <div class="category-card-icon" style="overflow:hidden;position:relative;">
+            <video muted loop playsinline preload="none" poster="assets/images/small_pet.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hamster_wheel.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="category-card-name">Small Pets</span>
+        </a>
+        <a href="shop.html?pet=bird" class="category-card fade-in" onmouseenter="this.querySelector('video')?.play()" onmouseleave="this.querySelector('video')?.pause()">
+          <div class="category-card-icon" style="overflow:hidden;position:relative;">
+            <video muted loop playsinline preload="none" poster="assets/images/bird_pet.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;">
+              <source src="https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/bird_colorful.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="category-card-name">Birds</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== FEATURED PRODUCTS ======== -->
+  <section class="section" style="background: var(--color-bg-alt);" id="featured">
+    <div class="container">
+      <span class="section-label fade-in">Featured</span>
+      <h2 class="section-title fade-in">Hand-Picked Essentials</h2>
+      <p class="section-subtitle fade-in">A few of our favorite foods, treats, and toys to get you started</p>
+      <div class="product-grid" id="featured-products"></div>
+      <div class="text-center" style="margin-top: var(--space-8);">
+        <a href="shop.html" class="btn btn-secondary btn-lg">Shop All Products</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== GAME CTA ======== -->
+  <section class="section" id="game-cta">
+    <div class="container">
+      <div class="split-section">
+        <div class="split-content slide-up">
+          <span class="section-label">Play & Learn</span>
+          <h2 style="margin-bottom: var(--space-5);">&#x1F9E0; Pet Nutrition IQ</h2>
+          <p style="color: var(--color-text-secondary); margin-bottom: var(--space-6); line-height: var(--lh-relaxed);">Think you know what's best for your pet? Test your knowledge with our quick trivia game and pick up a few pet nutrition facts along the way.</p>
+          <div style="display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-8);">
+            <div class="flex items-center gap-4">
+              <span style="font-size: var(--fs-xl); width: 40px; height: 40px; background: rgba(var(--color-primary-rgb), 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">&#x1F525;</span>
+              <div><strong>10 Questions</strong><span class="text-sm text-muted" style="margin-left: var(--space-2);">Timed & streak-scored</span></div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span style="font-size: var(--fs-xl); width: 40px; height: 40px; background: rgba(107,197,160,0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">&#x1F4A1;</span>
+              <div><strong>Learn as You Play</strong><span class="text-sm text-muted" style="margin-left: var(--space-2);">A fact with every answer</span></div>
+            </div>
+          </div>
+          <div style="display: flex; gap: var(--space-4); align-items: center;">
+            <a href="game.html" class="btn btn-primary btn-lg">Play Now</a>
+            <span class="text-sm text-muted" id="home-game-high"></span>
+          </div>
+        </div>
+        <div class="split-image slide-up" style="background: linear-gradient(135deg, #1a1040, #2d1f6e); display: flex; align-items: center; justify-content: center; aspect-ratio: 4/3;">
+          <div style="text-align: center; color: white; padding: var(--space-8);">
+            <div style="font-size: 80px; margin-bottom: var(--space-4); animation: bounce 2s ease-in-out infinite;">&#x1F9E0;</div>
+            <div style="font-family: var(--font-heading); font-size: var(--fs-3xl); font-weight: var(--fw-bold); margin-bottom: var(--space-2); background: linear-gradient(135deg, var(--color-primary-light), #FFD700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">NUTRITION IQ</div>
+            <div style="font-family: var(--font-accent); font-size: var(--fs-base); opacity: 0.7;">Learn &#x2022; Play &#x2022; Share</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== HELP & SUPPORT ======== -->
+  <section class="section" style="background: var(--color-bg-alt);" id="support">
+    <div class="container">
+      <span class="section-label fade-in">We're Here to Help</span>
+      <h2 class="section-title fade-in">Shop With Confidence</h2>
+      <p class="section-subtitle fade-in">Clear policies and a real team behind every order</p>
+      <div class="perks-grid stagger">
+        <a href="shipping.html" class="perk-card fade-in" style="text-decoration: none; color: inherit;">
+          <div class="perk-icon">&#x1F69A;</div>
+          <h4>Shipping</h4>
+          <p id="support-shipping-copy">Free standard shipping on orders over $49. See delivery times and options.</p>
+        </a>
+        <a href="returns.html" class="perk-card fade-in" style="text-decoration: none; color: inherit;">
+          <div class="perk-icon">&#x1F504;</div>
+          <h4>Returns</h4>
+          <p>Unopened items can be returned within 30 days. Read the full returns policy.</p>
+        </a>
+        <a href="help.html" class="perk-card fade-in" style="text-decoration: none; color: inherit;">
+          <div class="perk-icon">&#x2753;</div>
+          <h4>Help Center</h4>
+          <p>Answers to common questions about orders, payments, and your account.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== WELCOME OFFER ======== -->
+  <section class="newsletter-section" id="welcome-offer">
+    <div class="container">
+      <div class="newsletter-content fade-in">
+        <h2>New to My Wow Pet?</h2>
+        <p>Use code <strong>WELCOME15</strong> at checkout for 15% off your first order.</p>
+        <a href="shop.html" class="btn btn-primary btn-lg">Start Shopping</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-slot"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/animations.js"></script>
+  <script>
+    // Init app
+    WowApp.init('home');
+
+    // Shipping copy comes from the single source in js/store.js
+    const freeShippingMin = '$' + WowStore.FREE_SHIPPING_THRESHOLD;
+    document.getElementById('trust-free-shipping').textContent = 'Free Shipping ' + freeShippingMin + '+';
+    document.getElementById('support-shipping-copy').textContent = 'Free standard shipping on orders over ' + freeShippingMin + '. See delivery times and options.';
+
+    // Featured products: curated catalog order (no sales data before launch)
+    const featuredContainer = document.getElementById('featured-products');
+    const featured = WowStore.getProducts({ sort: 'bestselling' }).slice(0, 8);
+    featuredContainer.innerHTML = featured.map(p => WowApp.renderProductCard(p)).join('');
+
+    // Re-init animations for dynamically added elements
+    WowAnimations.init();
+
+    // Show game high score if available
+    const ghs = WowStore.getGameHighScore();
+    const ghsEl = document.getElementById('home-game-high');
+    if (ghs.played > 0 && ghsEl) {
+      ghsEl.textContent = '\u{1F3C6} High Score: ' + ghs.score + ' pts';
+    }
+
+    // ===== Hero video crossfade =====
+    // Both videos stay opacity:1 so the browser keeps decoding them. The next
+    // source loads into the hidden bottom video, the top one fades out, then the
+    // layers swap and the cycle repeats.
+    (function() {
+      var sources = [
+        'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero_dog.mp4',
+        'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero_cat.mp4',
+        'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero_bunny.mp4',
+        'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero_bird.mp4'
+      ];
+      var vidA = document.getElementById('hero-vid-a');
+      var vidB = document.getElementById('hero-vid-b');
+      if (!vidA || !vidB) return;
+
+      var srcIdx = 0;
+      var top = vidA;
+      var bottom = vidB;
+      var transitioning = false;
+
+      function doNextCrossfade() {
+        if (transitioning) return;
+        transitioning = true;
+
+        srcIdx = (srcIdx + 1) % sources.length;
+        bottom.muted = true;
+        bottom.src = sources[srcIdx];
+        bottom.load();
+
+        function onReady() {
+          bottom.play().catch(function(){});
+          top.style.transition = 'opacity 1.5s ease';
+          top.style.opacity = '0';
+
+          function afterFade() {
+            top.pause();
+            top.style.transition = 'none';
+            top.style.opacity = '1';
+            top.style.zIndex = '1';
+            bottom.style.zIndex = '2';
+            var tmp = top;
+            top = bottom;
+            bottom = tmp;
+            transitioning = false;
+          }
+
+          var faded = false;
+          top.addEventListener('transitionend', function handler() {
+            top.removeEventListener('transitionend', handler);
+            if (!faded) { faded = true; afterFade(); }
+          });
+          setTimeout(function() {
+            if (!faded) { faded = true; afterFade(); }
+          }, 2000);
+        }
+
+        var ready = false;
+        bottom.addEventListener('canplaythrough', function handler() {
+          bottom.removeEventListener('canplaythrough', handler);
+          if (!ready) { ready = true; onReady(); }
+        });
+        setTimeout(function() {
+          if (!ready) { ready = true; onReady(); }
+        }, 3000);
+      }
+
+      setInterval(doNextCrossfade, 7000);
+    })();
+  </script>
+  <style>
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  </style>
+  <script src="js/pet-cursor.js"></script>
+</body>
+</html>

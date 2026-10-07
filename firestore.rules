@@ -41,16 +41,55 @@ service cloud.firestore {
 
     match /reviews/{reviewId} {
       allow read: if true;
+      // Reviews are public and rendered on product pages, so every field is typed
+      // and size-capped. Doc id is `${uid}_${productId}`: one review per user per product.
       allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly([
+          'id',
+          'productId',
+          'author',
+          'rating',
+          'text',
+          'pet',
+          'date',
+          'avatar',
+          'userId',
+          'createdAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'id',
+          'productId',
+          'author',
+          'rating',
+          'text',
+          'userId',
+          'createdAt'
+        ])
         && request.resource.data.userId == request.auth.uid
-        && request.resource.data.rating is number
-        && request.resource.data.rating >= 1
-        && request.resource.data.rating <= 5
+        && request.resource.data.id == reviewId
+        && reviewId == request.auth.uid + '_' + string(request.resource.data.productId)
         && request.resource.data.productId is int
         && request.resource.data.productId >= 1
         && request.resource.data.productId <= 999999
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.author is string
+        && request.resource.data.author.size() >= 1
+        && request.resource.data.author.size() <= 60
         && request.resource.data.text is string
-        && request.resource.data.text.size() <= 2000;
+        && request.resource.data.text.size() >= 1
+        && request.resource.data.text.size() <= 2000
+        && (!('pet' in request.resource.data)
+          || (request.resource.data.pet is string && request.resource.data.pet.size() <= 60))
+        && (!('date' in request.resource.data)
+          || (request.resource.data.date is string
+            && request.resource.data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))
+        && (!('avatar' in request.resource.data)
+          || (request.resource.data.avatar is string
+            && request.resource.data.avatar.size() <= 16
+            && request.resource.data.avatar.matches('^[^<>&"]*$')))
+        && request.resource.data.createdAt == request.time;
       allow update, delete: if false;
     }
 

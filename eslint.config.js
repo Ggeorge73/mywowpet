@@ -60,10 +60,7 @@ export default [
         WowFirebase: "writable",
         WowAnimations: "writable",
         WowQuickView: "writable",
-        WowSocialProof: "writable",
-        WowSpinWheel: "writable",
         WowStreak: "writable",
-        WowFlashSale: "writable",
         SubscribePage: "writable",
         CartPage: "writable",
         PetCheckPage: "writable",
@@ -112,5 +109,16 @@ export default [
       "test-results/",
       "sw.js",
     ],
+  },
+  {
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        console: "readonly",
+        process: "readonly",
+      },
+    },
   },
 ];

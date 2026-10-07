@@ -5,7 +5,6 @@
    ============================================ */
 
 const CartPage = (() => {
-  let appliedPromo = null;
 
   function init() {
     render();
@@ -22,8 +21,8 @@ const CartPage = (() => {
 
     if (isEmpty) return;
 
-    // Check if upsell should show
-    const hasNonSub = cart.some(item => !item.isSubscription && WowStore.getProduct(item.productId)?.subscribable);
+    // Check if upsell should show (only once Shopify selling plans exist)
+    const hasNonSub = WowStore.FEATURES.subscriptions && cart.some(item => !item.isSubscription && WowStore.getProduct(item.productId)?.subscribable);
     document.getElementById('subscribe-upsell').style.display = hasNonSub ? 'flex' : 'none';
 
     renderItems(cart);
@@ -35,7 +34,9 @@ const CartPage = (() => {
     container.innerHTML = cart.map(item => {
       const product = WowStore.getProduct(item.productId);
       if (!product) return '';
-      const price = item.isSubscription && product.subscribePrice ? product.subscribePrice : product.price;
+      // Mirrors WowStore.getCartTotal: subscription pricing only while the feature is live.
+      const isSubscription = WowStore.FEATURES.subscriptions && item.isSubscription && product.subscribePrice;
+      const price = isSubscription ? product.subscribePrice : product.price;
       const imgSrc = WowStore.getProductImage(product);
       const gradient = WowStore.generateProductGradient(product);
 
@@ -46,7 +47,7 @@ const CartPage = (() => {
           </a>
           <div class="cart-item-info">
             <a href="product.html?id=${product.id}" class="cart-item-title">${product.name}</a>
-            <div class="cart-item-variant">${product.weight}${item.isSubscription ? ' · <span class="badge badge-subscribe">Subscribe & Save</span>' : ''}</div>
+            <div class="cart-item-variant">${product.weight}${isSubscription ? ' · <span class="badge badge-subscribe">Subscribe & Save</span>' : ''}</div>
             <div class="cart-item-actions">
               <div class="qty-stepper">
                 <button onclick="CartPage.updateQty(${product.id}, ${item.qty - 1}, ${item.isSubscription})">−</button>
@@ -59,7 +60,7 @@ const CartPage = (() => {
           <div class="cart-item-price" style="display: none;"></div>
           <div class="cart-item-price">
             <span class="price">${WowStore.formatPrice(price * item.qty)}</span>
-            ${item.isSubscription ? `<div style="font-size: var(--fs-xs); color: var(--color-sky); margin-top: 2px;">Save ${WowStore.formatPrice((product.price - product.subscribePrice) * item.qty)}</div>` : ''}
+            ${isSubscription ? `<div style="font-size: var(--fs-xs); color: var(--color-sky); margin-top: 2px;">Save ${WowStore.formatPrice((product.price - product.subscribePrice) * item.qty)}</div>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -68,19 +69,8 @@ const CartPage = (() => {
   function renderSummary() {
     const cart = WowStore.getCart();
     const totals = WowStore.getCartTotal();
-    const activeCode = localStorage.getItem('wow_applied_promo');
-    const appliedPromo = activeCode ? WowStore.validatePromo(activeCode) : null;
-    let promoHtml = '';
-
-    if (appliedPromo && (totals.promoDiscount > 0 || totals.freeShippingFromPromo)) {
-      const promoValue = totals.freeShippingFromPromo
-        ? 'FREE SHIPPING'
-        : `-${WowStore.formatPrice(totals.promoDiscount)}`;
-      promoHtml = `<div class="summary-row savings">
-        <span>${appliedPromo.description}</span>
-        <span>${promoValue}</span>
-      </div>`;
-    }
+    // The code is only carried to Shopify; it never changes the prices shown here.
+    const activeCode = WowStore.getPromoCode();
 
     const pointsEarned = Math.floor(totals.total * 4);
     const missingShopifyItems = WowStore.getMissingShopifyCartItems(cart);
@@ -99,7 +89,6 @@ const CartPage = (() => {
         <span>Subscribe & Save</span>
         <span>-${WowStore.formatPrice(totals.savings)}</span>
       </div>` : ''}
-      ${promoHtml}
       <div class="summary-row">
         <span>Estimated Shipping</span>
         <span>${totals.shipping === 0 ? '<span style="color: var(--color-secondary); font-weight: var(--fw-semibold);">FREE</span>' : WowStore.formatPrice(totals.shipping)}</span>
@@ -114,20 +103,22 @@ const CartPage = (() => {
       </div>
 
       <div class="promo-code">
-        <input type="text" id="promo-input" placeholder="Promo code" value="${activeCode || ''}">
+        <input type="text" id="promo-input" placeholder="Discount code (e.g. WELCOME15)" value="${activeCode || ''}" maxlength="64" autocomplete="off">
         <button onclick="CartPage.applyPromo()">Apply</button>
       </div>
-      ${appliedPromo ? `<div style="font-size: var(--fs-xs); color: var(--color-secondary); margin-bottom: var(--space-4);">Code will be applied during secure checkout: ${appliedPromo.description}</div>` : ''}
+      <div id="promo-note" style="font-size: var(--fs-xs); color: var(--color-text-muted); margin-bottom: var(--space-4);">
+        ${activeCode ? `Code <strong>${activeCode}</strong> will be sent to secure checkout, where it is validated and any discount is applied.` : 'Discount codes such as WELCOME15 are validated and applied at secure checkout.'}
+      </div>
 
       ${checkoutDisabled ? `<div style="font-size: var(--fs-sm); color: var(--color-error); margin-bottom: var(--space-4);">One or more items cannot be checked out yet.</div>` : ''}
       <button id="checkout-btn" class="btn btn-primary btn-block btn-lg" onclick="CartPage.startShopifyCheckout()" ${checkoutDisabled ? 'disabled' : ''}>Proceed to Secure Checkout</button>
       <a href="shop.html" class="btn btn-secondary btn-block btn-lg" style="margin-top: var(--space-3);">Continue Shopping</a>
 
-      <div style="text-align: center; margin-top: var(--space-4); padding: var(--space-3); background: rgba(var(--color-primary-rgb), 0.06); border-radius: var(--radius-md);">
+      ${WowStore.FEATURES.loyalty ? `<div style="text-align: center; margin-top: var(--space-4); padding: var(--space-3); background: rgba(var(--color-primary-rgb), 0.06); border-radius: var(--radius-md);">
         <span style="font-size: var(--fs-sm); color: var(--color-primary-dark);">⭐ Estimated loyalty points: <strong>${pointsEarned}</strong></span>
-      </div>
+      </div>` : ''}
 
-      ${totals.shipping > 0 && !totals.freeShippingFromPromo ? `<div style="text-align: center; margin-top: var(--space-3); font-size: var(--fs-xs); color: var(--color-text-muted);">Add ${WowStore.formatPrice(Math.max(0, WowStore.FREE_SHIPPING_THRESHOLD - totals.subtotal))} more for estimated free shipping.</div>` : ''}
+      ${totals.shipping > 0 ? `<div style="text-align: center; margin-top: var(--space-3); font-size: var(--fs-xs); color: var(--color-text-muted);">Add ${WowStore.formatPrice(Math.max(0, WowStore.FREE_SHIPPING_THRESHOLD - totals.subtotal))} more for estimated free shipping.</div>` : ''}
     `;
   }
 
@@ -144,15 +135,14 @@ const CartPage = (() => {
   }
 
   function applyPromo() {
-    const code = document.getElementById('promo-input').value.trim();
-    if (!code) return;
-    const promo = WowStore.validatePromo(code);
-    if (promo) {
-      WowApp.showToast(`Promo code will be applied during secure checkout: ${promo.description}`, '🎉');
-      renderSummary();
+    // No local validation or price change: Shopify is the source of truth for codes.
+    const code = WowStore.setPromoCode(document.getElementById('promo-input').value);
+    if (code) {
+      WowApp.showToast(`${code} will be checked and applied at secure checkout.`, '🎟️');
     } else {
-      WowApp.showToast('Invalid promo code', '❌');
+      WowApp.showToast('Discount code removed.', '🎟️');
     }
+    renderSummary();
   }
 
   async function startShopifyCheckout() {
@@ -170,7 +160,7 @@ const CartPage = (() => {
         throw new Error('One or more cart items cannot be prepared for secure checkout.');
       }
 
-      const activeCode = localStorage.getItem('wow_applied_promo');
+      const activeCode = WowStore.getPromoCode();
       const user = typeof WowFirebase !== 'undefined' && WowFirebase.getCurrentUser ? WowFirebase.getCurrentUser() : null;
       const returnUrl = WowStore.getCustomStorefrontUrl('/');
       const shopifyCart = await WowStore.createShopifyCart(cart, {
@@ -180,7 +170,17 @@ const CartPage = (() => {
       });
 
       localStorage.setItem('wow_shopify_cart_id', shopifyCart.id);
-      window.location.href = WowStore.buildShopifyCheckoutUrl(shopifyCart.checkoutUrl, returnUrl);
+      const checkoutHref = WowStore.buildShopifyCheckoutUrl(shopifyCart.checkoutUrl, returnUrl);
+
+      // Shopify reports whether the code it was given actually applies. Tell the
+      // shopper before handing off rather than letting them find out at payment.
+      const rejected = (shopifyCart.discountCodes || []).filter(dc => dc && dc.applicable === false);
+      if (rejected.length) {
+        WowApp.showToast(`Code ${rejected.map(dc => dc.code).join(', ')} isn't valid for this order. You can try another code at checkout.`, '⚠️', 4000);
+        setTimeout(() => { window.location.href = checkoutHref; }, 2500);
+        return;
+      }
+      window.location.href = checkoutHref;
     } catch (err) {
       console.error('[My Wow Pet] Secure checkout handoff failed:', err);
       WowApp.showToast(err.message || 'Secure checkout could not be started.', '❌');

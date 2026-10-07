@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Track your My Wow Pet order in real-time.">
+  <meta name="description" content="Find tracking details for your My Wow Pet order.">
   <title>Track Order | My Wow Pet</title>
+  <link rel="canonical" href="/tracking">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
@@ -98,12 +99,12 @@
       
       <div class="tracking-container slide-up">
         <h1 style="margin-bottom: var(--space-2);">📦 Track Your Order</h1>
-        <p style="color: var(--color-text-secondary);">Enter your order details below to see real-time shipping updates.</p>
+        <p style="color: var(--color-text-secondary);">Your shipping confirmation email includes a carrier tracking link. Enter your order details below and we'll help you find it.</p>
         
-        <form class="tracking-form" onsubmit="event.preventDefault(); WowApp.showToast('Looking up your order... Please check your email for tracking details.', '📦'); this.reset();">
+        <form class="tracking-form" onsubmit="event.preventDefault(); WowApp.showToast('Thanks! Tracking links are in your shipping confirmation email. If you can\'t find it, contact support and we\'ll resend it.', '📦', 5000); this.reset();">
           <div class="form-group">
             <label for="order_number">Order Number</label>
-            <input type="text" id="order_number" required placeholder="e.g. #WOW-1042">
+            <input type="text" id="order_number" required placeholder="e.g. #1001">
           </div>
           <div class="form-group">
             <label for="order_email">Email Address</label>
@@ -127,7 +128,7 @@
         <div class="step">
           <span class="step-icon">🚚</span>
           <h4>3. Get Updates</h4>
-          <p style="color: var(--color-text-secondary); font-size: var(--fs-sm);">View real-time location and estimated delivery date.</p>
+          <p style="color: var(--color-text-secondary); font-size: var(--fs-sm);">Follow the carrier link for location and estimated delivery date.</p>
         </div>
       </div>
 

@@ -67,10 +67,12 @@ const WowStreak = (() => {
     return true;
   }
 
+  // Milestones are celebratory only. The STREAK* discount codes never existed in
+  // Shopify, so none are advertised.
   function getMilestoneReward(count) {
-    if (count === 7) return { points: 100, code: 'STREAK7', msg: '7-Day Champion!' };
-    if (count === 14) return { points: 200, code: 'STREAK14', msg: '2-Week Legend!' };
-    if (count === 30) return { points: 500, code: 'STREAK30', msg: '30-Day Pet Expert!' };
+    if (count === 7) return { msg: '7-Day Champion!' };
+    if (count === 14) return { msg: '2-Week Legend!' };
+    if (count === 30) return { msg: '30-Day Pet Expert!' };
     return null;
   }
 
@@ -140,7 +142,6 @@ const WowStreak = (() => {
         ${milestone ? `
           <div style="background:linear-gradient(135deg,rgba(212,168,83,0.2),rgba(255,165,0,0.1));border:1px solid rgba(212,168,83,0.4);border-radius:12px;padding:12px 16px;margin-bottom:16px;text-align:center;">
             <div style="font-size:13px;font-weight:700;color:#FFD700;">🏆 ${milestone.msg}</div>
-            <div style="font-size:12px;opacity:0.8;margin-top:4px;">Bonus code: <strong>${milestone.code}</strong> for +${milestone.points} extra points!</div>
           </div>
         ` : ''}
 
@@ -183,6 +184,8 @@ const WowStreak = (() => {
   }
 
   function init() {
+    // The streak only awards loyalty points, which are not redeemable yet.
+    if (typeof WowStore === 'undefined' || !WowStore.FEATURES.loyalty) return;
     const { data, isNewDay } = checkAndUpdateStreak();
 
     // Auto-show a celebration toast for new-day streak continuation

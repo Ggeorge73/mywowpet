@@ -16,11 +16,9 @@ const WowStore = (() => {
       price: 54.99,
       subscribePrice: 46.74,
       subscribeDiscount: 15,
-      rating: 4.8,
-      reviewCount: 342,
       image: "",
       images: [],
-      badge: "bestseller",
+      badge: null,
       tags: ["grain-free", "high-protein", "wild-caught"],
       dietary: ["grain-free", "high-protein"],
       lifeStage: ["adult"],
@@ -41,8 +39,6 @@ const WowStore = (() => {
       price: 62.99,
       subscribePrice: 53.54,
       subscribeDiscount: 15,
-      rating: 4.9,
-      reviewCount: 218,
       image: "",
       images: [],
       badge: "new",
@@ -66,8 +62,6 @@ const WowStore = (() => {
       price: 42.99,
       subscribePrice: 36.54,
       subscribeDiscount: 15,
-      rating: 4.7,
-      reviewCount: 156,
       image: "",
       images: [],
       badge: null,
@@ -91,11 +85,9 @@ const WowStore = (() => {
       price: 38.99,
       subscribePrice: 33.14,
       subscribeDiscount: 15,
-      rating: 4.6,
-      reviewCount: 289,
       image: "",
       images: [],
-      badge: "bestseller",
+      badge: null,
       tags: ["indoor", "hairball-control", "weight-management"],
       dietary: ["grain-free"],
       lifeStage: ["adult"],
@@ -116,8 +108,6 @@ const WowStore = (() => {
       price: 29.99,
       subscribePrice: 25.49,
       subscribeDiscount: 15,
-      rating: 4.8,
-      reviewCount: 412,
       image: "",
       images: [],
       badge: null,
@@ -141,11 +131,9 @@ const WowStore = (() => {
       price: 18.99,
       subscribePrice: 16.14,
       subscribeDiscount: 15,
-      rating: 4.9,
-      reviewCount: 567,
       image: "",
       images: [],
-      badge: "bestseller",
+      badge: null,
       tags: ["raw", "single-ingredient", "training"],
       dietary: ["raw", "high-protein"],
       lifeStage: ["puppy", "adult", "senior"],
@@ -166,8 +154,6 @@ const WowStore = (() => {
       price: 24.99,
       subscribePrice: 21.24,
       subscribeDiscount: 15,
-      rating: 4.5,
-      reviewCount: 198,
       image: "",
       images: [],
       badge: null,
@@ -191,8 +177,6 @@ const WowStore = (() => {
       price: 8.99,
       subscribePrice: 7.64,
       subscribeDiscount: 15,
-      rating: 4.7,
-      reviewCount: 334,
       image: "",
       images: [],
       badge: null,
@@ -216,8 +200,6 @@ const WowStore = (() => {
       price: 16.99,
       subscribePrice: null,
       subscribeDiscount: 0,
-      rating: 4.4,
-      reviewCount: 223,
       image: "",
       images: [],
       badge: "new",
@@ -241,8 +223,6 @@ const WowStore = (() => {
       price: 22.99,
       subscribePrice: null,
       subscribeDiscount: 0,
-      rating: 4.6,
-      reviewCount: 178,
       image: "",
       images: [],
       badge: null,
@@ -266,11 +246,9 @@ const WowStore = (() => {
       price: 12.99,
       subscribePrice: null,
       subscribeDiscount: 0,
-      rating: 4.8,
-      reviewCount: 445,
       image: "",
       images: [],
-      badge: "bestseller",
+      badge: null,
       tags: ["interactive", "feather", "exercise"],
       dietary: [],
       lifeStage: ["puppy", "adult"],
@@ -291,8 +269,6 @@ const WowStore = (() => {
       price: 32.99,
       subscribePrice: 28.04,
       subscribeDiscount: 15,
-      rating: 4.7,
-      reviewCount: 156,
       image: "",
       images: [],
       badge: null,
@@ -316,8 +292,6 @@ const WowStore = (() => {
       price: 34.99,
       subscribePrice: 29.74,
       subscribeDiscount: 15,
-      rating: 4.8,
-      reviewCount: 289,
       image: "",
       images: [],
       badge: null,
@@ -341,8 +315,6 @@ const WowStore = (() => {
       price: 26.99,
       subscribePrice: 22.94,
       subscribeDiscount: 15,
-      rating: 4.3,
-      reviewCount: 132,
       image: "",
       images: [],
       badge: null,
@@ -366,8 +338,6 @@ const WowStore = (() => {
       price: 39.99,
       subscribePrice: null,
       subscribeDiscount: 0,
-      rating: 4.9,
-      reviewCount: 87,
       image: "",
       images: [],
       badge: "new",
@@ -391,8 +361,6 @@ const WowStore = (() => {
       price: 44.99,
       subscribePrice: null,
       subscribeDiscount: 0,
-      rating: 4.6,
-      reviewCount: 93,
       image: "",
       images: [],
       badge: null,
@@ -416,8 +384,6 @@ const WowStore = (() => {
       price: 149.99,
       subscribePrice: null,
       subscribeDiscount: 0,
-      rating: 4.4,
-      reviewCount: 167,
       image: "",
       images: [],
       badge: null,
@@ -441,8 +407,6 @@ const WowStore = (() => {
       price: 16.99,
       subscribePrice: 14.44,
       subscribeDiscount: 15,
-      rating: 4.7,
-      reviewCount: 145,
       image: "",
       images: [],
       badge: null,
@@ -466,8 +430,6 @@ const WowStore = (() => {
       price: 11.99,
       subscribePrice: 10.19,
       subscribeDiscount: 15,
-      rating: 4.5,
-      reviewCount: 89,
       image: "",
       images: [],
       badge: null,
@@ -491,8 +453,6 @@ const WowStore = (() => {
       price: 14.99,
       subscribePrice: 12.74,
       subscribeDiscount: 15,
-      rating: 4.6,
-      reviewCount: 112,
       image: "",
       images: [],
       badge: null,
@@ -516,11 +476,9 @@ const WowStore = (() => {
       price: 49.99,
       subscribePrice: null,
       subscribeDiscount: 0,
-      rating: 4.8,
-      reviewCount: 312,
       image: "",
       images: [],
-      badge: "bestseller",
+      badge: null,
       tags: ["bed", "plush", "calming"],
       dietary: [],
       lifeStage: ["puppy", "adult", "senior"],
@@ -541,8 +499,6 @@ const WowStore = (() => {
       price: 45.99,
       subscribePrice: 39.09,
       subscribeDiscount: 15,
-      rating: 4.7,
-      reviewCount: 134,
       image: "",
       images: [],
       badge: null,
@@ -566,8 +522,6 @@ const WowStore = (() => {
       price: 14.99,
       subscribePrice: 12.74,
       subscribeDiscount: 15,
-      rating: 4.9,
-      reviewCount: 201,
       image: "",
       images: [],
       badge: null,
@@ -591,8 +545,6 @@ const WowStore = (() => {
       price: 34.99,
       subscribePrice: null,
       subscribeDiscount: 0,
-      rating: 4.5,
-      reviewCount: 156,
       image: "",
       images: [],
       badge: "new",
@@ -735,40 +687,22 @@ const WowStore = (() => {
     return catVideos.default || 'https://pub-40ec11da72c446d3a4c39df5fdae319c.r2.dev/videos/hero.mp4';
   }
 
-  // ---- Reviews ----
-  const reviews = [
-    { id: 1, productId: 1, author: "Sarah M.", rating: 5, text: "My golden retriever absolutely loves this food! His coat has never looked better and he has so much energy.", pet: "Max — Golden Retriever", date: "2024-03-15", avatar: "🐕" },
-    { id: 2, productId: 1, author: "James K.", rating: 5, text: "Finally found a grain-free food that doesn't upset my dog's stomach. Highly recommend!", pet: "Bella — Lab Mix", date: "2024-03-10", avatar: "🐾" },
-    { id: 3, productId: 1, author: "Emily R.", rating: 4, text: "Great quality, but a bit pricey. Subscribe & Save discount makes it more affordable though.", pet: "Charlie — Border Collie", date: "2024-03-05", avatar: "🐶" },
-    { id: 4, productId: 4, author: "Lisa T.", rating: 5, text: "Fewer hairballs since switching to this food. My indoor cats love the taste.", pet: "Luna & Mochi — Domestic Short Hair", date: "2024-03-12", avatar: "🐱" },
-    { id: 5, productId: 6, author: "Mike D.", rating: 5, text: "The only treats my picky eater will actually eat. Pure beef, nothing else. Perfect for training.", pet: "Rocky — German Shepherd", date: "2024-03-08", avatar: "🦴" },
-    { id: 6, productId: 11, author: "Anna W.", rating: 5, text: "My cat goes absolutely crazy for this wand toy! Best cat toy purchase ever.", pet: "Whiskers — Tabby", date: "2024-03-14", avatar: "🐈" }
-  ];
+  // ---- Feature flags ----
+  // Single switch for features that need Shopify-side setup before they can be
+  // honoured at checkout. While a flag is false the UI must not advertise the
+  // feature or let it change a displayed price.
+  //  - subscriptions: Subscribe & Save / autoship. No Shopify selling plans exist
+  //    yet (MWP-16), so a subscription line would be charged full price.
+  //  - loyalty: points, tiers and rewards. Nothing redeems them at checkout yet.
+  const FEATURES = Object.freeze({
+    subscriptions: false,
+    loyalty: false
+  });
 
-  // ---- Testimonials ----
-  const testimonials = [
-    {
-      text: "My Wow Pet transformed how I shop for my pets. The Subscribe & Save feature means I never run out of Luna's food, and I save 15% every month!",
-      author: "Jessica R.",
-      pet: "Pet Parent of Luna (Labrador)",
-      avatar: "👩",
-      rating: 5
-    },
-    {
-      text: "The quality of products here is unmatched. Every treat and toy I've ordered has been premium quality. My cats are living their best lives.",
-      author: "David M.",
-      pet: "Pet Parent of Milo & Oscar (Cats)",
-      avatar: "👨",
-      rating: 5
-    },
-    {
-      text: "I love that I can filter by my dog's specific dietary needs. Finding grain-free, large breed senior food has never been easier!",
-      author: "Patricia L.",
-      pet: "Pet Parent of Bear (Great Dane)",
-      avatar: "👩‍🦳",
-      rating: 5
-    }
-  ];
+  // ---- Reviews ----
+  // Only genuine customer submissions are shown (local + Firestore). The store is
+  // pre-launch, so there are no seeded reviews, ratings or testimonials: inventing
+  // them would breach the FTC Consumer Reviews and Testimonials Rule (16 CFR 465).
 
   // ---- Categories ----
   const categories = [
@@ -823,18 +757,13 @@ const WowStore = (() => {
   const SHIPPING_FLAT_RATE = 5.99;
   const TAX_RATE = 0.08;
 
-  // ---- Promo Codes ----
-  const promoCodes = {
-    "WELCOME15": { discount: 0.15, type: "percent", description: "15% off your first order" },
-    "PET10": { discount: 0.10, type: "percent", description: "10% off" },
-    "FREESHIP": { discount: 0, type: "shipping", description: "Free shipping" },
-    "PETIQ10": { discount: 0.10, type: "percent", description: "10% off — Pet Nutrition IQ Silver" },
-    "PETIQ15": { discount: 0.15, type: "percent", description: "15% off — Pet Nutrition IQ Gold" },
-    "PETIQ25": { discount: 0.25, type: "percent", description: "25% off — Pet Nutrition IQ Perfect Score" },
-    "STREAK7": { discount: 0.10, type: "percent", description: "10% off — 7-Day Streak Reward" },
-    "STREAK14": { discount: 0.15, type: "percent", description: "15% off — 14-Day Streak Reward" },
-    "STREAK30": { discount: 0.25, type: "percent", description: "25% off — 30-Day Streak Reward" }
-  };
+  // ---- Discount codes ----
+  // Shopify is the only source of truth for discount codes. The storefront never
+  // validates a code or shows a discounted price locally: whatever the shopper
+  // types is handed to cartCreate as `discountCodes` and Shopify decides at
+  // checkout. (A client-side table used to show e.g. -25% for codes that do not
+  // exist in Shopify, and checkout then charged full price.)
+  const PROMO_STORAGE_KEY = 'wow_applied_promo';
 
   // ---- Storage helpers ----
   // JSON.parse only proves the stored value was parseable, not that it is still
@@ -933,10 +862,17 @@ const WowStore = (() => {
       switch (filterObj.sort) {
         case 'price-low': filtered.sort((a, b) => a.price - b.price); break;
         case 'price-high': filtered.sort((a, b) => b.price - a.price); break;
-        case 'rating': filtered.sort((a, b) => b.rating - a.rating); break;
+        case 'rating': {
+          // Real customer ratings only; unreviewed products keep catalog order.
+          const score = p => getProductRating(p.id);
+          filtered.sort((a, b) => (score(b).average - score(a).average) || (score(b).count - score(a).count));
+          break;
+        }
         case 'newest': filtered.sort((a, b) => b.id - a.id); break;
+        // There is no sales data before launch, so "bestselling" (the default)
+        // is curated catalog order rather than an invented ranking.
         case 'bestselling':
-        default: filtered.sort((a, b) => b.reviewCount - a.reviewCount); break;
+        default: break;
       }
     }
 
@@ -944,25 +880,48 @@ const WowStore = (() => {
   }
 
   function getProductReviews(productId) {
-    const staticFiltered = reviews.filter(r => r.productId === parseInt(productId));
     let custom = [];
     try {
       custom = readList('wow_custom_reviews');
     } catch (e) {
       custom = [];
     }
-    const customFiltered = custom.filter(r => r.productId === parseInt(productId));
-    
-    // Combine, avoiding duplicates by id
-    const combined = [...staticFiltered];
+    const customFiltered = custom.filter(r => r && r.productId === parseInt(productId));
+
+    // De-duplicate by id
+    const combined = [];
     customFiltered.forEach(cRev => {
       if (!combined.some(r => r.id === cRev.id)) {
-        combined.push(cRev);
+        // Older submissions were stamped "Verified Buyer" by default with no
+        // order behind them. Nothing here is tied to a Shopify order, so drop it.
+        combined.push(cRev.pet === 'Verified Buyer' ? { ...cRev, pet: '' } : cRev);
       }
     });
-    
+
     // Sort by date descending
     return combined.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+
+  // Aggregate rating computed from real reviews only. `count` is 0 (and
+  // `average` 0) until a customer has actually reviewed the product, and callers
+  // must not render stars in that case.
+  function getProductRating(productId) {
+    const ratings = getProductReviews(productId)
+      .map(r => Number(r.rating))
+      .filter(n => Number.isFinite(n) && n >= 1 && n <= 5);
+    if (!ratings.length) return { average: 0, count: 0 };
+    const average = ratings.reduce((sum, n) => sum + n, 0) / ratings.length;
+    return { average: Math.round(average * 10) / 10, count: ratings.length };
+  }
+
+  // Shared rating line for cards, quick view and the product page. Renders the
+  // neutral empty state (or nothing, with { emptyText: '' }) when unreviewed.
+  function renderRatingSummary(productId, { emptyText = 'No reviews yet — be the first' } = {}) {
+    const { average, count } = getProductRating(productId);
+    if (!count) {
+      return emptyText ? `<span class="rating-empty text-sm text-muted">${emptyText}</span>` : '';
+    }
+    return `${renderStars(average)}<span class="rating-count">${average} (${count} review${count === 1 ? '' : 's'})</span>`;
   }
 
   function addReview(productId, review) {
@@ -1130,7 +1089,7 @@ const WowStore = (() => {
           quantity: Math.max(1, parseInt(item.qty, 10) || 1)
         };
 
-        if (item.isSubscription && product.shopifySellingPlanId) {
+        if (FEATURES.subscriptions && item.isSubscription && product.shopifySellingPlanId) {
           line.sellingPlanId = toShopifyGid('SellingPlan', product.shopifySellingPlanId);
         }
 
@@ -1185,8 +1144,10 @@ const WowStore = (() => {
       ]
     };
 
-    if (options.discountCode) {
-      input.discountCodes = [options.discountCode];
+    // Shopify validates the code; we only forward what the shopper typed.
+    const discountCode = normalizePromoCode(options.discountCode);
+    if (discountCode) {
+      input.discountCodes = [discountCode];
     }
 
     if (options.email) {
@@ -1253,6 +1214,8 @@ const WowStore = (() => {
   }
 
   function addToCart(productId, qty = 1, isSubscription = false, frequency = '4weeks') {
+    // Subscription lines cannot be honoured at checkout until selling plans exist.
+    if (!FEATURES.subscriptions) isSubscription = false;
     const product = getProduct(productId);
     if (!product || !getShopifyVariantGid(product) || product.inStock === false) {
       return null;
@@ -1289,9 +1252,11 @@ const WowStore = (() => {
 
   function clearCart() {
     saveCart([]);
-    localStorage.removeItem('wow_applied_promo');
+    localStorage.removeItem(PROMO_STORAGE_KEY);
   }
 
+  // Estimated totals only. Discount codes are never applied here: Shopify applies
+  // them at checkout, so the cart must not show a price Shopify might not honour.
   function getCartTotal() {
     const cart = getCart();
     let subtotal = 0;
@@ -1299,42 +1264,31 @@ const WowStore = (() => {
     cart.forEach(item => {
       const product = getProduct(item.productId);
       if (!product) return;
-      const price = item.isSubscription && product.subscribePrice ? product.subscribePrice : product.price;
+      const subscriptionPriced = FEATURES.subscriptions && item.isSubscription && product.subscribePrice;
+      const price = subscriptionPriced ? product.subscribePrice : product.price;
       subtotal += price * item.qty;
-      if (item.isSubscription && product.subscribePrice) {
+      if (subscriptionPriced) {
         savings += (product.price - product.subscribePrice) * item.qty;
       }
     });
 
-    const activeCode = localStorage.getItem('wow_applied_promo');
-    const promo = activeCode ? promoCodes[activeCode] : null;
-    let promoDiscount = 0;
-    if (promo) {
-      if (promo.type === 'percent') promoDiscount = subtotal * promo.discount;
-      else if (promo.type === 'fixed') promoDiscount = promo.discount;
-      // 'shipping' promos waive the shipping line instead of discounting the
-      // subtotal, so they leave promoDiscount at 0.
-    }
+    const shipping = getShippingEstimate(subtotal);
+    const tax = subtotal * TAX_RATE;
 
-    const discountedSubtotal = Math.max(0, subtotal - promoDiscount);
-    // A shipping promo must waive shipping outright. Modelling it as a subtotal
-    // discount used to push carts just over the threshold back under it, so a code
-    // labelled "Free shipping" added a shipping charge.
-    const shippingWaived = promo?.type === 'shipping' || discountedSubtotal >= FREE_SHIPPING_THRESHOLD;
-    const shipping = shippingWaived ? 0 : SHIPPING_FLAT_RATE;
-    const tax = discountedSubtotal * TAX_RATE;
-
-    return { 
-      subtotal, 
-      savings, 
-      shipping, 
-      tax, 
-      promoDiscount, 
-      // Lets the cart UI acknowledge a shipping promo, which reduces the shipping
-      // line rather than promoDiscount and would otherwise render as nothing.
-      freeShippingFromPromo: promo?.type === 'shipping',
-      total: discountedSubtotal + shipping + tax 
+    return {
+      subtotal,
+      savings,
+      shipping,
+      tax,
+      // Kept for callers that still read it; always 0 by design.
+      promoDiscount: 0,
+      total: subtotal + shipping + tax
     };
+  }
+
+  // Shipping estimate for a subtotal, so every page uses the same rule.
+  function getShippingEstimate(subtotal) {
+    return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT_RATE;
   }
 
   function getCartCount() {
@@ -1367,18 +1321,43 @@ const WowStore = (() => {
     return pets;
   }
 
+  // ---- Legacy demo data ----
+  // Earlier builds seeded every new visitor with 750 points, two fake 2024 orders
+  // and two "active" subscriptions, and synced them to Firestore. New visitors now
+  // start empty; these matchers scrub the old seed wherever it was persisted.
+  const DEMO_ORDER_IDS = ['#WOW-1042', '#WOW-1038'];
+  const DEMO_LOYALTY_ENTRIES = [
+    '2024-03-15|Purchase — Order #1042',
+    '2024-03-01|Welcome Bonus',
+    '2024-02-20|Purchase — Order #1038',
+    '2024-02-10|Review Bonus'
+  ];
+  const DEMO_SUBSCRIPTION_STARTS = ['1|1|2024-01-15', '2|4|2024-02-12'];
+
+  function isDemoLoyaltyEntry(entry) {
+    return Boolean(entry) && DEMO_LOYALTY_ENTRIES.includes(`${entry.date}|${entry.description}`);
+  }
+
+  function isDemoSubscription(sub) {
+    return Boolean(sub) && DEMO_SUBSCRIPTION_STARTS.includes(`${sub.id}|${sub.productId}|${sub.startDate}`);
+  }
+
   // ---- Loyalty Points (localStorage) ----
   function getLoyalty() {
-    const loyalty = readRecord('wow_loyalty', { points: 750, history: [
-      { date: '2024-03-15', description: 'Purchase — Order #1042', points: 320 },
-      { date: '2024-03-01', description: 'Welcome Bonus', points: 200 },
-      { date: '2024-02-20', description: 'Purchase — Order #1038', points: 180 },
-      { date: '2024-02-10', description: 'Review Bonus', points: 50 }
-    ]});
+    const loyalty = readRecord('wow_loyalty', { points: 0, history: [] });
     // addLoyaltyPoints unshifts into history, so it has to be an array even
     // when a partial record was written.
     if (!Array.isArray(loyalty.history)) loyalty.history = [];
     if (typeof loyalty.points !== 'number' || !Number.isFinite(loyalty.points)) loyalty.points = 0;
+    // Strip the demo history earlier builds seeded for every visitor (and synced
+    // to Firestore), along with the points it accounted for.
+    const demoPoints = loyalty.history
+      .filter(isDemoLoyaltyEntry)
+      .reduce((sum, h) => sum + (Number(h.points) || 0), 0);
+    if (demoPoints) {
+      loyalty.history = loyalty.history.filter(h => !isDemoLoyaltyEntry(h));
+      loyalty.points = Math.max(0, loyalty.points - demoPoints);
+    }
     return loyalty;
   }
 
@@ -1433,10 +1412,7 @@ const WowStore = (() => {
 
   // ---- Subscriptions (localStorage) ----
   function getSubscriptions() {
-    return readList('wow_subscriptions', [
-      { id: 1, productId: 1, frequency: '4weeks', status: 'active', nextDelivery: '2024-04-15', startDate: '2024-01-15' },
-      { id: 2, productId: 4, frequency: '4weeks', status: 'active', nextDelivery: '2024-04-12', startDate: '2024-02-12' }
-    ]);
+    return readList('wow_subscriptions').filter(sub => !isDemoSubscription(sub));
   }
 
   function saveSubscriptions(subs) {
@@ -1446,30 +1422,7 @@ const WowStore = (() => {
 
   // ---- Order History (localStorage) ----
   function getOrders() {
-    return readList('wow_orders', [
-      {
-        id: '#WOW-1042',
-        date: '2024-03-15',
-        status: 'delivered',
-        items: [
-          { productId: 1, qty: 1, price: 46.74, isSubscription: true },
-          { productId: 6, qty: 2, price: 18.99 }
-        ],
-        total: 84.72,
-        pointsEarned: 320
-      },
-      {
-        id: '#WOW-1038',
-        date: '2024-02-20',
-        status: 'delivered',
-        items: [
-          { productId: 4, qty: 1, price: 33.14, isSubscription: true },
-          { productId: 11, qty: 1, price: 12.99 }
-        ],
-        total: 46.13,
-        pointsEarned: 180
-      }
-    ]);
+    return readList('wow_orders').filter(order => !DEMO_ORDER_IDS.includes(order?.id));
   }
 
   function addOrder(order) {
@@ -1480,29 +1433,51 @@ const WowStore = (() => {
     return orders;
   }
 
-  // ---- Validate Promo ----
-  function validatePromo(code) {
-    const promo = promoCodes[code.toUpperCase()];
-    if (promo) {
-      localStorage.setItem('wow_applied_promo', code.toUpperCase());
-    }
-    return promo || null;
+  // ---- Discount code entry ----
+  // Remembers the code the shopper typed so checkout can forward it to Shopify.
+  // It is deliberately not validated or priced here.
+  function normalizePromoCode(code) {
+    if (typeof code !== 'string') return '';
+    return code.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 64);
+  }
+
+  function setPromoCode(code) {
+    const normalized = normalizePromoCode(code);
+    if (normalized) localStorage.setItem(PROMO_STORAGE_KEY, normalized);
+    else localStorage.removeItem(PROMO_STORAGE_KEY);
+    return normalized || null;
+  }
+
+  function getPromoCode() {
+    return normalizePromoCode(localStorage.getItem(PROMO_STORAGE_KEY)) || null;
+  }
+
+  // ---- HTML Escaping ----
+  // Escape untrusted text (URL params, user reviews) before it is interpolated
+  // into an innerHTML template or an attribute value.
+  const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' };
+  function escapeHTML(value) {
+    if (value === null || value === undefined) return '';
+    return String(value).replace(/[&<>"'`]/g, ch => HTML_ESCAPES[ch]);
   }
 
   // ---- Public API ----
   return {
+    escapeHTML,
     products,
     categories,
     productCategories,
     filters,
     loyaltyTiers,
-    testimonials,
+    FEATURES,
     shopifyConfig,
     shopifyProductIds,
     shopifyVariantIds,
     getProduct,
     getProducts,
     getProductReviews,
+    getProductRating,
+    renderRatingSummary,
     addReview,
     getRelatedProducts,
     getBundleProducts,
@@ -1530,6 +1505,7 @@ const WowStore = (() => {
     removeFromCart,
     clearCart,
     getCartTotal,
+    getShippingEstimate,
     getCartCount,
     getPets,
     savePet,
@@ -1545,7 +1521,9 @@ const WowStore = (() => {
     saveSubscriptions,
     getOrders,
     addOrder,
-    validatePromo,
+    normalizePromoCode,
+    setPromoCode,
+    getPromoCode,
     productColors,
     FREE_SHIPPING_THRESHOLD,
     SHIPPING_FLAT_RATE,

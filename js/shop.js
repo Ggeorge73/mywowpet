@@ -15,21 +15,29 @@ const ShopPage = (() => {
     sort: 'bestselling'
   };
 
+  const SORT_OPTIONS = ['bestselling', 'price-low', 'price-high', 'rating', 'newest'];
+  const esc = WowStore.escapeHTML;
+
   function init() {
     readURLParams();
     renderFilters('filter-sidebar');
     renderFilters('filter-sidebar-mobile');
     renderProducts();
+    renderActiveChips();
     updateBreadcrumbs();
     updateTitle();
   }
 
   function readURLParams() {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('pet')) activeFilters.petType = params.get('pet');
-    if (params.get('category')) activeFilters.category = params.get('category');
+    // pet/category/sort must be known ids; anything else from the URL is dropped.
+    const pet = params.get('pet');
+    const category = params.get('category');
+    const sort = params.get('sort');
+    if (pet && WowStore.categories.some(c => c.id === pet)) activeFilters.petType = pet;
+    if (category && WowStore.productCategories.some(c => c.id === category)) activeFilters.category = category;
     if (params.get('search')) activeFilters.search = params.get('search');
-    if (params.get('sort')) activeFilters.sort = params.get('sort');
+    if (sort && SORT_OPTIONS.includes(sort)) activeFilters.sort = sort;
   }
 
   function renderFilters(containerId) {
@@ -102,7 +110,7 @@ const ShopPage = (() => {
         </div>
         <div class="filter-group-body">${breedSizeOptions}</div>
       </div>
-      <div class="filter-group">
+      ${WowStore.FEATURES.subscriptions ? `<div class="filter-group">
         <div class="filter-group-header" onclick="this.parentElement.classList.toggle('open')">
           <span>Subscription</span><span class="chevron">▾</span>
         </div>
@@ -112,7 +120,7 @@ const ShopPage = (() => {
             <span>Subscribe & Save eligible</span>
           </div>
         </div>
-      </div>
+      </div>` : ''}
     `;
   }
 
@@ -170,36 +178,51 @@ const ShopPage = (() => {
 
     if (activeFilters.petType) {
       const cat = WowStore.categories.find(c => c.id === activeFilters.petType);
-      chips.push(`<span class="active-filter-chip" onclick="ShopPage.toggleFilter('petType', '${activeFilters.petType}')">${cat?.name || activeFilters.petType} <span class="remove">✕</span></span>`);
+      chips.push(`<span class="active-filter-chip" data-chip-action="filter" data-key="petType" data-value="${esc(activeFilters.petType)}">${esc(cat?.name || activeFilters.petType)} <span class="remove">✕</span></span>`);
     }
     if (activeFilters.category) {
       const cat = WowStore.productCategories.find(c => c.id === activeFilters.category);
-      chips.push(`<span class="active-filter-chip" onclick="ShopPage.toggleFilter('category', '${activeFilters.category}')">${cat?.name || activeFilters.category} <span class="remove">✕</span></span>`);
+      chips.push(`<span class="active-filter-chip" data-chip-action="filter" data-key="category" data-value="${esc(activeFilters.category)}">${esc(cat?.name || activeFilters.category)} <span class="remove">✕</span></span>`);
     }
     activeFilters.dietary.forEach(d => {
       const f = WowStore.filters.dietary.find(x => x.id === d);
-      chips.push(`<span class="active-filter-chip" onclick="ShopPage.toggleArrayFilter('dietary', '${d}')">${f?.label || d} <span class="remove">✕</span></span>`);
+      chips.push(`<span class="active-filter-chip" data-chip-action="array" data-key="dietary" data-value="${esc(d)}">${esc(f?.label || d)} <span class="remove">✕</span></span>`);
     });
     activeFilters.lifeStage.forEach(ls => {
       const f = WowStore.filters.lifeStage.find(x => x.id === ls);
-      chips.push(`<span class="active-filter-chip" onclick="ShopPage.toggleArrayFilter('lifeStage', '${ls}')">${f?.label || ls} <span class="remove">✕</span></span>`);
+      chips.push(`<span class="active-filter-chip" data-chip-action="array" data-key="lifeStage" data-value="${esc(ls)}">${esc(f?.label || ls)} <span class="remove">✕</span></span>`);
     });
     activeFilters.breedSize.forEach(bs => {
       const f = WowStore.filters.breedSize.find(x => x.id === bs);
-      chips.push(`<span class="active-filter-chip" onclick="ShopPage.toggleArrayFilter('breedSize', '${bs}')">${f?.label || bs} <span class="remove">✕</span></span>`);
+      chips.push(`<span class="active-filter-chip" data-chip-action="array" data-key="breedSize" data-value="${esc(bs)}">${esc(f?.label || bs)} <span class="remove">✕</span></span>`);
     });
     if (activeFilters.subscribable) {
-      chips.push(`<span class="active-filter-chip" onclick="ShopPage.toggleFilter('subscribable', false)">Subscribe & Save <span class="remove">✕</span></span>`);
+      chips.push(`<span class="active-filter-chip" data-chip-action="subscribable">Subscribe & Save <span class="remove">✕</span></span>`);
     }
     if (activeFilters.search) {
-      chips.push(`<span class="active-filter-chip" onclick="ShopPage.clearSearch()">Search: "${activeFilters.search}" <span class="remove">✕</span></span>`);
+      chips.push(`<span class="active-filter-chip" data-chip-action="search">Search: "${esc(activeFilters.search)}" <span class="remove">✕</span></span>`);
     }
 
     if (chips.length > 1) {
-      chips.push(`<span class="active-filter-chip" style="background: var(--color-coral); color: white;" onclick="clearAllFilters()">Clear All ✕</span>`);
+      chips.push(`<span class="active-filter-chip" style="background: var(--color-coral); color: white;" data-chip-action="clear-all">Clear All ✕</span>`);
     }
 
     container.innerHTML = chips.join('');
+    if (!container.dataset.chipsBound) {
+      container.dataset.chipsBound = '1';
+      container.addEventListener('click', onChipClick);
+    }
+  }
+
+  function onChipClick(e) {
+    const chip = e.target.closest('[data-chip-action]');
+    if (!chip) return;
+    const { chipAction, key, value } = chip.dataset;
+    if (chipAction === 'filter') toggleFilter(key, value);
+    else if (chipAction === 'array') toggleArrayFilter(key, value);
+    else if (chipAction === 'subscribable') toggleFilter('subscribable', false);
+    else if (chipAction === 'search') clearSearch();
+    else if (chipAction === 'clear-all') clearAllFilters();
   }
 
   function clearSearch() {
@@ -212,7 +235,7 @@ const ShopPage = (() => {
     let html = '<a href="index.html">Home</a><span class="separator">›</span>';
     if (activeFilters.petType) {
       const cat = WowStore.categories.find(c => c.id === activeFilters.petType);
-      html += `<a href="shop.html">Shop</a><span class="separator">›</span><span class="current">${cat?.name || activeFilters.petType}</span>`;
+      html += `<a href="shop.html">Shop</a><span class="separator">›</span><span class="current">${esc(cat?.name || activeFilters.petType)}</span>`;
     } else {
       html += '<span class="current">Shop</span>';
     }
@@ -232,9 +255,6 @@ const ShopPage = (() => {
   }
 
   function getFilters() { return activeFilters; }
-
-  // Init active chips
-  setTimeout(() => renderActiveChips(), 0);
 
   return { init, toggleFilter, toggleArrayFilter, refresh, clearSearch, getFilters };
 })();

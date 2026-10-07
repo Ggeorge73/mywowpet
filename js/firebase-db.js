@@ -529,16 +529,33 @@ const WowFirebase = (() => {
       return Promise.resolve();
     }
     
+    if (!currentUser) {
+      console.warn("🐾 [WowPetStore] Review kept on this device only: sign in to post reviews.");
+      return;
+    }
+
     try {
+      // Only the fields firestore.rules allows on /reviews; doc ids must be strings.
+      const reviewId = String(review.id);
       const reviewData = {
-        ...review,
-        userId: currentUser ? currentUser.uid : 'guest',
+        id: reviewId,
+        productId: review.productId,
+        author: review.author,
+        rating: review.rating,
+        text: review.text,
+        pet: review.pet,
+        date: review.date,
+        avatar: review.avatar,
+        userId: currentUser.uid,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
-      await db.collection('reviews').doc(review.id).set(reviewData);
-      console.log(`🐾 [WowPetStore] Review transacted successfully to Firestore: ${review.id}`);
+      await db.collection('reviews').doc(reviewId).set(reviewData);
+      console.log(`🐾 [WowPetStore] Review transacted successfully to Firestore: ${reviewId}`);
     } catch (err) {
       console.error("🐾 [WowPetStore] Firestore review write failed:", err);
+      if (window.WowApp && typeof window.WowApp.showToast === 'function') {
+        window.WowApp.showToast("Your review is saved on this device but couldn't be posted. Please try again later.", '⚠️', 5000);
+      }
     }
   }
 
