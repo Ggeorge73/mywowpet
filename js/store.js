@@ -1193,8 +1193,22 @@ const WowStore = (() => {
   }
 
   // ---- Cart (localStorage) ----
+  const MIN_CART_QTY = 1;
+  const MAX_CART_QTY = 99;
+
+  // Quantities come from storage, the Firestore sync and onclick arguments, so any of
+  // them can be stale or tampered with. A negative, zero, fractional or NaN quantity
+  // must never reach the totals or Shopify; it is pulled back into 1..99.
+  function clampCartQty(qty) {
+    const n = Math.floor(Number(qty));
+    if (!Number.isFinite(n) || n < MIN_CART_QTY) return MIN_CART_QTY;
+    return Math.min(n, MAX_CART_QTY);
+  }
+
   function getCart() {
-    return readList('wow_cart');
+    return readList('wow_cart')
+      .filter(item => item && typeof item === 'object' && !Array.isArray(item))
+      .map(item => (item.qty === clampCartQty(item.qty) ? item : { ...item, qty: clampCartQty(item.qty) }));
   }
 
   function triggerSync() {
@@ -1224,9 +1238,9 @@ const WowStore = (() => {
     const cart = getCart();
     const existing = cart.find(item => item.productId === productId && item.isSubscription === isSubscription);
     if (existing) {
-      existing.qty += qty;
+      existing.qty = clampCartQty(existing.qty + clampCartQty(qty));
     } else {
-      cart.push({ productId, qty, isSubscription, frequency });
+      cart.push({ productId, qty: clampCartQty(qty), isSubscription, frequency });
     }
     saveCart(cart);
     return cart;
@@ -1234,11 +1248,13 @@ const WowStore = (() => {
 
   function updateCartQty(productId, qty, isSubscription = false) {
     let cart = getCart();
-    if (qty <= 0) {
+    // A deliberate step down to zero (the cart's "−" on a qty of 1) removes the line;
+    // anything else, including negatives and NaN, is clamped into the allowed range.
+    if (qty === 0) {
       cart = cart.filter(item => !(item.productId === productId && item.isSubscription === isSubscription));
     } else {
       const item = cart.find(item => item.productId === productId && item.isSubscription === isSubscription);
-      if (item) item.qty = qty;
+      if (item) item.qty = clampCartQty(qty);
     }
     saveCart(cart);
     return cart;
@@ -1500,6 +1516,8 @@ const WowStore = (() => {
     buildShopifyCheckoutUrl,
     createShopifyCart,
     getCart,
+    clampCartQty,
+    MAX_CART_QTY,
     addToCart,
     updateCartQty,
     removeFromCart,

@@ -10,10 +10,8 @@ const ProductPage = (() => {
   let autoOpenReviewForm = false;
 
   async function init() {
-    console.error('=== DEBUG ===', window.location.href, window.location.search);
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    console.error('=== DEBUG ID ===', id);
     product = WowStore.getProduct(id);
 
     if (product && typeof WowFirebase !== 'undefined') {
@@ -260,7 +258,7 @@ const ProductPage = (() => {
   }
 
   function changeQty(delta) {
-    qty = Math.max(1, qty + delta);
+    qty = WowStore.clampCartQty(qty + delta);
     document.getElementById('qty-display').textContent = qty;
     updateAddButton();
   }

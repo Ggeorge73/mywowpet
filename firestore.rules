@@ -129,8 +129,47 @@ service cloud.firestore {
           'other'
         ]
         && request.resource.data.consent == true
-        && request.resource.data.source == 'coming-soon'
+        && request.resource.data.source in ['coming-soon', 'footer']
         && request.resource.data.offer == 'launch-15'
+        && request.resource.data.createdAt == request.time;
+    }
+
+    // Contact-form messages: anyone may create one, nobody can read, edit or delete
+    // them from a client (support reads them with admin access). Every field is typed
+    // and size-capped so the collection cannot be used as free storage.
+    match /contactMessages/{messageId} {
+      allow read, update, delete: if false;
+      allow create: if request.resource.data.keys().hasOnly([
+          'name',
+          'email',
+          'subject',
+          'message',
+          'orderNumber',
+          'createdAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'name',
+          'email',
+          'subject',
+          'message',
+          'createdAt'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 1
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.email is string
+        && request.resource.data.email.size() >= 5
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && request.resource.data.subject is string
+        && request.resource.data.subject.size() >= 1
+        && request.resource.data.subject.size() <= 150
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 1
+        && request.resource.data.message.size() <= 5000
+        && (!('orderNumber' in request.resource.data)
+          || (request.resource.data.orderNumber is string
+            && request.resource.data.orderNumber.size() <= 40))
         && request.resource.data.createdAt == request.time;
     }
 

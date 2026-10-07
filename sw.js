@@ -39,6 +39,7 @@ const CORE_ASSETS = [
   'js/product.js',
   'js/cart.js',
   'js/checkout.js',
+  'js/contact.js',
   'js/profile.js',
   'js/subscribe.js',
   'js/game.js',
