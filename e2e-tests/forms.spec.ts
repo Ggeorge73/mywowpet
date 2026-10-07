@@ -214,12 +214,14 @@ test.describe('Footer newsletter (QA-02)', () => {
 });
 
 test.describe('Checkout handoff failure (QA-03)', () => {
+  // Once sw.js controls the page, WebKit sends its fetches past page.route,
+  // so the blocked Storefront call reached real Shopify on Mobile Safari.
+  test.use({ serviceWorkers: 'block' });
+
   test('shows a persistent inline retry UI and keeps the cart', async ({ page }) => {
     await suppressInstallPrompt(page);
     await blockFirebase(page);
-    // Match by hostname: WebKit let the `https://*.myshopify.com/**` glob through
-    // and reached the real Storefront API in CI.
-    await page.route(url => url.hostname.endsWith('.myshopify.com'), route => route.abort('failed'));
+    await page.route('https://*.myshopify.com/**', route => route.abort());
 
     await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.WowStore && typeof window.WowStore.getProducts === 'function');
