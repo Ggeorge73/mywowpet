@@ -345,7 +345,7 @@ const WowApp = (() => {
           overflow:hidden;max-height:400px;overflow-y:auto;
         `;
         if (!results.length) {
-          dropdown.innerHTML = `<div style="padding:16px 20px;color:var(--color-text-muted);font-size:14px;">No results for "${query}"</div>`;
+          dropdown.innerHTML = `<div style="padding:16px 20px;color:var(--color-text-muted);font-size:14px;">No results for "${WowStore.escapeHTML(query)}"</div>`;
         } else {
           dropdown.innerHTML = results.slice(0,6).map(p => `
             <a href="product.html?id=${p.id}" style="
@@ -367,7 +367,7 @@ const WowApp = (() => {
               display:block;padding:12px 16px;text-align:center;
               font-size:13px;color:var(--color-primary);font-weight:600;
               text-decoration:none;background:var(--color-bg-alt,#f3ede3);
-            ">See all results for "${query}" →</a>
+            ">See all results for "${WowStore.escapeHTML(query)}" →</a>
           `;
         }
         const wrapper = input.closest('.nav-search, .mobile-search');
@@ -442,11 +442,11 @@ const WowApp = (() => {
 
   function getAuthSecurity() {
     if (window.WOWPET_SECURITY) return window.WOWPET_SECURITY;
+    // Mock auth is only ever allowed on a local dev server. There is deliberately
+    // no URL switch (the old ?devAuth=true) that can enable it on another host.
     const host = window.location.hostname;
-    const params = new URLSearchParams(window.location.search);
-    const explicitDevMode = params.get('devAuth') === 'true';
-    const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
-    const isProductionLike = !isLocalHost && !explicitDevMode;
+    const isLocalHost = host === 'localhost' || host === '127.0.0.1';
+    const isProductionLike = !isLocalHost;
 
     return {
       isProductionLike,

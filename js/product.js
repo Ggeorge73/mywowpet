@@ -300,6 +300,20 @@ const ProductPage = (() => {
     WowApp.showToast(isWished ? 'Added to wishlist!' : 'Removed from wishlist', isWished ? '❤️' : '🤍');
   }
 
+  const esc = WowStore.escapeHTML;
+  const REVIEW_AVATAR_FALLBACK = '👤';
+
+  // Review avatars come from Firestore, so only a short emoji/text or a plain
+  // https image URL is rendered; anything else falls back to the default.
+  function renderReviewAvatar(avatar) {
+    const value = typeof avatar === 'string' ? avatar.trim() : '';
+    if (/^https:\/\/[^\s"'<>`]+$/i.test(value) && value.length <= 500) {
+      return `<img src="${esc(value)}" alt="" width="32" height="32" style="border-radius: 50%; object-fit: cover;" referrerpolicy="no-referrer" loading="lazy">`;
+    }
+    const text = value && value.length <= 16 && !/[<>&"'`]/.test(value) ? value : REVIEW_AVATAR_FALLBACK;
+    return `<span style="font-size: var(--fs-xl);">${esc(text)}</span>`;
+  }
+
   function renderTabs() {
     const reviews = WowStore.getProductReviews(product.id);
     const tabs = ['Description', 'Ingredients', 'Feeding Guide', 'Reviews'];
@@ -312,16 +326,16 @@ const ProductPage = (() => {
       <div style="padding: var(--space-5); background: var(--color-bg); border-radius: var(--radius-lg); margin-bottom: var(--space-3);">
         <div class="flex justify-between items-center mb-3">
           <div class="flex items-center gap-3">
-            <span style="font-size: var(--fs-xl);">${r.avatar}</span>
+            ${renderReviewAvatar(r.avatar)}
             <div>
-              <strong style="font-size: var(--fs-sm);">${r.author}</strong>
-              <div class="text-sm text-muted">${r.pet}</div>
+              <strong style="font-size: var(--fs-sm);">${esc(r.author)}</strong>
+              <div class="text-sm text-muted">${esc(r.pet)}</div>
             </div>
           </div>
-          ${WowStore.renderStars(r.rating)}
+          ${WowStore.renderStars(Number(r.rating) || 0)}
         </div>
-        <p style="font-size: var(--fs-sm); color: var(--color-text-secondary);">${r.text}</p>
-        <span class="text-sm text-muted" style="margin-top: var(--space-2); display: block;">${r.date}</span>
+        <p style="font-size: var(--fs-sm); color: var(--color-text-secondary);">${esc(r.text)}</p>
+        <span class="text-sm text-muted" style="margin-top: var(--space-2); display: block;">${esc(r.date)}</span>
       </div>
     `).join('') : '<p class="text-muted">No reviews yet. Be the first to review this product!</p>';
 
@@ -330,10 +344,10 @@ const ProductPage = (() => {
     let petOptionsHtml = '';
     if (user) {
       const userName = user.displayName || user.email.split('@')[0] || 'You';
-      petOptionsHtml += `<option value="self">${userName} (You)</option>`;
+      petOptionsHtml += `<option value="self">${esc(userName)} (You)</option>`;
       const pets = WowStore.getPets();
       pets.forEach(pet => {
-        petOptionsHtml += `<option value="${pet.id}">${pet.name} (${pet.breed || pet.species}) ${pet.emoji || '🐾'}</option>`;
+        petOptionsHtml += `<option value="${esc(pet.id)}">${esc(pet.name)} (${esc(pet.breed || pet.species)}) ${esc(pet.emoji || '🐾')}</option>`;
       });
     }
 
@@ -369,7 +383,7 @@ const ProductPage = (() => {
           <!-- Review Text -->
           <div style="margin-bottom: var(--space-4);">
             <label for="review-text-input" style="display: block; font-size: var(--fs-sm); margin-bottom: var(--space-2); font-weight: var(--fw-semibold);">Your Review</label>
-            <textarea id="review-text-input" name="text" rows="4" placeholder="What did you think of this product? What did your pet think?" style="width: 100%; padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--color-border-light); background: rgba(0,0,0,0.2); color: var(--color-text-primary); font-family: inherit; resize: vertical;" required></textarea>
+            <textarea id="review-text-input" name="text" rows="4" maxlength="2000" placeholder="What did you think of this product? What did your pet think?" style="width: 100%; padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--color-border-light); background: rgba(0,0,0,0.2); color: var(--color-text-primary); font-family: inherit; resize: vertical;" required></textarea>
           </div>
 
           <!-- Post as Pet Selector -->
@@ -485,7 +499,7 @@ const ProductPage = (() => {
     }
 
     const textInput = document.getElementById('review-text-input');
-    const text = textInput.value.trim();
+    const text = textInput.value.trim().slice(0, 2000);
     if (!text) return;
 
     const petSelect = document.getElementById('review-pet-select');
@@ -506,13 +520,20 @@ const ProductPage = (() => {
       }
     }
 
+    // Firestore doc ids must be strings. One review per signed-in user per product.
+    const reviewId = user ? `${user.uid}_${product.id}` : `local_${Date.now()}`;
+    if (user && WowStore.getProductReviews(product.id).some(r => r.id === reviewId)) {
+      if (typeof WowApp !== 'undefined') WowApp.showToast("You've already reviewed this product.", 'ℹ️');
+      return;
+    }
+
     const review = {
-      id: Date.now(),
+      id: reviewId,
       productId: product.id,
-      author: authorName,
+      author: String(authorName).slice(0, 60),
       rating: ratingVal,
       text: text,
-      pet: petSubtitle,
+      pet: petSubtitle.slice(0, 60),
       date: new Date().toISOString().split('T')[0],
       avatar: avatar
     };

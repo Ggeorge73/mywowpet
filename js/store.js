@@ -1489,8 +1489,18 @@ const WowStore = (() => {
     return promo || null;
   }
 
+  // ---- HTML Escaping ----
+  // Escape untrusted text (URL params, user reviews) before it is interpolated
+  // into an innerHTML template or an attribute value.
+  const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' };
+  function escapeHTML(value) {
+    if (value === null || value === undefined) return '';
+    return String(value).replace(/[&<>"'`]/g, ch => HTML_ESCAPES[ch]);
+  }
+
   // ---- Public API ----
   return {
+    escapeHTML,
     products,
     categories,
     productCategories,
