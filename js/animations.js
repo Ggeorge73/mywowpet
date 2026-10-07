@@ -5,11 +5,11 @@
 (function () {
   if (window.WOWPET_SECURITY) return;
 
+  // Mock auth is only ever allowed on a local dev server. There is deliberately
+  // no URL switch (the old ?devAuth=true) that can enable it on another host.
   const host = window.location.hostname;
-  const params = new URLSearchParams(window.location.search);
-  const explicitDevMode = params.get('devAuth') === 'true';
-  const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
-  const isProductionLike = !isLocalHost && !explicitDevMode;
+  const isLocalHost = host === 'localhost' || host === '127.0.0.1';
+  const isProductionLike = !isLocalHost;
 
   window.WOWPET_SECURITY = Object.freeze({
     isProductionLike,
