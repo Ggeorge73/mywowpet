@@ -112,6 +112,7 @@ const CartPage = (() => {
 
       ${checkoutDisabled ? `<div style="font-size: var(--fs-sm); color: var(--color-error); margin-bottom: var(--space-4);">One or more items cannot be checked out yet.</div>` : ''}
       <button id="checkout-btn" class="btn btn-primary btn-block btn-lg" onclick="CartPage.startShopifyCheckout()" ${checkoutDisabled ? 'disabled' : ''}>Proceed to Secure Checkout</button>
+      <div id="checkout-error" role="alert" hidden style="margin-top: var(--space-3); padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--color-error); background: rgba(229, 57, 53, 0.08); font-size: var(--fs-sm); line-height: var(--lh-relaxed);"></div>
       <a href="shop.html" class="btn btn-secondary btn-block btn-lg" style="margin-top: var(--space-3);">Continue Shopping</a>
 
       ${WowStore.FEATURES.loyalty ? `<div style="text-align: center; margin-top: var(--space-4); padding: var(--space-3); background: rgba(var(--color-primary-rgb), 0.06); border-radius: var(--radius-md);">
@@ -145,9 +146,31 @@ const CartPage = (() => {
     renderSummary();
   }
 
+  // Shown in place of the raw exception text: the shopper only needs to know their
+  // cart is safe, that they can retry, and how to reach a person.
+  const CHECKOUT_ERROR_MESSAGE = 'We couldn’t open secure checkout just now. Your cart is saved. Please check your connection and try again.';
+
+  function showCheckoutError() {
+    const box = document.getElementById('checkout-error');
+    if (!box) return;
+    box.innerHTML = `
+      <p style="margin: 0 0 var(--space-2);"><strong>Checkout didn’t start.</strong> ${CHECKOUT_ERROR_MESSAGE}</p>
+      <button type="button" class="btn btn-secondary btn-block" id="checkout-retry-btn" onclick="CartPage.startShopifyCheckout()">Try again</button>
+      <p style="margin: var(--space-2) 0 0;">Still stuck? Email <a href="mailto:support@mywowpet.com?subject=Checkout%20problem" style="color: inherit; text-decoration: underline;">support@mywowpet.com</a> and we’ll help you complete your order.</p>`;
+    box.hidden = false;
+  }
+
+  function hideCheckoutError() {
+    const box = document.getElementById('checkout-error');
+    if (!box) return;
+    box.hidden = true;
+    box.innerHTML = '';
+  }
+
   async function startShopifyCheckout() {
     const btn = document.getElementById('checkout-btn');
     const originalText = btn ? btn.textContent : '';
+    hideCheckoutError();
     if (btn) {
       btn.disabled = true;
       btn.textContent = 'Preparing Secure Checkout...';
@@ -183,7 +206,7 @@ const CartPage = (() => {
       window.location.href = checkoutHref;
     } catch (err) {
       console.error('[My Wow Pet] Secure checkout handoff failed:', err);
-      WowApp.showToast(err.message || 'Secure checkout could not be started.', '❌');
+      showCheckoutError();
       if (btn) {
         btn.disabled = false;
         btn.textContent = originalText;

@@ -427,6 +427,40 @@ const ProfilePage = (() => {
     container.innerHTML = `<div class="product-grid">${products.map(p => WowApp.renderProductCard(p)).join('')}</div>`;
   }
 
+  // ---- Order Tracking ----
+  // Only shows carrier data the order actually carries. Without it the customer is
+  // pointed at Shopify's order status page (or the tracking help page), never at an
+  // invented carrier or tracking number.
+  function safeHttpUrl(value) {
+    if (typeof value !== 'string') return '';
+    try {
+      const url = new URL(value, window.location.href);
+      return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : '';
+    } catch {
+      return '';
+    }
+  }
+
+  function renderTrackingDetails(order) {
+    const esc = WowStore.escapeHTML;
+    const tracking = order.tracking && typeof order.tracking === 'object' ? order.tracking : {};
+    const carrier = tracking.company || tracking.carrier || order.carrier || '';
+    const number = tracking.number || order.trackingNumber || '';
+    const trackingUrl = safeHttpUrl(tracking.url || order.trackingUrl);
+    const statusUrl = safeHttpUrl(order.statusUrl);
+
+    if (carrier || number) {
+      return `
+        ${carrier ? `🚚 <strong>Carrier:</strong> ${esc(carrier)}<br>` : ''}
+        ${number ? `📦 <strong>Tracking:</strong> ${trackingUrl ? `<a href="${esc(trackingUrl)}" target="_blank" rel="noopener">${esc(number)}</a>` : esc(number)}` : ''}`;
+    }
+
+    const link = statusUrl
+      ? `<a href="${esc(statusUrl)}" target="_blank" rel="noopener">View order status</a>`
+      : '<a href="tracking.html">How to track your order</a>';
+    return `📦 Tracking details will appear here once your order ships. ${link}`;
+  }
+
   // ---- Order Details Modal ----
   function openOrderDetails(orderId) {
     const orders = WowStore.getOrders();
@@ -439,7 +473,7 @@ const ProfilePage = (() => {
 
     const statuses = ['ordered', 'processing', 'shipping', 'delivered'];
     let statusIndex = statuses.indexOf(order.status);
-    if (statusIndex === -1) statusIndex = 2; // fallback to shipping
+    if (statusIndex === -1) statusIndex = 0; // unknown status: claim no more progress than "ordered"
 
     const steps = [
       { label: 'Ordered', icon: '📝' },
@@ -494,17 +528,19 @@ const ProfilePage = (() => {
     const shipping = WowStore.getShippingEstimate(subtotal);
     const tax = subtotal * WowStore.TAX_RATE;
 
-    let profile = { name: 'Pet Parent', phone: '', address: '123 Pet Lane, San Francisco, CA 94105' };
+    let profile = { name: 'Pet Parent', phone: '', address: '' };
     try {
       const saved = JSON.parse(localStorage.getItem('wow_profile_info'));
       if (saved) {
+        const stateZip = [saved.state, saved.zip].filter(Boolean).join(' ');
         profile = {
           name: saved.name || 'Pet Parent',
           phone: saved.phone || '',
-          address: `${saved.address || ''}, ${saved.city || ''}, ${saved.state || ''} ${saved.zip || ''}`
+          address: [saved.address, saved.city, stateZip].filter(Boolean).join(', ')
         };
       }
     } catch(e) {}
+    const esc = WowStore.escapeHTML;
 
     body.innerHTML = `
       ${timelineHtml}
@@ -526,13 +562,12 @@ const ProfilePage = (() => {
         <!-- Shipping Details -->
         <div style="border-left: 1px solid var(--color-border-light); padding-left: var(--space-6);">
           <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: var(--ls-wide); color: var(--color-text-muted); margin-bottom: var(--space-3); font-family: var(--font-accent);">Shipping Address</h4>
-          <div class="text-xs font-semibold mb-1" style="font-family: var(--font-accent);">${profile.name}</div>
-          <p class="text-xs text-muted mb-2" style="line-height: var(--lh-relaxed); font-family: var(--font-accent);">${profile.address}</p>
-          ${profile.phone ? `<div class="text-xs text-muted mb-3" style="font-family: var(--font-accent);">📞 ${profile.phone}</div>` : ''}
+          <div class="text-xs font-semibold mb-1" style="font-family: var(--font-accent);">${esc(profile.name)}</div>
+          <p class="text-xs text-muted mb-2" style="line-height: var(--lh-relaxed); font-family: var(--font-accent);">${profile.address ? esc(profile.address) : 'The shipping address is on your order confirmation email.'}</p>
+          ${profile.phone ? `<div class="text-xs text-muted mb-3" style="font-family: var(--font-accent);">📞 ${esc(profile.phone)}</div>` : ''}
           
           <div style="padding: 6px var(--space-3); background: var(--color-bg-alt); border-radius: var(--radius-md); font-size: 10px; font-family: var(--font-accent); line-height: 1.4;">
-            🚚 <strong>Carrier:</strong> FedEx Express<br>
-            📦 <strong>Tracking:</strong> WOW-${orderId.replace(/\D/g, '') || '940382'}
+            ${renderTrackingDetails(order)}
           </div>
         </div>
       </div>

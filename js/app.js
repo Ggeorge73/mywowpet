@@ -198,15 +198,22 @@ const WowApp = (() => {
             <h4>Stay Connected</h4>
             <p class="footer-desc" style="margin-bottom: var(--space-4);">New customers: 15% off your first order with code WELCOME15 at checkout.</p>
             <div class="footer-newsletter">
-              <form class="footer-newsletter-form" onsubmit="event.preventDefault(); WowApp.showToast('Thanks! Use code WELCOME15 at checkout for 15% off your first order.', '🎉'); this.reset();">
-                <input type="email" placeholder="Your email" required>
-                <button type="submit">Join</button>
+              <form class="footer-newsletter-form" id="footer-newsletter-form" novalidate>
+                <div class="footer-newsletter-row">
+                  <input type="email" id="footer-newsletter-email" name="email" placeholder="Your email" aria-label="Email address for offers and store updates" autocomplete="email" maxlength="254" required>
+                  <button type="submit">Join</button>
+                </div>
+                <label class="footer-newsletter-consent" for="footer-newsletter-consent">
+                  <input type="checkbox" id="footer-newsletter-consent" name="consent">
+                  <span>I’d like launch news, pet tips, and offers from My Wow Pet by email. Unsubscribe anytime.</span>
+                </label>
+                <p class="footer-newsletter-status" id="footer-newsletter-status" role="status" aria-live="polite"></p>
               </form>
             </div>
           </div>
         </div>
         <div class="footer-bottom">
-          <span class="footer-copyright">© 2025 My Wow Pet. All rights reserved. Made with ❤️ for pets.</span>
+          <span class="footer-copyright">© ${new Date().getFullYear()} My Wow Pet. All rights reserved. Made with ❤️ for pets.</span>
           <div class="footer-payment-icons">
             <span title="Visa">💳</span>
             <span title="Mastercard">💳</span>
@@ -217,6 +224,65 @@ const WowApp = (() => {
         </div>
       </div>
     </footer>`;
+  }
+
+  // ---- Footer Newsletter ----
+  // Writes to the same `launchSignups` collection as the coming-soon form, and only
+  // with explicit marketing consent. Success is shown only once the write resolves.
+  function initFooterNewsletter() {
+    const form = document.getElementById('footer-newsletter-form');
+    if (!form) return;
+    const emailInput = document.getElementById('footer-newsletter-email');
+    const consentInput = document.getElementById('footer-newsletter-consent');
+    const status = document.getElementById('footer-newsletter-status');
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    const setStatus = (message, type) => {
+      status.textContent = message;
+      status.className = `footer-newsletter-status${type ? ` is-${type}` : ''}`;
+    };
+
+    form.addEventListener('input', () => {
+      setStatus('', '');
+      emailInput.removeAttribute('aria-invalid');
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = emailInput.value.trim().toLowerCase();
+
+      if (!email || !emailInput.validity.valid) {
+        emailInput.setAttribute('aria-invalid', 'true');
+        setStatus('Please enter a valid email address.', 'error');
+        emailInput.focus();
+        return;
+      }
+      if (!consentInput.checked) {
+        setStatus('Please tick the box to confirm you’d like emails from us.', 'error');
+        consentInput.focus();
+        return;
+      }
+
+      submitButton.disabled = true;
+      setStatus('Signing you up…', '');
+      try {
+        await whenFirebaseReady();
+        const firebaseService = window.WowFirebase;
+        if (!firebaseService || typeof firebaseService.saveNewsletterSignup !== 'function') {
+          throw new Error('newsletter-service-unavailable');
+        }
+        const result = await firebaseService.saveNewsletterSignup(email, { consent: true, source: 'footer' });
+        form.reset();
+        setStatus(result === 'already-subscribed'
+          ? 'You’re already on the list. Thanks for being part of the pack!'
+          : 'You’re subscribed! New customers can use code WELCOME15 at checkout for 15% off a first order.', 'success');
+      } catch (err) {
+        console.error('[My Wow Pet] Newsletter signup failed:', err);
+        setStatus('We couldn’t sign you up just now. Please try again in a moment.', 'error');
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
   }
 
   // ---- Navbar HTML ----
@@ -477,10 +543,15 @@ const WowApp = (() => {
     return Promise.reject(new Error('Account service is temporarily unavailable.'));
   }
 
+  function rejectUnavailableDataService() {
+    return Promise.reject(new Error('database-unavailable'));
+  }
+
   function installUnavailableAuthService() {
     clearMockAuthStorage();
+    const existingService = window.WowFirebase || {};
     window.WowFirebase = {
-      ...(window.WowFirebase || {}),
+      ...existingService,
       init: () => {},
       signInWithEmail: unavailableAuthMethod,
       signUpWithEmail: unavailableAuthMethod,
@@ -502,7 +573,10 @@ const WowApp = (() => {
       syncMockDataLocally: () => {},
       writeOrderToRootDb: () => Promise.resolve(),
       writeReview: () => Promise.resolve(),
-      fetchReviews: () => Promise.resolve([])
+      fetchReviews: () => Promise.resolve([]),
+      // Auth being unavailable does not stop Firestore writes when the SDK loaded.
+      submitContactMessage: existingService.submitContactMessage || rejectUnavailableDataService,
+      saveNewsletterSignup: existingService.saveNewsletterSignup || rejectUnavailableDataService
     };
   }
 
@@ -516,7 +590,25 @@ const WowApp = (() => {
     }
   }
 
+  // Settles once loadFirebaseAssets has installed a WowFirebase service (real, mock or
+  // unavailable). Forms that write to Firestore await it so a submit made while the
+  // SDK is still loading does not fail spuriously.
+  let resolveFirebaseReady;
+  const firebaseReady = new Promise((resolve) => { resolveFirebaseReady = resolve; });
+
+  function whenFirebaseReady() {
+    return firebaseReady;
+  }
+
   async function loadFirebaseAssets() {
+    try {
+      await installFirebaseAssets();
+    } finally {
+      resolveFirebaseReady();
+    }
+  }
+
+  async function installFirebaseAssets() {
     loadStyle("/css/auth-modal.css");
     injectAuthModal(); // Inject auth modal synchronously before scripts load!
 
@@ -634,12 +726,16 @@ const WowApp = (() => {
           authCallback = callback;
           callback(mockUser);
         },
+        getCurrentUser: () => mockUser,
         isMockMode: () => true,
         syncUserData: () => Promise.resolve(),
         syncMockDataLocally: () => {},
         writeOrderToRootDb: () => Promise.resolve(),
         writeReview: () => Promise.resolve(),
-        fetchReviews: () => Promise.resolve([])
+        fetchReviews: () => Promise.resolve([]),
+        // No database behind the mock: forms must report failure, never fake success.
+        submitContactMessage: rejectUnavailableDataService,
+        saveNewsletterSignup: rejectUnavailableDataService
       };
     })();
     enforceAuthAvailability();
@@ -1242,7 +1338,10 @@ const WowApp = (() => {
     if (navSlot) navSlot.innerHTML = getNavHTML(activePage);
 
     const footerSlot = document.getElementById('footer-slot');
-    if (footerSlot) footerSlot.innerHTML = getFooterHTML();
+    if (footerSlot) {
+      footerSlot.innerHTML = getFooterHTML();
+      initFooterNewsletter();
+    }
 
     initAnnouncements();
     initNavbar();
@@ -1286,7 +1385,8 @@ const WowApp = (() => {
     handleSocialAuth,
     handlePasswordReset,
     toggleForgotPassword,
-    initInstallPrompt
+    initInstallPrompt,
+    whenFirebaseReady
   };
 })();
 
