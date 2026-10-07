@@ -27,7 +27,7 @@
 }
 
 .auth-header-logo .logo-accent {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .auth-tabs {
@@ -60,7 +60,7 @@
 }
 
 .auth-tab.active {
-  color: var(--color-primary-dark);
+  color: var(--color-primary-text);
 }
 
 [data-theme="dark"] .auth-tab.active {
@@ -247,13 +247,25 @@
 }
 
 .auth-forgot-link {
-  color: var(--color-primary-dark);
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--color-primary-text);
   text-decoration: none;
   font-weight: var(--fw-semibold);
   background: transparent;
   border: none;
   cursor: pointer;
   padding: 0;
+}
+
+.auth-remember {
+  min-height: 24px;
+}
+
+.auth-remember input {
+  width: 18px;
+  height: 18px;
 }
 
 [data-theme="dark"] .auth-forgot-link {
@@ -269,7 +281,7 @@
   padding: var(--space-3);
   border-radius: var(--radius-lg);
   background: var(--color-primary);
-  color: var(--color-text-inverse);
+  color: var(--color-on-primary);
   font-family: var(--font-accent);
   font-weight: var(--fw-bold);
   font-size: var(--fs-sm);
@@ -321,9 +333,12 @@
 }
 
 .auth-switch-msg button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   background: transparent;
   border: none;
-  color: var(--color-primary-dark);
+  color: var(--color-primary-text);
   font-weight: var(--fw-bold);
   cursor: pointer;
   padding: 0 4px;

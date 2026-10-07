@@ -1,5 +1,5 @@
 /* ============================================
-   WowPetStore — Pet-Check AI CSS Styles
+   WowPetStore — Pet Symptom Guide CSS Styles
    ============================================ */
 
 /* ---- Layout Grid ---- */
@@ -43,8 +43,8 @@
   padding-bottom: var(--space-3);
 }
 
-.canvas-header h3,
-.console-header h3 {
+.canvas-header h2,
+.console-header h2 {
   font-size: var(--fs-lg);
   font-weight: var(--fw-bold);
   color: var(--color-text-primary);
@@ -78,7 +78,7 @@
 
 .pet-switch-tab.active {
   background: var(--color-surface);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   box-shadow: var(--shadow-sm);
 }
 
@@ -145,6 +145,21 @@
 }
 
 /* Interactive Hover States */
+.hotspot-group:focus {
+  outline: none;
+}
+
+.hotspot-group:focus-visible .hotspot-trigger {
+  opacity: 1;
+  fill: none;
+  stroke: var(--color-focus);
+  stroke-width: 3px;
+}
+
+.hotspot-group:focus-visible .hotspot-label {
+  opacity: 1;
+}
+
 .hotspot-group:hover .hotspot-pulse {
   fill: var(--color-secondary);
   r: 10px;
@@ -165,7 +180,7 @@
 
 .hotspot-group.active-part .hotspot-label {
   opacity: 1;
-  fill: var(--color-primary);
+  fill: var(--color-primary-text);
   font-weight: var(--fw-bold);
 }
 
@@ -212,7 +227,7 @@
 .selected-region-header span {
   font-weight: var(--fw-bold);
   font-family: var(--font-heading);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .close-region-btn {
@@ -245,7 +260,7 @@
 
 .symptom-btn-tag:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   transform: translateY(-1px);
 }
 
@@ -284,7 +299,40 @@
   border-color: var(--color-border);
 }
 
-/* ---- Diagnostic Outputs (Results) ---- */
+/* ---- Prominent Disclaimer ---- */
+.check-disclaimer {
+  max-width: 760px;
+  margin: 0 auto var(--space-8);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid #c0392b;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed);
+}
+
+.check-disclaimer strong {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.check-results-note {
+  font-size: var(--fs-sm);
+  color: var(--color-text-secondary);
+}
+
+.check-shop-link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--color-primary-text);
+  font-weight: var(--fw-semibold);
+  text-decoration: underline;
+}
+
+/* ---- Guidance Results ---- */
 .results-wrapper {
   animation: fade-in 0.4s var(--ease-out);
 }
@@ -380,7 +428,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-weight: bold;
 }
 
@@ -403,7 +451,8 @@
 .emergency-overlay {
   position: fixed;
   inset: 0;
-  z-index: var(--z-modal);
+  /* Above the support chat launcher (650) so nothing covers the emergency actions */
+  z-index: 700;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px);
   display: flex;
@@ -420,7 +469,8 @@
   max-width: 600px;
   width: 100%;
   box-shadow: 0 0 30px rgba(231, 76, 60, 0.4);
-  overflow: hidden;
+  max-height: calc(100vh - 2 * var(--space-4));
+  overflow-y: auto;
   animation: scale-up 0.3s var(--ease-spring);
 }
 
@@ -467,10 +517,10 @@
   border-left: 4px solid #e74c3c;
 }
 
-.emergency-instructions h4 {
+.emergency-instructions h3 {
   margin-top: 0;
   margin-bottom: var(--space-2);
-  color: #e74c3c;
+  color: #b03a2e;
   font-size: var(--fs-sm);
 }
 
@@ -508,81 +558,36 @@
 }
 
 .hotline-link {
-  color: #e74c3c;
+  display: inline-block;
+  min-height: 24px;
+  color: #c0392b;
   font-weight: var(--fw-bold);
   font-size: var(--fs-sm);
 }
 
-/* Emergency Map representation */
-.emergency-map-card {
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin-bottom: var(--space-6);
+.hotline-note {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--fs-xs);
+  color: var(--color-text-secondary);
 }
 
-.map-header {
-  background: var(--color-bg-alt);
-  padding: var(--space-2) var(--space-4);
-  font-size: 11px;
-  font-weight: var(--fw-semibold);
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--color-border-light);
+.emergency-find-vet {
+  margin-bottom: var(--space-5);
+  text-align: center;
 }
 
-.gps-badge {
-  color: #2ecc71;
-}
-
-.map-placeholder {
-  height: 140px;
-  background-color: #1e1e24; /* Dark map theme */
-  background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 15px 15px;
-  position: relative;
-  overflow: hidden;
-}
-
-.mock-map-marker {
-  position: absolute;
-  background: var(--color-surface);
-  border: 1px solid #e74c3c;
-  padding: 4px var(--space-2);
-  border-radius: var(--radius-full);
-  font-size: 9px;
-  font-weight: var(--fw-semibold);
-  display: flex;
+.emergency-find-vet-link {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  box-shadow: var(--shadow-sm);
-  color: var(--color-text);
-}
-
-.mock-map-marker.marker-1 {
-  top: 30px;
-  left: 40px;
-}
-
-.mock-map-marker.marker-2 {
-  bottom: 40px;
-  right: 50px;
-}
-
-.marker-pulse {
-  width: 6px;
-  height: 6px;
-  background: #e74c3c;
-  border-radius: 50%;
-  animation: pulse-ring 1.5s infinite;
-}
-
-.map-watermark {
-  position: absolute;
-  bottom: 4px;
-  left: 6px;
-  font-size: 8px;
-  color: var(--color-text-muted);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 2px solid #c0392b;
+  border-radius: var(--radius-full);
+  color: #c0392b;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-sm);
+  text-decoration: underline;
 }
 
 .emergency-footer {
@@ -605,8 +610,8 @@
 }
 
 .disclaimer-sticky-footer p {
-  font-size: 10px;
-  color: var(--color-text-secondary);
+  font-size: 12px;
+  color: #d6d6d6;
   margin: 0;
   max-width: 100%;
 }

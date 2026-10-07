@@ -17,6 +17,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="My Wow Pet">
+  <link rel="icon" href="assets/images/icon-192x192.png">
   <link rel="apple-touch-icon" href="assets/images/icon-192x192.png">
 </head>
 <body>
@@ -71,7 +72,7 @@
           <div class="product-grid" id="product-grid"></div>
           <div id="no-results" class="empty-state" style="display: none;">
             <div class="empty-state-icon">&#x1F50D;</div>
-            <h3>No products found</h3>
+            <h2>No products found</h2>
             <p>Try adjusting your filters or search terms</p>
             <button class="btn btn-primary" onclick="clearAllFilters()">Clear All Filters</button>
           </div>
@@ -84,7 +85,7 @@
   <div class="filter-backdrop" id="filter-backdrop" onclick="toggleMobileFilter()"></div>
   <div class="filter-sidebar-mobile" id="filter-mobile">
     <div class="flex justify-between items-center mb-6">
-      <h3>Filters</h3>
+      <h2 style="font-size: var(--fs-2xl);">Filters</h2>
       <button class="btn btn-ghost" onclick="toggleMobileFilter()">&#x2715; Close</button>
     </div>
     <div class="filter-sidebar" id="filter-sidebar-mobile"></div>

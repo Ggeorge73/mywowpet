@@ -97,7 +97,7 @@
     pickerPanel = document.createElement('div');
     pickerPanel.className = 'pet-picker-panel';
 
-    var title = document.createElement('h3');
+    var title = document.createElement('h2');
     title.textContent = '\u{1F43E} Choose Your Pet Cursor';
     pickerPanel.appendChild(title);
 

@@ -45,80 +45,80 @@ const ShopPage = (() => {
     if (!container) return;
 
     const petOptions = WowStore.categories.map(c =>
-      `<div class="filter-option ${activeFilters.petType === c.id ? 'active' : ''}" onclick="ShopPage.toggleFilter('petType', '${c.id}')">
-        <div class="filter-checkbox">${activeFilters.petType === c.id ? '✓' : ''}</div>
+      `<button type="button" class="filter-option ${activeFilters.petType === c.id ? 'active' : ''}" aria-pressed="${activeFilters.petType === c.id ? 'true' : 'false'}" data-filter-id="petType:${c.id}" onclick="ShopPage.toggleFilter('petType', '${c.id}')">
+        <span class="filter-checkbox" aria-hidden="true">${activeFilters.petType === c.id ? '✓' : ''}</span>
         <span>${c.icon} ${c.name}</span>
-      </div>`
+      </button>`
     ).join('');
 
     const catOptions = WowStore.productCategories.map(c =>
-      `<div class="filter-option ${activeFilters.category === c.id ? 'active' : ''}" onclick="ShopPage.toggleFilter('category', '${c.id}')">
-        <div class="filter-checkbox">${activeFilters.category === c.id ? '✓' : ''}</div>
+      `<button type="button" class="filter-option ${activeFilters.category === c.id ? 'active' : ''}" aria-pressed="${activeFilters.category === c.id ? 'true' : 'false'}" data-filter-id="category:${c.id}" onclick="ShopPage.toggleFilter('category', '${c.id}')">
+        <span class="filter-checkbox" aria-hidden="true">${activeFilters.category === c.id ? '✓' : ''}</span>
         <span>${c.icon} ${c.name}</span>
-      </div>`
+      </button>`
     ).join('');
 
     const dietaryOptions = WowStore.filters.dietary.map(d =>
-      `<div class="filter-option ${activeFilters.dietary.includes(d.id) ? 'active' : ''}" onclick="ShopPage.toggleArrayFilter('dietary', '${d.id}')">
-        <div class="filter-checkbox">${activeFilters.dietary.includes(d.id) ? '✓' : ''}</div>
+      `<button type="button" class="filter-option ${activeFilters.dietary.includes(d.id) ? 'active' : ''}" aria-pressed="${activeFilters.dietary.includes(d.id) ? 'true' : 'false'}" data-filter-id="dietary:${d.id}" onclick="ShopPage.toggleArrayFilter('dietary', '${d.id}')">
+        <span class="filter-checkbox" aria-hidden="true">${activeFilters.dietary.includes(d.id) ? '✓' : ''}</span>
         <span>${d.label}</span>
-      </div>`
+      </button>`
     ).join('');
 
     const lifeStageOptions = WowStore.filters.lifeStage.map(ls =>
-      `<div class="filter-option ${activeFilters.lifeStage.includes(ls.id) ? 'active' : ''}" onclick="ShopPage.toggleArrayFilter('lifeStage', '${ls.id}')">
-        <div class="filter-checkbox">${activeFilters.lifeStage.includes(ls.id) ? '✓' : ''}</div>
+      `<button type="button" class="filter-option ${activeFilters.lifeStage.includes(ls.id) ? 'active' : ''}" aria-pressed="${activeFilters.lifeStage.includes(ls.id) ? 'true' : 'false'}" data-filter-id="lifeStage:${ls.id}" onclick="ShopPage.toggleArrayFilter('lifeStage', '${ls.id}')">
+        <span class="filter-checkbox" aria-hidden="true">${activeFilters.lifeStage.includes(ls.id) ? '✓' : ''}</span>
         <span>${ls.label}</span>
-      </div>`
+      </button>`
     ).join('');
 
     const breedSizeOptions = WowStore.filters.breedSize.map(bs =>
-      `<div class="filter-option ${activeFilters.breedSize.includes(bs.id) ? 'active' : ''}" onclick="ShopPage.toggleArrayFilter('breedSize', '${bs.id}')">
-        <div class="filter-checkbox">${activeFilters.breedSize.includes(bs.id) ? '✓' : ''}</div>
+      `<button type="button" class="filter-option ${activeFilters.breedSize.includes(bs.id) ? 'active' : ''}" aria-pressed="${activeFilters.breedSize.includes(bs.id) ? 'true' : 'false'}" data-filter-id="breedSize:${bs.id}" onclick="ShopPage.toggleArrayFilter('breedSize', '${bs.id}')">
+        <span class="filter-checkbox" aria-hidden="true">${activeFilters.breedSize.includes(bs.id) ? '✓' : ''}</span>
         <span>${bs.label}</span>
-      </div>`
+      </button>`
     ).join('');
 
     container.innerHTML = `
       <div class="filter-group open">
-        <div class="filter-group-header" onclick="this.parentElement.classList.toggle('open')">
-          <span>Pet Type</span><span class="chevron">▾</span>
-        </div>
+        <button type="button" class="filter-group-header" aria-expanded="true" onclick="ShopPage.toggleGroup(this)">
+          <span>Pet Type</span><span class="chevron" aria-hidden="true">▾</span>
+        </button>
         <div class="filter-group-body">${petOptions}</div>
       </div>
       <div class="filter-group open">
-        <div class="filter-group-header" onclick="this.parentElement.classList.toggle('open')">
-          <span>Category</span><span class="chevron">▾</span>
-        </div>
+        <button type="button" class="filter-group-header" aria-expanded="true" onclick="ShopPage.toggleGroup(this)">
+          <span>Category</span><span class="chevron" aria-hidden="true">▾</span>
+        </button>
         <div class="filter-group-body">${catOptions}</div>
       </div>
       <div class="filter-group ${activeFilters.dietary.length ? 'open' : ''}">
-        <div class="filter-group-header" onclick="this.parentElement.classList.toggle('open')">
-          <span>Dietary Needs</span><span class="chevron">▾</span>
-        </div>
+        <button type="button" class="filter-group-header" aria-expanded="${activeFilters.dietary.length ? 'true' : 'false'}" onclick="ShopPage.toggleGroup(this)">
+          <span>Dietary Needs</span><span class="chevron" aria-hidden="true">▾</span>
+        </button>
         <div class="filter-group-body">${dietaryOptions}</div>
       </div>
       <div class="filter-group ${activeFilters.lifeStage.length ? 'open' : ''}">
-        <div class="filter-group-header" onclick="this.parentElement.classList.toggle('open')">
-          <span>Life Stage</span><span class="chevron">▾</span>
-        </div>
+        <button type="button" class="filter-group-header" aria-expanded="${activeFilters.lifeStage.length ? 'true' : 'false'}" onclick="ShopPage.toggleGroup(this)">
+          <span>Life Stage</span><span class="chevron" aria-hidden="true">▾</span>
+        </button>
         <div class="filter-group-body">${lifeStageOptions}</div>
       </div>
       <div class="filter-group ${activeFilters.breedSize.length ? 'open' : ''}">
-        <div class="filter-group-header" onclick="this.parentElement.classList.toggle('open')">
-          <span>Breed Size</span><span class="chevron">▾</span>
-        </div>
+        <button type="button" class="filter-group-header" aria-expanded="${activeFilters.breedSize.length ? 'true' : 'false'}" onclick="ShopPage.toggleGroup(this)">
+          <span>Breed Size</span><span class="chevron" aria-hidden="true">▾</span>
+        </button>
         <div class="filter-group-body">${breedSizeOptions}</div>
       </div>
       ${WowStore.FEATURES.subscriptions ? `<div class="filter-group">
-        <div class="filter-group-header" onclick="this.parentElement.classList.toggle('open')">
-          <span>Subscription</span><span class="chevron">▾</span>
-        </div>
+        <button type="button" class="filter-group-header" aria-expanded="false" onclick="ShopPage.toggleGroup(this)">
+          <span>Subscription</span><span class="chevron" aria-hidden="true">▾</span>
+        </button>
         <div class="filter-group-body">
-          <div class="filter-option ${activeFilters.subscribable ? 'active' : ''}" onclick="ShopPage.toggleFilter('subscribable', !ShopPage.getFilters().subscribable)">
-            <div class="filter-checkbox">${activeFilters.subscribable ? '✓' : ''}</div>
+          <button type="button" class="filter-option ${activeFilters.subscribable ? 'active' : ''}" aria-pressed="${activeFilters.subscribable ? 'true' : 'false'}" data-filter-id="subscribable" onclick="ShopPage.toggleFilter('subscribable', !ShopPage.getFilters().subscribable)">
+            <span class="filter-checkbox" aria-hidden="true">${activeFilters.subscribable ? '✓' : ''}</span>
             <span>Subscribe & Save eligible</span>
-          </div>
+          </button>
         </div>
       </div>` : ''}
     `;
@@ -145,9 +145,22 @@ const ShopPage = (() => {
     refresh();
   }
 
+  function toggleGroup(header) {
+    const open = header.parentElement.classList.toggle('open');
+    header.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
   function refresh() {
+    // Filters are re-rendered on every change; keep keyboard focus on the option that was used.
+    const focused = document.activeElement;
+    const focusId = focused && focused.dataset ? focused.dataset.filterId : null;
+    const focusSidebar = focusId ? focused.closest('[id^="filter-sidebar"]') : null;
     renderFilters('filter-sidebar');
     renderFilters('filter-sidebar-mobile');
+    if (focusId && focusSidebar) {
+      const target = [...focusSidebar.querySelectorAll('[data-filter-id]')].find(el => el.dataset.filterId === focusId);
+      if (target) target.focus();
+    }
     renderProducts();
     renderActiveChips();
     updateTitle();
@@ -256,7 +269,7 @@ const ShopPage = (() => {
 
   function getFilters() { return activeFilters; }
 
-  return { init, toggleFilter, toggleArrayFilter, refresh, clearSearch, getFilters };
+  return { init, toggleFilter, toggleArrayFilter, toggleGroup, refresh, clearSearch, getFilters };
 })();
 
 // Global handlers

@@ -944,13 +944,21 @@ const WowStore = (() => {
     }
   }
 
+  // "You may also like": only products for the same pet (same category first), so a cat
+  // food page never suggests puppy food or bird seed. Falls back to the same category only
+  // when nothing else exists for that pet. Order is deterministic (catalog order).
   function getRelatedProducts(productId, limit = 4) {
     const product = getProduct(productId);
     if (!product) return [];
-    return products
-      .filter(p => p.id !== product.id && (p.petType === product.petType || p.category === product.category))
-      .sort(() => Math.random() - 0.5)
-      .slice(0, limit);
+    const others = products.filter(p => p.id !== product.id);
+    const samePet = others.filter(p => p.petType === product.petType);
+    const pool = samePet.length
+      ? [
+          ...samePet.filter(p => p.category === product.category),
+          ...samePet.filter(p => p.category !== product.category)
+        ]
+      : others.filter(p => p.category === product.category);
+    return pool.slice(0, limit);
   }
 
   function getBundleProducts(productId) {
