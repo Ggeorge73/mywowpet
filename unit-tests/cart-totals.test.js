@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { loadStore } from './helpers/load-store.js';
 
 const WowStore = loadStore();
@@ -55,100 +55,114 @@ describe('getCartTotal — shipping threshold', () => {
   });
 });
 
-describe('getCartTotal — promo codes', () => {
-  it('applies a percentage discount to the subtotal', () => {
-    seedCart(UNDER_THRESHOLD);
-    WowStore.validatePromo('WELCOME15');
-    const totals = WowStore.getCartTotal();
-    expect(totals.promoDiscount).toBeCloseTo(totals.subtotal * 0.15, 10);
-  });
+describe('getCartTotal — discount codes are never applied client-side', () => {
+  // H3: Shopify is the source of truth for discount codes. A code stored in the
+  // cart is only forwarded to cartCreate; it must never change a local total,
+  // whether or not it is a real Shopify code.
+  it.each(['WELCOME15', 'PET10', 'FREESHIP', 'PETIQ25', 'STREAK30', 'SPIN20', 'NOT-A-REAL-CODE'])(
+    'leaves every line of the total untouched for %s',
+    (code) => {
+      seedCart(UNDER_THRESHOLD);
+      const before = WowStore.getCartTotal();
 
-  it('taxes the discounted subtotal, not the original', () => {
-    seedCart(UNDER_THRESHOLD);
-    WowStore.validatePromo('PET10');
-    const totals = WowStore.getCartTotal();
-    expect(totals.tax).toBeCloseTo((totals.subtotal - totals.promoDiscount) * 0.08, 10);
-  });
+      WowStore.setPromoCode(code);
+      const after = WowStore.getCartTotal();
 
-  it('ignores an unknown code', () => {
-    seedCart(UNDER_THRESHOLD);
-    expect(WowStore.validatePromo('NOT-A-REAL-CODE')).toBeNull();
-    expect(WowStore.getCartTotal().promoDiscount).toBe(0);
-  });
+      expect(after).toEqual(before);
+      expect(after.promoDiscount).toBe(0);
+      expect(after.shipping).toBe(5.99);
+      expect(after.total).toBeCloseTo(after.subtotal + after.shipping + after.tax, 10);
+    },
+  );
 
-  it('never discounts below zero', () => {
-    seedCart(UNDER_THRESHOLD);
-    WowStore.validatePromo('PETIQ25');
-    const totals = WowStore.getCartTotal();
-    expect(totals.total).toBeGreaterThanOrEqual(0);
-    expect(totals.promoDiscount).toBeLessThanOrEqual(totals.subtotal);
-  });
-});
-
-describe('getCartTotal — FREESHIP regression', () => {
-  // Regression: FREESHIP was modelled as { discount: 5.99, type: 'fixed' }, so it
-  // came off the subtotal. Because the threshold is evaluated against the
-  // *discounted* subtotal, applying it to a $51.98 cart dropped the cart to $45.99
-  // and re-charged $5.99 shipping — a code labelled "Free shipping" added a
-  // shipping charge.
-  it('waives shipping on a cart just over the threshold', () => {
+  it('ignores a code written straight into storage by older builds', () => {
     seedCart(OVER_THRESHOLD);
     const before = WowStore.getCartTotal();
-    expect(before.shipping).toBe(0);
-
-    WowStore.validatePromo('FREESHIP');
-    const after = WowStore.getCartTotal();
-
-    expect(after.shipping).toBe(0);
-    expect(after.total).toBeLessThanOrEqual(before.total);
+    localStorage.setItem('wow_applied_promo', 'PETIQ25');
+    expect(WowStore.getCartTotal()).toEqual(before);
   });
 
-  it('waives shipping on a cart below the threshold', () => {
-    seedCart(UNDER_THRESHOLD);
-    expect(WowStore.getCartTotal().shipping).toBe(5.99);
-
-    WowStore.validatePromo('FREESHIP');
-    const totals = WowStore.getCartTotal();
-
-    expect(totals.shipping).toBe(0);
-    expect(totals.freeShippingFromPromo).toBe(true);
+  it('no longer exposes a client-side code table or validator', () => {
+    expect(WowStore.validatePromo).toBeUndefined();
+    expect(WowStore.promoCodes).toBeUndefined();
   });
 
-  it('waives shipping without discounting the subtotal', () => {
-    seedCart(UNDER_THRESHOLD);
-    WowStore.validatePromo('FREESHIP');
-    const totals = WowStore.getCartTotal();
-
-    expect(totals.promoDiscount).toBe(0);
-    expect(totals.subtotal).toBeCloseTo(subtotalOf(UNDER_THRESHOLD), 10);
-    expect(totals.tax).toBeCloseTo(totals.subtotal * 0.08, 10);
-  });
-
-  it('applying FREESHIP never increases the total, at any cart size', () => {
-    // A complementary property rather than the regression guard: the old bug still
-    // lowered the total by ~$0.48 while adding a shipping charge, so it slipped past
-    // a total-only check. That is precisely why the assertions above target the
-    // shipping line directly.
-    for (const qty of [1, 2, 3, 4, 5, 6, 7]) {
-      localStorage.clear();
-      seedCart([{ productId: 8, qty }]);
-      const before = WowStore.getCartTotal().total;
-
-      WowStore.validatePromo('FREESHIP');
-      const after = WowStore.getCartTotal().total;
-
-      expect(after, `qty=${qty}`).toBeLessThanOrEqual(before);
-    }
+  it('stores the typed code normalised, for Shopify to validate', () => {
+    expect(WowStore.setPromoCode('  welcome15 ')).toBe('WELCOME15');
+    expect(WowStore.getPromoCode()).toBe('WELCOME15');
+    expect(WowStore.setPromoCode('')).toBeNull();
+    expect(WowStore.getPromoCode()).toBeNull();
   });
 });
 
-describe('getCartTotal — subscription savings', () => {
-  it('bills the subscription price and reports the saving', () => {
+describe('createShopifyCart — forwards the code to Shopify', () => {
+  it('passes the typed code as cartCreate discountCodes', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: {
+          cartCreate: {
+            cart: { id: 'gid://shopify/Cart/1', checkoutUrl: 'https://example.com/c', discountCodes: [{ code: 'WELCOME15', applicable: true }] },
+            userErrors: [],
+          },
+        },
+      }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      await WowStore.createShopifyCart([{ productId: 6, qty: 1 }], { discountCode: 'welcome15', returnUrl: 'https://example.com/' });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body.variables.input.discountCodes).toEqual(['WELCOME15']);
+  });
+
+  it('omits discountCodes when no code was entered', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: { cartCreate: { cart: { id: 'c', checkoutUrl: 'https://example.com/c' }, userErrors: [] } } }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      await WowStore.createShopifyCart([{ productId: 6, qty: 1 }], { returnUrl: 'https://example.com/' });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body.variables.input.discountCodes).toBeUndefined();
+  });
+});
+
+describe('getCartTotal — subscriptions gated off (MWP-16)', () => {
+  // No Shopify selling plans exist, so a subscription line is charged full price
+  // at checkout. The cart must show that same price and no "Subscribe & Save" saving.
+  it('keeps the feature flags off until Shopify can honour them', () => {
+    expect(WowStore.FEATURES.subscriptions).toBe(false);
+    expect(WowStore.FEATURES.loyalty).toBe(false);
+  });
+
+  it('bills a legacy subscription line at full price with no saving', () => {
     const product = WowStore.getProduct(1);
     seedCart([{ productId: 1, qty: 2, isSubscription: true }]);
     const totals = WowStore.getCartTotal();
 
-    expect(totals.subtotal).toBeCloseTo(product.subscribePrice * 2, 10);
-    expect(totals.savings).toBeCloseTo((product.price - product.subscribePrice) * 2, 10);
+    expect(totals.subtotal).toBeCloseTo(product.price * 2, 10);
+    expect(totals.savings).toBe(0);
+  });
+
+  it('adds new items as one-time purchases even if asked for a subscription', () => {
+    WowStore.addToCart(1, 1, true);
+    expect(WowStore.getCart()).toEqual([expect.objectContaining({ productId: 1, isSubscription: false })]);
+    expect(WowStore.buildShopifyCartLines()[0].sellingPlanId).toBeUndefined();
+  });
+});
+
+describe('getShippingEstimate', () => {
+  it('applies the same threshold rule as the cart', () => {
+    expect(WowStore.getShippingEstimate(WowStore.FREE_SHIPPING_THRESHOLD)).toBe(0);
+    expect(WowStore.getShippingEstimate(WowStore.FREE_SHIPPING_THRESHOLD - 0.01)).toBe(WowStore.SHIPPING_FLAT_RATE);
   });
 });

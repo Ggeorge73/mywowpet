@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Subscribe & Save up to 15% on every delivery. Never run out of your pet's essentials.">
+  <meta name="description" content="Autoship from My Wow Pet is coming soon. Join the list to hear when recurring deliveries open.">
   <title>Subscribe & Save | My Wow Pet</title>
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
@@ -21,6 +21,19 @@
 <body>
   <div id="nav-slot"></div>
 
+  <!-- Shown while WowStore.FEATURES.subscriptions is false (no Shopify selling plans yet, MWP-16) -->
+  <section class="subscribe-hero" id="autoship-coming-soon">
+    <div class="container" style="position: relative; z-index: 1;">
+      <h1 class="slide-up">Autoship is coming soon</h1>
+      <p class="slide-up">We're setting up recurring deliveries so you never run out of your pet's essentials. Join the list and we'll email you when autoship opens &#x2014; details and pricing will be announced then.</p>
+      <div class="hero-actions slide-up" style="display: flex; gap: var(--space-3); justify-content: center; flex-wrap: wrap;">
+        <a href="mailto:support@mywowpet.com?subject=Autoship%20waitlist&amp;body=Please%20let%20me%20know%20when%20autoship%20is%20available." class="btn btn-primary btn-lg" id="autoship-join-list">Join the list</a>
+        <a href="shop.html" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.5); color: white;">Shop now</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="subscribe-live" hidden>
   <!-- Hero -->
   <section class="subscribe-hero">
     <div class="container" style="position: relative; z-index: 1;">
@@ -99,6 +112,8 @@
       </div>
     </div>
   </section>
+
+  </div>
 
   <div id="footer-slot"></div>
 

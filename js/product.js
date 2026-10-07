@@ -158,13 +158,12 @@ const ProductPage = (() => {
         <span class="section-label" style="margin-bottom: var(--space-2);">${product.brand}</span>
         <h1 class="product-title">${product.name}</h1>
         <div class="product-rating">
-          ${WowStore.renderStars(product.rating)}
-          <span class="rating-count">${product.rating} (${product.reviewCount} reviews)</span>
+          ${WowStore.renderRatingSummary(product.id)}
         </div>
 
         <div class="product-price-block" id="price-block">
           <span class="price" id="display-price">${WowStore.formatPrice(product.price)}</span>
-          ${product.subscribable ? `<span class="badge badge-subscribe" style="font-size: var(--fs-xs);">Save ${product.subscribeDiscount}%</span>` : ''}
+          ${WowStore.FEATURES.subscriptions && product.subscribable ? `<span class="badge badge-subscribe" style="font-size: var(--fs-xs);">Save ${product.subscribeDiscount}%</span>` : ''}
         </div>
 
         <div class="product-highlights">${highlights}</div>
@@ -192,7 +191,7 @@ const ProductPage = (() => {
         </div>
 
         <div class="flex gap-6" style="margin-top: var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--color-border-light);">
-          <div class="flex items-center gap-2 text-sm text-muted"><span>🚚</span> Free shipping $49+</div>
+          <div class="flex items-center gap-2 text-sm text-muted"><span>🚚</span> Free shipping $${WowStore.FREE_SHIPPING_THRESHOLD}+</div>
           <div class="flex items-center gap-2 text-sm text-muted"><span>🔄</span> Easy returns</div>
           <div class="flex items-center gap-2 text-sm text-muted"><span>🔒</span> Secure checkout</div>
         </div>
@@ -342,8 +341,7 @@ const ProductPage = (() => {
         <div>
           <h4 style="margin: 0; font-size: var(--fs-lg);">Customer Reviews</h4>
           <div class="flex items-center gap-2 mt-1">
-            ${WowStore.renderStars(product.rating)}
-            <span class="text-sm text-muted">${product.rating} out of 5 stars (${reviews.length} reviews)</span>
+            ${WowStore.renderRatingSummary(product.id, { emptyText: '' })}
           </div>
         </div>
         <button class="btn btn-primary" onclick="ProductPage.toggleReviewForm()">Write a Review</button>
@@ -495,7 +493,7 @@ const ProductPage = (() => {
     const authorName = user ? (user.displayName || user.email.split('@')[0]) : 'Anonymous';
 
     let avatar = '👤';
-    let petSubtitle = 'Verified Buyer';
+    let petSubtitle = '';
 
     if (petId !== 'self') {
       const pets = WowStore.getPets();
@@ -554,12 +552,12 @@ const ProductPage = (() => {
     const bundle = WowStore.getBundleProducts(product.id);
     if (bundle.length < 2) { document.getElementById('fbt-container').style.display = 'none'; return; }
     const allProducts = [product, ...bundle];
+    // No bundle discount exists in Shopify, so show the real combined price.
     const totalPrice = allProducts.reduce((s, p) => s + p.price, 0);
-    const bundlePrice = totalPrice * 0.9;
 
     document.getElementById('fbt-container').innerHTML = `
       <div class="fbt-section">
-        <h3>Frequently Bought Together</h3>
+        <h3>Pairs Well Together</h3>
         <div class="fbt-items">
           ${allProducts.map((p, i) => `
             ${i > 0 ? '<span class="fbt-plus">+</span>' : ''}
@@ -573,9 +571,7 @@ const ProductPage = (() => {
         </div>
         <div class="fbt-total">
           <div>
-            <span class="price-original">${WowStore.formatPrice(totalPrice)}</span>
-            <span class="bundle-price">${WowStore.formatPrice(bundlePrice)}</span>
-            <span class="badge badge-sale" style="margin-left: var(--space-2);">Save 10%</span>
+            <span class="bundle-price">${WowStore.formatPrice(totalPrice)}</span>
           </div>
           <button class="btn btn-primary" onclick="ProductPage.addBundle([${allProducts.map(p => p.id).join(',')}])">Add All to Cart</button>
         </div>

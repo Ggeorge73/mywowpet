@@ -5,6 +5,19 @@
 const SubscribePage = (() => {
 
   function init() {
+    // Until Shopify selling plans exist the page only shows the "coming soon"
+    // state; the live content (15% pricing, management UI) stays hidden.
+    const live = document.getElementById('subscribe-live');
+    const comingSoon = document.getElementById('autoship-coming-soon');
+    if (!WowStore.FEATURES.subscriptions) {
+      if (live) live.hidden = true;
+      if (comingSoon) comingSoon.hidden = false;
+      WowAnimations.init();
+      return;
+    }
+    if (live) live.hidden = false;
+    if (comingSoon) comingSoon.hidden = true;
+
     renderProducts();
     renderSubscriptions();
     calcSavings(100);

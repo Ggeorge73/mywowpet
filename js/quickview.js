@@ -70,9 +70,8 @@ const WowQuickView = (() => {
           <div>
             <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);font-family:var(--font-accent);">${product.brand}</span>
             <h2 style="font-family:var(--font-heading);font-size:1.5rem;margin:6px 0;line-height:1.3;color:var(--color-text);">${product.name}</h2>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-              ${WowStore.renderStars(product.rating)}
-              <span style="font-size:13px;color:var(--color-text-muted);">(${product.reviewCount} reviews)</span>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;color:var(--color-text-muted);">
+              ${WowStore.renderRatingSummary(product.id)}
             </div>
           </div>
 
@@ -80,7 +79,7 @@ const WowQuickView = (() => {
           <div style="display:flex;align-items:baseline;gap:12px;">
             <span style="font-size:2rem;font-weight:800;color:var(--color-text);font-family:var(--font-heading);">${WowStore.formatPrice(product.price)}</span>
             ${product.originalPrice ? `<span style="font-size:1.1rem;color:var(--color-text-muted);text-decoration:line-through;">${WowStore.formatPrice(product.originalPrice)}</span>` : ''}
-            ${product.subscribable ? `<span style="font-size:13px;background:rgba(45,95,58,0.1);color:var(--color-secondary);padding:4px 10px;border-radius:99px;font-weight:600;">Subscribe ${WowStore.formatPrice(product.subscribePrice)}</span>` : ''}
+            ${WowStore.FEATURES.subscriptions && product.subscribable ? `<span style="font-size:13px;background:rgba(45,95,58,0.1);color:var(--color-secondary);padding:4px 10px;border-radius:99px;font-weight:600;">Subscribe ${WowStore.formatPrice(product.subscribePrice)}</span>` : ''}
           </div>
 
           <!-- Tags -->
