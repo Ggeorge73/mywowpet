@@ -17,6 +17,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="My Wow Pet">
+  <link rel="icon" href="assets/images/icon-192x192.png">
   <link rel="apple-touch-icon" href="assets/images/icon-192x192.png">
 </head>
 <body>
@@ -101,7 +102,7 @@
       <p class="section-subtitle fade-in">Calculate your estimated savings with Subscribe & Save</p>
       <div class="savings-calc fade-in" style="max-width: 600px; margin: 0 auto;">
         <div class="input-group mb-4">
-          <label>Monthly Spending on Pet Products</label>
+          <label for="spending-slider">Monthly Spending on Pet Products</label>
           <input type="range" id="spending-slider" min="20" max="300" value="100" oninput="SubscribePage.calcSavings(this.value)" style="width: 100%; accent-color: var(--color-primary);">
           <div class="flex justify-between text-sm text-muted"><span>$20</span><span id="spending-display">$100</span><span>$300</span></div>
         </div>

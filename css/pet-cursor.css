@@ -374,6 +374,7 @@ body.pet-cursor-active *:not(.pet-picker-btn):not(.pet-picker-panel):not(.pet-pi
   pointer-events: auto;
 }
 
+.pet-picker-panel h2,
 .pet-picker-panel h3 {
   margin: 0 0 4px 0;
   color: #fff;

@@ -271,6 +271,12 @@ h1 em {
   box-shadow: 0 0 0 4px rgba(201, 149, 54, 0.14);
 }
 
+.field input:focus-visible,
+.field select:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+
 .field input[aria-invalid="true"] {
   border-color: var(--error);
   box-shadow: 0 0 0 4px rgba(166, 63, 50, 0.1);
@@ -334,8 +340,8 @@ h1 em {
 }
 
 .consent input {
-  width: 15px;
-  height: 15px;
+  width: 18px;
+  height: 18px;
   flex: 0 0 auto;
   margin: 1px 0 0;
   accent-color: var(--forest);
@@ -589,6 +595,8 @@ h1 em {
   .launch-content {
     min-height: auto;
     padding: 24px clamp(20px, 5vw, 42px) 28px;
+    /* The decorative ring below sits past the right edge; clip it so the page never scrolls sideways. */
+    overflow: hidden;
   }
 
   .launch-content::after {

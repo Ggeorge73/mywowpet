@@ -4,7 +4,7 @@
    ============================================ */
 
 // Bump the version on every deploy that changes precached files.
-const CACHE_NAME = 'mywowpet-v11-2026-10-07';
+const CACHE_NAME = 'mywowpet-v12-2026-10-07';
 const CORE_ASSETS = [
   './',
   'index.html',

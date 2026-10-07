@@ -8,6 +8,12 @@
   --color-primary-light: #E8C97A;
   --color-primary-dark: #B8913A;
   --color-primary-rgb: 212, 168, 83;
+  /* Gold for TEXT on light backgrounds (>= 4.5:1 on cream/white). The fills above stay brand gold. */
+  --color-primary-text: #856518;
+  /* Text on gold fills (white on gold is ~2.2:1) */
+  --color-on-primary: #1A1A1A;
+  /* Keyboard focus ring (>= 3:1 against light surfaces) */
+  --color-focus: #856518;
 
   --color-secondary: #2D5F3A;
   --color-secondary-light: #3D7A4E;
@@ -30,7 +36,7 @@
   --color-border-light: #F0EBE3;
   --color-text: #2C2C2C;
   --color-text-secondary: #5A5A5A;
-  --color-text-muted: #8A8A8A;
+  --color-text-muted: #6B6B6B;
   --color-text-inverse: #FFFFFF;
 
   /* ---- Dark Sections ---- */
@@ -156,7 +162,9 @@
   --color-border-light: #2A2A2A;
   --color-text: #E8E2D8;
   --color-text-secondary: #B0A89C;
-  --color-text-muted: #7A756E;
+  --color-text-muted: #8E8880;
+  --color-primary-text: #D4A853;
+  --color-focus: #E8C97A;
 
   --glass-bg: rgba(30, 30, 30, 0.82);
   --glass-border: rgba(255, 255, 255, 0.08);
