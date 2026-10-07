@@ -38,7 +38,7 @@ Then, in the same commit:
 
 1. **`index.html` (new store home)**: remove the "Pre-launch this lives at
    /home.html" comment, add OG/Twitter meta (title, description, image), and a
-   `<link rel="canonical" href="https://www.mywowpet.com/">`.
+   `<link rel="canonical" href="/">`.
 2. **`coming-soon.html`**: change the brand link `href="index.html"` to
    `href="coming-soon.html"` (or leave it pointing at the store home), and add
    `<meta name="robots" content="noindex">` so it does not compete with the home page.

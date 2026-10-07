@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import picomatch from 'picomatch';
 
 // Guards firebase.json against two launch blockers: shipping repo internals with
 // `"public": "."` (B4) and pinning unhashed js/css/sw.js with a 1-year immutable
@@ -11,30 +12,11 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const config = JSON.parse(readFileSync(path.resolve(here, '../firebase.json'), 'utf8'));
 const hosting = config.hosting;
 
-// Minimal glob -> RegExp covering the syntax firebase.json uses:
-// `**/`, `**`, `*`, `?` and the `@(a|b)` extglob. Paths are relative to the
-// public dir with no leading slash.
-function globToRegExp(glob) {
-  let src = '';
-  let i = 0;
-  const g = glob.replace(/^\//, '');
-  while (i < g.length) {
-    if (g.startsWith('**/', i)) { src += '(?:.*/)?'; i += 3; continue; }
-    if (g.startsWith('**', i)) { src += '.*'; i += 2; continue; }
-    if (g.startsWith('@(', i)) {
-      const end = g.indexOf(')', i);
-      const alts = g.slice(i + 2, end).split('|').map((a) => a.replace(/[.+^${}()[\]\\]/g, '\\$&'));
-      src += `(?:${alts.join('|')})`;
-      i = end + 1;
-      continue;
-    }
-    const ch = g[i];
-    if (ch === '*') src += '[^/]*';
-    else if (ch === '?') src += '[^/]';
-    else src += ch.replace(/[.+^${}()|[\]\\]/g, '\\$&');
-    i += 1;
-  }
-  return new RegExp(`^${src}$`);
+// Firebase matches hosting globs with minimatch-style extglob semantics;
+// picomatch covers the `**`, `*`, `?` and `@(a|b)` syntax firebase.json uses.
+// Paths are relative to the public dir with no leading slash.
+function matches(glob, file) {
+  return picomatch(glob.replace(/^\//, ''), { dot: true })(file);
 }
 
 // A file is skipped when it or any parent directory matches an ignore pattern
@@ -43,15 +25,14 @@ function isIgnored(file) {
   const parts = file.split('/');
   const candidates = parts.map((_, i) => parts.slice(0, i + 1).join('/'));
   return hosting.ignore.some((pattern) => {
-    const re = globToRegExp(pattern);
-    return candidates.some((candidate) => re.test(candidate));
+    return candidates.some((candidate) => matches(pattern, candidate));
   });
 }
 
 function cacheControlFor(path) {
   let value;
   for (const rule of hosting.headers) {
-    if (!globToRegExp(rule.source).test(path)) continue;
+    if (!matches(rule.source, path)) continue;
     const header = rule.headers.find((h) => h.key.toLowerCase() === 'cache-control');
     if (header) value = header.value; // last matching rule wins
   }
