@@ -289,8 +289,10 @@
   margin-bottom: var(--space-5);
 }
 
+.perk-card h3,
 .perk-card h4 {
   font-family: var(--font-heading);
+  font-size: var(--fs-xl);
   margin-bottom: var(--space-3);
 }
 
@@ -377,10 +379,15 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
+.newsletter-form input:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
 .newsletter-form button {
   padding: var(--space-4) var(--space-6);
   background: white;
-  color: var(--color-primary-dark);
+  color: var(--color-primary-text);
   font-family: var(--font-accent);
   font-weight: var(--fw-bold);
   font-size: var(--fs-sm);
@@ -546,6 +553,9 @@
 }
 
 .cart-item-remove {
+  min-height: 24px;
+  min-width: 24px;
+  padding: 0 var(--space-1);
   font-size: var(--fs-sm);
   color: var(--color-text-muted);
   text-decoration: underline;
@@ -572,7 +582,9 @@
   height: fit-content;
 }
 
+.order-summary h2,
 .order-summary h3 {
+  font-size: var(--fs-2xl);
   margin-bottom: var(--space-6);
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-border-light);
@@ -741,7 +753,7 @@
 }
 
 .profile-tab.active {
-  color: var(--color-primary-dark);
+  color: var(--color-primary-text);
   border-bottom-color: var(--color-primary);
   font-weight: var(--fw-semibold);
 }

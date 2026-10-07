@@ -39,6 +39,7 @@ const CartPage = (() => {
       const price = isSubscription ? product.subscribePrice : product.price;
       const imgSrc = WowStore.getProductImage(product);
       const gradient = WowStore.generateProductGradient(product);
+      const nameAttr = WowStore.escapeHTML(product.name);
 
       return `
         <div class="cart-item">
@@ -50,11 +51,11 @@ const CartPage = (() => {
             <div class="cart-item-variant">${product.weight}${isSubscription ? ' · <span class="badge badge-subscribe">Subscribe & Save</span>' : ''}</div>
             <div class="cart-item-actions">
               <div class="qty-stepper">
-                <button onclick="CartPage.updateQty(${product.id}, ${item.qty - 1}, ${item.isSubscription})">−</button>
+                <button type="button" aria-label="Decrease quantity of ${nameAttr}" onclick="CartPage.updateQty(${product.id}, ${item.qty - 1}, ${item.isSubscription})">−</button>
                 <div class="qty-value">${item.qty}</div>
-                <button onclick="CartPage.updateQty(${product.id}, ${item.qty + 1}, ${item.isSubscription})">+</button>
+                <button type="button" aria-label="Increase quantity of ${nameAttr}" onclick="CartPage.updateQty(${product.id}, ${item.qty + 1}, ${item.isSubscription})">+</button>
               </div>
-              <span class="cart-item-remove" onclick="CartPage.remove(${product.id}, ${item.isSubscription})">Remove</span>
+              <button type="button" class="cart-item-remove" aria-label="Remove ${nameAttr} from cart" onclick="CartPage.remove(${product.id}, ${item.isSubscription})">Remove</button>
             </div>
           </div>
           <div class="cart-item-price" style="display: none;"></div>
@@ -77,7 +78,7 @@ const CartPage = (() => {
     const checkoutDisabled = missingShopifyItems.length > 0;
 
     document.getElementById('order-summary').innerHTML = `
-      <h3>Cart Summary</h3>
+      <h2>Cart Summary</h2>
       <div style="margin-bottom: var(--space-4); padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid rgba(34, 197, 94, 0.35); background: rgba(34, 197, 94, 0.10); font-size: var(--fs-sm); line-height: var(--lh-relaxed);">
         <strong>Secure checkout:</strong> Final pricing, discounts, taxes, shipping, payment, and order creation are confirmed securely before payment.
       </div>
@@ -103,7 +104,7 @@ const CartPage = (() => {
       </div>
 
       <div class="promo-code">
-        <input type="text" id="promo-input" placeholder="Discount code (e.g. WELCOME15)" value="${activeCode || ''}" maxlength="64" autocomplete="off">
+        <input type="text" id="promo-input" aria-label="Discount code" placeholder="Discount code (e.g. WELCOME15)" value="${activeCode || ''}" maxlength="64" autocomplete="off">
         <button onclick="CartPage.applyPromo()">Apply</button>
       </div>
       <div id="promo-note" style="font-size: var(--fs-xs); color: var(--color-text-muted); margin-bottom: var(--space-4);">
@@ -112,6 +113,7 @@ const CartPage = (() => {
 
       ${checkoutDisabled ? `<div style="font-size: var(--fs-sm); color: var(--color-error); margin-bottom: var(--space-4);">One or more items cannot be checked out yet.</div>` : ''}
       <button id="checkout-btn" class="btn btn-primary btn-block btn-lg" onclick="CartPage.startShopifyCheckout()" ${checkoutDisabled ? 'disabled' : ''}>Proceed to Secure Checkout</button>
+      <div id="checkout-error" role="alert" hidden style="margin-top: var(--space-3); padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--color-error); background: rgba(229, 57, 53, 0.08); font-size: var(--fs-sm); line-height: var(--lh-relaxed);"></div>
       <a href="shop.html" class="btn btn-secondary btn-block btn-lg" style="margin-top: var(--space-3);">Continue Shopping</a>
 
       ${WowStore.FEATURES.loyalty ? `<div style="text-align: center; margin-top: var(--space-4); padding: var(--space-3); background: rgba(var(--color-primary-rgb), 0.06); border-radius: var(--radius-md);">
@@ -145,9 +147,31 @@ const CartPage = (() => {
     renderSummary();
   }
 
+  // Shown in place of the raw exception text: the shopper only needs to know their
+  // cart is safe, that they can retry, and how to reach a person.
+  const CHECKOUT_ERROR_MESSAGE = 'We couldn’t open secure checkout just now. Your cart is saved. Please check your connection and try again.';
+
+  function showCheckoutError() {
+    const box = document.getElementById('checkout-error');
+    if (!box) return;
+    box.innerHTML = `
+      <p style="margin: 0 0 var(--space-2);"><strong>Checkout didn’t start.</strong> ${CHECKOUT_ERROR_MESSAGE}</p>
+      <button type="button" class="btn btn-secondary btn-block" id="checkout-retry-btn" onclick="CartPage.startShopifyCheckout()">Try again</button>
+      <p style="margin: var(--space-2) 0 0;">Still stuck? Email <a href="mailto:support@mywowpet.com?subject=Checkout%20problem" style="color: inherit; text-decoration: underline;">support@mywowpet.com</a> and we’ll help you complete your order.</p>`;
+    box.hidden = false;
+  }
+
+  function hideCheckoutError() {
+    const box = document.getElementById('checkout-error');
+    if (!box) return;
+    box.hidden = true;
+    box.innerHTML = '';
+  }
+
   async function startShopifyCheckout() {
     const btn = document.getElementById('checkout-btn');
     const originalText = btn ? btn.textContent : '';
+    hideCheckoutError();
     if (btn) {
       btn.disabled = true;
       btn.textContent = 'Preparing Secure Checkout...';
@@ -183,7 +207,7 @@ const CartPage = (() => {
       window.location.href = checkoutHref;
     } catch (err) {
       console.error('[My Wow Pet] Secure checkout handoff failed:', err);
-      WowApp.showToast(err.message || 'Secure checkout could not be started.', '❌');
+      showCheckoutError();
       if (btn) {
         btn.disabled = false;
         btn.textContent = originalText;

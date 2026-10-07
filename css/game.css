@@ -397,6 +397,7 @@
   50% { box-shadow: 0 0 40px rgba(var(--color-primary-rgb), 0.25); }
 }
 
+.results-reward h3,
 .results-reward h4 {
   color: var(--color-primary-light);
   font-family: var(--font-accent);
@@ -446,6 +447,7 @@
   max-width: 400px;
 }
 
+.game-leaderboard h3,
 .game-leaderboard h4 {
   font-family: var(--font-accent);
   font-size: var(--fs-sm);
@@ -506,6 +508,7 @@
 .game-nav-back {
   display: flex;
   align-items: center;
+  min-height: 24px;
   gap: var(--space-2);
   color: rgba(255,255,255,0.6);
   font-family: var(--font-accent);

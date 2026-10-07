@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Use Pet-Check AI first-aid diagnostic tool to analyze symptoms, get immediate triage advice, and product recommendations.">
-  <title>Pet-Check AI Triage | My Wow Pet</title>
+  <meta name="description" content="Pet Symptom Guide: general first-aid information for common pet symptoms and signs that mean it is time to call your vet. Not veterinary advice.">
+  <title>Pet Symptom Guide | My Wow Pet</title>
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
@@ -17,6 +17,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="My Wow Pet">
+  <link rel="icon" href="assets/images/icon-192x192.png">
   <link rel="apple-touch-icon" href="assets/images/icon-192x192.png">
 </head>
 <body>
@@ -28,9 +29,15 @@
       
       <!-- Page Header -->
       <div class="check-header text-center mb-10">
-        <span class="section-label">👩‍⚕️ First-Aid Diagnostic</span>
-        <h1 class="check-title">Pet-Check <span class="logo-accent">AI</span></h1>
-        <p class="section-subtitle">Real-time symptom checker, home-care instructions, and veterinary triage guidance.</p>
+        <span class="section-label">👩‍⚕️ General Pet Health Information</span>
+        <h1 class="check-title">Pet Symptom <span class="logo-accent">Guide</span></h1>
+        <p class="section-subtitle">Look up common symptoms, general home-care tips, and signs that mean it's time to call your vet.</p>
+      </div>
+
+      <!-- Prominent medical disclaimer -->
+      <div class="check-disclaimer" role="note" id="check-disclaimer">
+        <strong>General information only, not veterinary advice.</strong>
+        This guide matches words in your description to general care information. It cannot examine or assess your pet. Always consult your vet, and if your pet may be in danger, contact an emergency vet now.
       </div>
 
       <!-- Main Layout: Grid split -->
@@ -39,7 +46,7 @@
         <!-- Left Column: Interactive Intake Canvas (Pet Body Mapper) -->
         <div class="intake-canvas-card">
           <div class="canvas-header">
-            <h3>Interactive Body Mapper</h3>
+            <h2>Interactive Body Mapper</h2>
             <p class="text-sm text-muted">Click a region on the pet avatar to view specific symptoms.</p>
           </div>
           
@@ -203,22 +210,22 @@
         <!-- Right Column: Intake Query Console -->
         <div class="query-console-card">
           <div class="console-header">
-            <h3>Diagnostic Intake</h3>
-            <p class="text-sm text-muted">Provide details regarding your pet's behavioral signs.</p>
+            <h2>Describe What You're Seeing</h2>
+            <p class="text-sm text-muted">Tell us what you've noticed about your pet.</p>
           </div>
 
           <!-- Anatomical Region Symptoms Panel (Populated dynamically) -->
           <div class="region-symptom-selector" id="region-symptom-selector" style="display: none;">
             <div class="selected-region-header">
               <span id="selected-region-title">Ears Symptoms</span>
-              <button class="close-region-btn" onclick="PetCheckPage.clearSelectedRegion()">&times;</button>
+              <button type="button" class="close-region-btn" onclick="PetCheckPage.clearSelectedRegion()" aria-label="Close symptom list">&times;</button>
             </div>
             <div class="symptom-tag-container" id="symptom-tag-container">
               <!-- Symptom tags injected dynamically -->
             </div>
           </div>
 
-          <form class="query-form" id="query-form" onsubmit="PetCheckPage.runDiagnostic(event)">
+          <form class="query-form" id="query-form" onsubmit="PetCheckPage.runCheck(event)">
             <div class="input-group">
               <label for="symptom-input">Describe symptoms in your own words</label>
               <textarea id="symptom-input" placeholder="e.g. My golden retriever is limping on his front paw, panting heavily, and seems lethargic." rows="5" required></textarea>
@@ -236,14 +243,14 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-block btn-lg" id="run-check-btn">
-              🩺 Run Diagnostics
+              🩺 Show General Guidance
             </button>
           </form>
         </div>
 
       </div>
 
-      <!-- Section: Diagnostic Outputs & Actionable Triage Results (Hidden by default) -->
+      <!-- Section: General guidance results (Hidden by default) -->
       <div class="results-wrapper section" id="results-wrapper" style="display: none; margin-top: var(--space-8);">
         
         <!-- Color-Coded Severity Indicator Banner -->
@@ -260,7 +267,7 @@
           
           <!-- Column 1: Immediate Triage First-Aid Guides -->
           <div class="first-aid-card">
-            <h3><span class="card-icon">🩹</span> Initial First-Aid Fixes</h3>
+            <h3><span class="card-icon">🩹</span> General First-Aid Steps</h3>
             <ul class="first-aid-steps" id="first-aid-steps">
               <!-- Steps injected dynamically -->
             </ul>
@@ -282,71 +289,58 @@
 
         </div>
 
-        <!-- Section: Curated Stores recommendations loop -->
-        <div class="store-recommendations-section mt-8" id="store-recommendations-section" style="display: none;">
-          <h3 class="mb-4">🌿 Curated Recovery Essentials</h3>
-          <p class="text-muted text-sm mb-6">Based on the reported symptoms, these premium recovery products can support your pet's comfort and rehabilitation.</p>
-          <div class="horizontal-scroll" id="recommended-products-grid">
-            <!-- Product cards injected dynamically -->
-          </div>
-        </div>
+        <p class="check-results-note mt-6">This is general information, not veterinary advice. If symptoms persist or get worse, contact your vet.</p>
+
+        <!-- Neutral shop link (never shown with emergency results) -->
+        <p class="check-shop-link mt-4" id="check-shop-link">
+          <a href="shop.html?category=health">Shop wellness</a>
+        </p>
 
       </div>
 
     </div>
   </div>
 
-  <!-- Full-Screen Emergency Red-Flag Intercept Overlay -->
-  <div class="emergency-overlay" id="emergency-overlay" style="display: none;">
+  <!-- Full-Screen Emergency Overlay -->
+  <div class="emergency-overlay" id="emergency-overlay" style="display: none;" role="alertdialog" aria-modal="true" aria-labelledby="emergency-title" aria-describedby="emergency-alert-text">
     <div class="emergency-modal">
       <div class="emergency-header">
-        <span class="alert-pulse">🔴</span>
-        <h2>CRITICAL LIFE-THREATENING EMERGENCY DETECTED</h2>
+        <span class="alert-pulse" aria-hidden="true">🔴</span>
+        <h2 id="emergency-title" tabindex="-1">This may be an emergency — contact a veterinarian now</h2>
       </div>
       
       <div class="emergency-body">
-        <p class="emergency-alert-text">Based on your input, your pet is showing critical "Red Flag" symptoms that require immediate, professional emergency veterinary medical care. <strong>Do not attempt home remedies.</strong></p>
+        <p class="emergency-alert-text" id="emergency-alert-text">What you described can be a sign of a serious problem. Call your vet or the nearest emergency vet right away. <strong>Do not wait to see if it improves, and do not try home remedies.</strong></p>
         
         <div class="emergency-instructions">
-          <h4>Immediate Actions:</h4>
+          <h3>What to do now:</h3>
           <ul>
-            <li><strong>Transport Immediately:</strong> Secure your pet in a carrier or wrap them gently in a blanket and head to the nearest emergency clinic.</li>
-            <li><strong>Do Not Induce Vomiting:</strong> Unless specifically instructed by animal poison control specialists.</li>
-            <li><strong>Call Ahead:</strong> Phone the clinic while en route so their medical staff can prepare for your arrival.</li>
+            <li><strong>Call ahead:</strong> Phone your vet or an emergency clinic so they can tell you what to do and prepare for your arrival.</li>
+            <li><strong>Do not induce vomiting</strong> unless a veterinarian or poison control specialist tells you to.</li>
+            <li><strong>Travel safely:</strong> Keep your pet calm and secure in a carrier or wrapped gently in a blanket.</li>
           </ul>
         </div>
 
         <div class="emergency-hotlines">
           <div class="hotline-box">
-            <strong>📞 ASPCA Animal Poison Control</strong>
-            <a href="tel:8884264435" class="hotline-link">(888) 426-4435</a>
+            <strong>📞 ASPCA Animal Poison Control Center</strong>
+            <a href="tel:+18884264435" class="hotline-link">(888) 426-4435</a>
+            <span class="hotline-note">A consultation fee may apply.</span>
           </div>
           <div class="hotline-box">
             <strong>📞 Pet Poison Helpline</strong>
-            <a href="tel:8557647661" class="hotline-link">(855) 764-7661</a>
+            <a href="tel:+18557647661" class="hotline-link">(855) 764-7661</a>
+            <span class="hotline-note">A consultation fee may apply.</span>
           </div>
         </div>
 
-        <!-- Emergency Clinic Map Widget Mock -->
-        <div class="emergency-map-card">
-          <div class="map-header">
-            <span>📍 Nearest 24/7 Veterinary Emergencies</span>
-            <span class="gps-badge">GPS Enabled</span>
-          </div>
-          <div class="map-placeholder">
-            <div class="mock-map-marker marker-1">
-              <span class="marker-pulse"></span>🐾 Emergency Vet Clinic A (0.8 mi)
-            </div>
-            <div class="mock-map-marker marker-2">
-              <span class="marker-pulse"></span>🐾 24/7 Animal Trauma Center (2.4 mi)
-            </div>
-            <div class="map-watermark">Map Data Simulation &copy; Google Maps</div>
-          </div>
-        </div>
+        <p class="emergency-find-vet">
+          <a href="https://www.google.com/maps/search/emergency+vet+near+me" target="_blank" rel="noopener" class="emergency-find-vet-link">📍 Find an emergency vet near you</a>
+        </p>
 
         <div class="emergency-footer">
-          <button class="btn btn-primary btn-block btn-lg" onclick="PetCheckPage.dismissEmergency()">
-            Dismiss Alert & Continue
+          <button type="button" class="btn btn-primary btn-block btn-lg" onclick="PetCheckPage.dismissEmergency()">
+            Close this message
           </button>
         </div>
       </div>
@@ -356,7 +350,7 @@
   <!-- Legal Sticky Disclaimer Footer -->
   <footer class="disclaimer-sticky-footer">
     <div class="container">
-      <p>⚠️ <strong>Medical Disclaimer:</strong> Pet-Check AI is an educational triage assistant and does not replace professional veterinary medicine, diagnosis, or treatment. If your pet is in severe distress, go to an emergency clinic immediately.</p>
+      <p>⚠️ <strong>General information only, not veterinary advice.</strong> The Pet Symptom Guide does not replace an exam or treatment by a veterinarian. Always consult your vet. If your pet is in severe distress, contact an emergency vet immediately.</p>
     </div>
   </footer>
 

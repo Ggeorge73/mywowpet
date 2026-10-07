@@ -126,7 +126,7 @@ strong { font-weight: var(--fw-semibold); }
 
 /* ---- Focus Styles ---- */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
@@ -195,7 +195,7 @@ strong { font-weight: var(--fw-semibold); }
 .text-xl { font-size: var(--fs-xl); }
 .text-muted { color: var(--color-text-muted); }
 .text-secondary { color: var(--color-text-secondary); }
-.text-primary { color: var(--color-primary); }
+.text-primary { color: var(--color-primary-text); }
 .text-accent { font-family: var(--font-accent); }
 .font-heading { font-family: var(--font-heading); }
 .font-medium { font-weight: var(--fw-medium); }
@@ -273,7 +273,7 @@ strong { font-weight: var(--fw-semibold); }
 
 .btn-primary {
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  color: var(--color-text-inverse);
+  color: var(--color-on-primary);
   box-shadow: 0 4px 14px rgba(var(--color-primary-rgb), 0.35);
 }
 
@@ -294,20 +294,20 @@ strong { font-weight: var(--fw-semibold); }
 
 .btn-secondary:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary-dark);
+  color: var(--color-primary-text);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
 
 .btn-outline {
   background: transparent;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   border: 2px solid var(--color-primary);
 }
 
 .btn-outline:hover {
   background: var(--color-primary);
-  color: var(--color-text-inverse);
+  color: var(--color-on-primary);
   transform: translateY(-1px);
 }
 
@@ -376,7 +376,7 @@ strong { font-weight: var(--fw-semibold); }
   font-weight: var(--fw-semibold);
   text-transform: uppercase;
   letter-spacing: var(--ls-widest);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   margin-bottom: var(--space-4);
 }
 
@@ -591,6 +591,15 @@ textarea:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
+}
+
+/* Keyboard focus must stay visible: the soft glow above is too faint on its own. */
+.input:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .input::placeholder,

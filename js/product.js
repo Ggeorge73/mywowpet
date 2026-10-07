@@ -10,10 +10,8 @@ const ProductPage = (() => {
   let autoOpenReviewForm = false;
 
   async function init() {
-    console.error('=== DEBUG ===', window.location.href, window.location.search);
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    console.error('=== DEBUG ID ===', id);
     product = WowStore.getProduct(id);
 
     if (product && typeof WowFirebase !== 'undefined') {
@@ -44,17 +42,20 @@ const ProductPage = (() => {
       document.getElementById('product-detail').innerHTML = `
         <div class="empty-state" style="grid-column: 1 / -1;">
           <div class="empty-state-icon">🔍</div>
-          <h3>Product Not Found</h3>
+          <h2>Product Not Found</h2>
           <p>Sorry, we couldn't find that product.</p>
           <a href="shop.html" class="btn btn-primary">Browse All Products</a>
         </div>`;
       document.getElementById('product-tabs-section').style.display = 'none';
       document.getElementById('fbt-container').style.display = 'none';
       document.getElementById('related-section').style.display = 'none';
+      // Soft 404: keep "not found" URLs out of search indexes.
+      document.title = 'Product Not Found | My Wow Pet';
+      setHeadTag('meta', 'name', 'robots', 'content', 'noindex');
       return;
     }
 
-    document.title = `${product.name} | My Wow Pet`;
+    setProductMeta();
     renderBreadcrumbs();
     renderProduct();
     syncShopifyProduct();
@@ -74,6 +75,26 @@ const ProductPage = (() => {
         WowApp.renderRecentlyViewed('recently-viewed-grid');
       }
     }, 300);
+  }
+
+  // Upsert a <meta>/<link> in <head> by its identifying attribute.
+  function setHeadTag(tag, keyAttr, keyValue, valueAttr, value) {
+    let el = [...document.head.querySelectorAll(tag)].find(node => node.getAttribute(keyAttr) === keyValue);
+    if (!el) {
+      el = document.createElement(tag);
+      el.setAttribute(keyAttr, keyValue);
+      document.head.appendChild(el);
+    }
+    el.setAttribute(valueAttr, value);
+  }
+
+  function setProductMeta() {
+    document.title = `${product.name} | My Wow Pet`;
+    const summary = String(product.description || '').trim();
+    const description = summary.length > 155 ? `${summary.slice(0, 152).trimEnd()}...` : summary;
+    if (description) setHeadTag('meta', 'name', 'description', 'content', description);
+    // Root-relative on purpose: one canonical per product id regardless of extra query params.
+    setHeadTag('link', 'rel', 'canonical', 'href', `/product?id=${encodeURIComponent(product.id)}`);
   }
 
   async function syncShopifyProduct() {
@@ -260,7 +281,7 @@ const ProductPage = (() => {
   }
 
   function changeQty(delta) {
-    qty = Math.max(1, qty + delta);
+    qty = WowStore.clampCartQty(qty + delta);
     document.getElementById('qty-display').textContent = qty;
     updateAddButton();
   }
@@ -353,7 +374,7 @@ const ProductPage = (() => {
     const reviewsTabHtml = `
       <div class="flex justify-between items-center mb-6" style="padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border-light);">
         <div>
-          <h4 style="margin: 0; font-size: var(--fs-lg);">Customer Reviews</h4>
+          <h2 style="margin: 0; font-size: var(--fs-lg);">Customer Reviews</h2>
           <div class="flex items-center gap-2 mt-1">
             ${WowStore.renderRatingSummary(product.id, { emptyText: '' })}
           </div>
@@ -363,7 +384,7 @@ const ProductPage = (() => {
 
       <!-- Expandable Review Form Container -->
       <div id="review-write-form-container" style="display: none; margin-bottom: var(--space-6); padding: var(--space-5); background: var(--color-bg-alt, rgba(255,255,255,0.03)); border-radius: var(--radius-lg); border: 1px solid var(--color-border-light);">
-        <h4 style="margin-top: 0; margin-bottom: var(--space-4);">Write a Customer Review</h4>
+        <h3 style="margin-top: 0; margin-bottom: var(--space-4); font-size: var(--fs-xl);">Write a Customer Review</h3>
         <form id="review-write-form" onsubmit="ProductPage.handleReviewSubmit(event)">
           <!-- Star Rating Selection -->
           <div style="margin-bottom: var(--space-4);">
@@ -578,7 +599,7 @@ const ProductPage = (() => {
 
     document.getElementById('fbt-container').innerHTML = `
       <div class="fbt-section">
-        <h3>Pairs Well Together</h3>
+        <h2 style="font-size: var(--fs-2xl);">Pairs Well Together</h2>
         <div class="fbt-items">
           ${allProducts.map((p, i) => `
             ${i > 0 ? '<span class="fbt-plus">+</span>' : ''}

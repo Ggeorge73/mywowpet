@@ -17,6 +17,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="My Wow Pet">
+  <link rel="icon" href="assets/images/icon-192x192.png">
   <link rel="apple-touch-icon" href="assets/images/icon-192x192.png">
   <style>
     .faq-section {
@@ -25,7 +26,7 @@
     .faq-title {
       font-size: var(--fs-lg);
       margin-bottom: var(--space-4);
-      color: var(--color-primary);
+      color: var(--color-primary-text);
       display: flex;
       align-items: center;
       gap: var(--space-2);
@@ -57,7 +58,7 @@
     summary::after {
       content: '+';
       font-size: 1.2em;
-      color: var(--color-primary);
+      color: var(--color-primary-text);
       transition: transform var(--transition-fast);
     }
     details[open] summary::after {
@@ -65,7 +66,7 @@
     }
     details[open] summary {
       margin-bottom: var(--space-3);
-      color: var(--color-primary);
+      color: var(--color-primary-text);
     }
     .faq-content {
       color: var(--color-text-secondary);
@@ -140,7 +141,7 @@
         </details>
         <details>
           <summary>How do I start a return?</summary>
-          <div class="faq-content">Simply head to our <a href="returns.html" style="color:var(--color-primary);">Returns page</a> or contact our support team with your order number. We'll provide you with a prepaid return label.</div>
+          <div class="faq-content">Simply head to our <a href="returns.html" style="color:var(--color-primary-text);">Returns page</a> or contact our support team with your order number. We'll provide you with a prepaid return label.</div>
         </details>
         <details>
           <summary>How long do refunds take?</summary>

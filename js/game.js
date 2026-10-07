@@ -276,7 +276,7 @@ const PetGame = (() => {
 
     const rankClasses = ['gold', 'silver', 'bronze', 'normal', 'normal'];
 
-    leaderboard.innerHTML = `<h4>🏆 Leaderboard</h4>
+    leaderboard.innerHTML = `<h3>🏆 Leaderboard</h3>
       ${entries.map((e, i) => `
         <div class="leaderboard-entry" ${e.highlight ? 'style="background: rgba(var(--color-primary-rgb), 0.1); border: 1px solid rgba(var(--color-primary-rgb), 0.2);"' : ''}>
           <span class="leaderboard-rank ${rankClasses[i]}">${i + 1}</span>

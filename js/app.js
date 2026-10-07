@@ -175,7 +175,7 @@ const WowApp = (() => {
             </div>
           </div>
           <div class="footer-column">
-            <h4>Shop</h4>
+            <h2 class="footer-heading">Shop</h2>
             <div class="footer-links">
               <a href="shop.html?pet=dog">Dogs</a>
               <a href="shop.html?pet=cat">Cats</a>
@@ -185,7 +185,7 @@ const WowApp = (() => {
             </div>
           </div>
           <div class="footer-column">
-            <h4>Support</h4>
+            <h2 class="footer-heading">Support</h2>
             <div class="footer-links">
               <a href="help.html">Help Center</a>
               <a href="shipping.html">Shipping Info</a>
@@ -195,18 +195,25 @@ const WowApp = (() => {
             </div>
           </div>
           <div class="footer-column">
-            <h4>Stay Connected</h4>
+            <h2 class="footer-heading">Stay Connected</h2>
             <p class="footer-desc" style="margin-bottom: var(--space-4);">New customers: 15% off your first order with code WELCOME15 at checkout.</p>
             <div class="footer-newsletter">
-              <form class="footer-newsletter-form" onsubmit="event.preventDefault(); WowApp.showToast('Thanks! Use code WELCOME15 at checkout for 15% off your first order.', '🎉'); this.reset();">
-                <input type="email" placeholder="Your email" required>
-                <button type="submit">Join</button>
+              <form class="footer-newsletter-form" id="footer-newsletter-form" novalidate>
+                <div class="footer-newsletter-row">
+                  <input type="email" id="footer-newsletter-email" name="email" placeholder="Your email" aria-label="Email address for offers and store updates" autocomplete="email" maxlength="254" required>
+                  <button type="submit">Join</button>
+                </div>
+                <label class="footer-newsletter-consent" for="footer-newsletter-consent">
+                  <input type="checkbox" id="footer-newsletter-consent" name="consent">
+                  <span>I’d like launch news, pet tips, and offers from My Wow Pet by email. Unsubscribe anytime.</span>
+                </label>
+                <p class="footer-newsletter-status" id="footer-newsletter-status" role="status" aria-live="polite"></p>
               </form>
             </div>
           </div>
         </div>
         <div class="footer-bottom">
-          <span class="footer-copyright">© 2025 My Wow Pet. All rights reserved. Made with ❤️ for pets.</span>
+          <span class="footer-copyright">© ${new Date().getFullYear()} My Wow Pet. All rights reserved. Made with ❤️ for pets.</span>
           <div class="footer-payment-icons">
             <span title="Visa">💳</span>
             <span title="Mastercard">💳</span>
@@ -217,6 +224,65 @@ const WowApp = (() => {
         </div>
       </div>
     </footer>`;
+  }
+
+  // ---- Footer Newsletter ----
+  // Writes to the same `launchSignups` collection as the coming-soon form, and only
+  // with explicit marketing consent. Success is shown only once the write resolves.
+  function initFooterNewsletter() {
+    const form = document.getElementById('footer-newsletter-form');
+    if (!form) return;
+    const emailInput = document.getElementById('footer-newsletter-email');
+    const consentInput = document.getElementById('footer-newsletter-consent');
+    const status = document.getElementById('footer-newsletter-status');
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    const setStatus = (message, type) => {
+      status.textContent = message;
+      status.className = `footer-newsletter-status${type ? ` is-${type}` : ''}`;
+    };
+
+    form.addEventListener('input', () => {
+      setStatus('', '');
+      emailInput.removeAttribute('aria-invalid');
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = emailInput.value.trim().toLowerCase();
+
+      if (!email || !emailInput.validity.valid) {
+        emailInput.setAttribute('aria-invalid', 'true');
+        setStatus('Please enter a valid email address.', 'error');
+        emailInput.focus();
+        return;
+      }
+      if (!consentInput.checked) {
+        setStatus('Please tick the box to confirm you’d like emails from us.', 'error');
+        consentInput.focus();
+        return;
+      }
+
+      submitButton.disabled = true;
+      setStatus('Signing you up…', '');
+      try {
+        await whenFirebaseReady();
+        const firebaseService = window.WowFirebase;
+        if (!firebaseService || typeof firebaseService.saveNewsletterSignup !== 'function') {
+          throw new Error('newsletter-service-unavailable');
+        }
+        const result = await firebaseService.saveNewsletterSignup(email, { consent: true, source: 'footer' });
+        form.reset();
+        setStatus(result === 'already-subscribed'
+          ? 'You’re already on the list. Thanks for being part of the pack!'
+          : 'You’re subscribed! New customers can use code WELCOME15 at checkout for 15% off a first order.', 'success');
+      } catch (err) {
+        console.error('[My Wow Pet] Newsletter signup failed:', err);
+        setStatus('We couldn’t sign you up just now. Please try again in a moment.', 'error');
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
   }
 
   // ---- Navbar HTML ----
@@ -235,14 +301,14 @@ const WowApp = (() => {
         </a>
         <div class="nav-links">
           <a href="shop.html" class="nav-link ${activePage === 'shop' ? 'active' : ''}">Shop</a>
-          <a href="check.html" class="nav-link ${activePage === 'check' ? 'active' : ''}">🩺 Pet-Check AI</a>
+          <a href="check.html" class="nav-link ${activePage === 'check' ? 'active' : ''}">🩺 Symptom Guide</a>
           <a href="game.html" class="nav-link ${activePage === 'game' ? 'active' : ''}">🧠 Play & Learn</a>
           ${WowStore.FEATURES.subscriptions ? `<a href="subscribe.html" class="nav-link ${activePage === 'subscribe' ? 'active' : ''}">Subscribe & Save</a>` : ''}
           <a href="profile.html" class="nav-link ${activePage === 'profile' ? 'active' : ''}">My Pets</a>
         </div>
         <div class="nav-search">
           <span class="search-icon">🔍</span>
-          <input type="search" placeholder="Search products..." id="nav-search-input" autocomplete="off">
+          <input type="search" placeholder="Search products..." id="nav-search-input" aria-label="Search products" autocomplete="off">
         </div>
         <div class="nav-actions">
           <button class="nav-action-btn" id="dark-mode-btn" onclick="WowApp.toggleDarkMode()" title="Toggle dark mode" style="font-size:18px;">🌙</button>
@@ -264,13 +330,13 @@ const WowApp = (() => {
     <div class="mobile-menu" id="mobile-menu">
       <div class="mobile-search">
         <span class="search-icon">🔍</span>
-        <input type="search" placeholder="Search products..." id="mobile-search-input" autocomplete="off">
+        <input type="search" placeholder="Search products..." id="mobile-search-input" aria-label="Search products" autocomplete="off">
       </div>
       <a href="shop.html?pet=dog" class="mobile-nav-link"><span class="link-icon">🐕</span> Dogs</a>
       <a href="shop.html?pet=cat" class="mobile-nav-link"><span class="link-icon">🐈</span> Cats</a>
       <a href="shop.html?pet=small-pet" class="mobile-nav-link"><span class="link-icon">🐹</span> Small Pets</a>
       <a href="shop.html?pet=bird" class="mobile-nav-link"><span class="link-icon">🦜</span> Birds</a>
-      <a href="check.html" class="mobile-nav-link"><span class="link-icon">🩺</span> Pet-Check AI</a>
+      <a href="check.html" class="mobile-nav-link"><span class="link-icon">🩺</span> Pet Symptom Guide</a>
       <a href="game.html" class="mobile-nav-link"><span class="link-icon">🧠</span> Play & Learn</a>
       ${WowStore.FEATURES.subscriptions ? '<a href="subscribe.html" class="mobile-nav-link"><span class="link-icon">🔄</span> Subscribe & Save</a>' : ''}
       <a href="profile.html" id="mobile-profile-link" class="mobile-nav-link"><span class="link-icon">👤</span> My Profile</a>
@@ -366,7 +432,7 @@ const WowApp = (() => {
           `).join('') + `
             <a href="shop.html?search=${encodeURIComponent(query)}" style="
               display:block;padding:12px 16px;text-align:center;
-              font-size:13px;color:var(--color-primary);font-weight:600;
+              font-size:13px;color:var(--color-primary-text);font-weight:600;
               text-decoration:none;background:var(--color-bg-alt,#f3ede3);
             ">See all results for "${WowStore.escapeHTML(query)}" →</a>
           `;
@@ -477,10 +543,15 @@ const WowApp = (() => {
     return Promise.reject(new Error('Account service is temporarily unavailable.'));
   }
 
+  function rejectUnavailableDataService() {
+    return Promise.reject(new Error('database-unavailable'));
+  }
+
   function installUnavailableAuthService() {
     clearMockAuthStorage();
+    const existingService = window.WowFirebase || {};
     window.WowFirebase = {
-      ...(window.WowFirebase || {}),
+      ...existingService,
       init: () => {},
       signInWithEmail: unavailableAuthMethod,
       signUpWithEmail: unavailableAuthMethod,
@@ -502,7 +573,10 @@ const WowApp = (() => {
       syncMockDataLocally: () => {},
       writeOrderToRootDb: () => Promise.resolve(),
       writeReview: () => Promise.resolve(),
-      fetchReviews: () => Promise.resolve([])
+      fetchReviews: () => Promise.resolve([]),
+      // Auth being unavailable does not stop Firestore writes when the SDK loaded.
+      submitContactMessage: existingService.submitContactMessage || rejectUnavailableDataService,
+      saveNewsletterSignup: existingService.saveNewsletterSignup || rejectUnavailableDataService
     };
   }
 
@@ -516,7 +590,25 @@ const WowApp = (() => {
     }
   }
 
+  // Settles once loadFirebaseAssets has installed a WowFirebase service (real, mock or
+  // unavailable). Forms that write to Firestore await it so a submit made while the
+  // SDK is still loading does not fail spuriously.
+  let resolveFirebaseReady;
+  const firebaseReady = new Promise((resolve) => { resolveFirebaseReady = resolve; });
+
+  function whenFirebaseReady() {
+    return firebaseReady;
+  }
+
   async function loadFirebaseAssets() {
+    try {
+      await installFirebaseAssets();
+    } finally {
+      resolveFirebaseReady();
+    }
+  }
+
+  async function installFirebaseAssets() {
     loadStyle("/css/auth-modal.css");
     injectAuthModal(); // Inject auth modal synchronously before scripts load!
 
@@ -634,12 +726,16 @@ const WowApp = (() => {
           authCallback = callback;
           callback(mockUser);
         },
+        getCurrentUser: () => mockUser,
         isMockMode: () => true,
         syncUserData: () => Promise.resolve(),
         syncMockDataLocally: () => {},
         writeOrderToRootDb: () => Promise.resolve(),
         writeReview: () => Promise.resolve(),
-        fetchReviews: () => Promise.resolve([])
+        fetchReviews: () => Promise.resolve([]),
+        // No database behind the mock: forms must report failure, never fake success.
+        submitContactMessage: rejectUnavailableDataService,
+        saveNewsletterSignup: rejectUnavailableDataService
       };
     })();
     enforceAuthAvailability();
@@ -652,7 +748,7 @@ const WowApp = (() => {
     <div class="modal-overlay" id="auth-modal">
       <div class="modal auth-modal">
         <div class="modal-header" style="border-bottom:none; padding-bottom:0;">
-          <button class="modal-close" onclick="WowApp.closeAuthModal()" style="margin-left:auto;">&#x2715;</button>
+          <button type="button" class="modal-close" onclick="WowApp.closeAuthModal()" aria-label="Close sign-in dialog" style="margin-left:auto;">&#x2715;</button>
         </div>
         <div class="auth-header-logo">
           <span>&#x1F43E;</span> My Wow <span class="logo-accent">Pet</span>
@@ -670,14 +766,14 @@ const WowApp = (() => {
         <form class="auth-form active" id="form-signin" onsubmit="WowApp.handleAuthSubmit(event, 'signin')">
           <div class="auth-input-wrapper">
             <span class="input-icon">&#x2709;&#xFE0F;</span>
-            <input type="email" placeholder="Email Address" id="signin-email" required>
+            <input type="email" placeholder="Email Address" id="signin-email" aria-label="Email address" autocomplete="email" required>
           </div>
           <div class="auth-input-wrapper">
             <span class="input-icon">&#x1F512;</span>
-            <input type="password" placeholder="Password" id="signin-password" required>
+            <input type="password" placeholder="Password" id="signin-password" aria-label="Password" autocomplete="current-password" required>
           </div>
           <div class="auth-form-footer">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <label class="auth-remember" style="display:flex; align-items:center; gap:6px; cursor:pointer;">
               <input type="checkbox" id="signin-remember"> Remember me
             </label>
             <button type="button" class="auth-forgot-link" onclick="WowApp.toggleForgotPassword(true)">Forgot Password?</button>
@@ -690,15 +786,15 @@ const WowApp = (() => {
         <form class="auth-form" id="form-signup" onsubmit="WowApp.handleAuthSubmit(event, 'signup')">
           <div class="auth-input-wrapper">
             <span class="input-icon">&#x1F464;</span>
-            <input type="text" placeholder="Full Name" id="signup-name" required>
+            <input type="text" placeholder="Full Name" id="signup-name" aria-label="Full name" autocomplete="name" required>
           </div>
           <div class="auth-input-wrapper">
             <span class="input-icon">&#x2709;&#xFE0F;</span>
-            <input type="email" placeholder="Email Address" id="signup-email" required>
+            <input type="email" placeholder="Email Address" id="signup-email" aria-label="Email address" autocomplete="email" required>
           </div>
           <div class="auth-input-wrapper">
             <span class="input-icon">&#x1F512;</span>
-            <input type="password" placeholder="Password" id="signup-password" required minlength="6">
+            <input type="password" placeholder="Password" id="signup-password" aria-label="Password (at least 6 characters)" autocomplete="new-password" required minlength="6">
           </div>
           <button type="submit" class="auth-btn-submit" id="btn-signup-submit">
             <span>Create Account</span>
@@ -710,7 +806,7 @@ const WowApp = (() => {
           <p style="color:var(--color-text-muted); font-size:var(--fs-xs); margin-bottom:var(--space-4); text-align:center; line-height:var(--lh-relaxed);">Enter your email address and we'll send you a link to reset your password.</p>
           <div class="auth-input-wrapper">
             <span class="input-icon">&#x2709;&#xFE0F;</span>
-            <input type="email" placeholder="Email Address" id="forgot-email" required>
+            <input type="email" placeholder="Email Address" id="forgot-email" aria-label="Email address" autocomplete="email" required>
           </div>
           <button type="submit" class="auth-btn-submit" id="btn-forgot-submit" style="margin-bottom:var(--space-3);">
             <span>Send Reset Link</span>
@@ -733,7 +829,7 @@ const WowApp = (() => {
         </div>
 
         <div class="auth-switch-msg" id="auth-switch-prompt" style="padding-bottom: var(--space-6);">
-          Don't have an account? <button onclick="WowApp.switchAuthTab('signup')">Create one</button>
+          Don't have an account? <button type="button" onclick="WowApp.switchAuthTab('signup')">Create one</button>
         </div>
       </div>
     </div>`;
@@ -1242,7 +1338,10 @@ const WowApp = (() => {
     if (navSlot) navSlot.innerHTML = getNavHTML(activePage);
 
     const footerSlot = document.getElementById('footer-slot');
-    if (footerSlot) footerSlot.innerHTML = getFooterHTML();
+    if (footerSlot) {
+      footerSlot.innerHTML = getFooterHTML();
+      initFooterNewsletter();
+    }
 
     initAnnouncements();
     initNavbar();
@@ -1286,7 +1385,8 @@ const WowApp = (() => {
     handleSocialAuth,
     handlePasswordReset,
     toggleForgotPassword,
-    initInstallPrompt
+    initInstallPrompt,
+    whenFirebaseReady
   };
 })();
 

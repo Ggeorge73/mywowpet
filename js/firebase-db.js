@@ -559,6 +559,110 @@ const WowFirebase = (() => {
     }
   }
 
+  // ---- Public write-only collections (contact form, newsletter) ----
+
+  // Compat Firestore keeps an unacknowledged write pending forever while offline, so a
+  // form would spin indefinitely. Give up after a while and let the caller say so.
+  const PUBLIC_WRITE_TIMEOUT_MS = 15000;
+
+  function withTimeout(promise, ms) {
+    let timer;
+    const timeout = new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error('write-timeout')), ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+  }
+
+  function requireDatabase() {
+    if (isMock || !db) {
+      return Promise.reject(new Error('database-unavailable'));
+    }
+    return null;
+  }
+
+  // Persists a contact-form message to `contactMessages`. firestore.rules make the
+  // collection create-only, so only the fields allowed there are sent. Resolves only
+  // once Firestore has acknowledged the write.
+  async function submitContactMessage(message) {
+    const unavailable = requireDatabase();
+    if (unavailable) return unavailable;
+
+    const data = {
+      name: message.name,
+      email: message.email,
+      subject: message.subject,
+      message: message.message,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (message.orderNumber) data.orderNumber = message.orderNumber;
+
+    await withTimeout(db.collection('contactMessages').add(data), PUBLIC_WRITE_TIMEOUT_MS);
+  }
+
+  // Newsletter signups share `launchSignups` and its document shape with the
+  // coming-soon form (js/coming-soon.js): the doc id is the SHA-256 of the email, so a
+  // repeat signup is a denied update rather than a duplicate row.
+  const SAVED_SIGNUPS_KEY = 'wow_launch_signups';
+
+  async function emailFingerprint(email) {
+    const bytes = new window.TextEncoder().encode(email);
+    const digest = await window.crypto.subtle.digest('SHA-256', bytes);
+    return Array.from(new Uint8Array(digest))
+      .map(byte => byte.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function readSavedSignups() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SAVED_SIGNUPS_KEY) || '[]');
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function rememberSignup(signupId) {
+    try {
+      const saved = readSavedSignups();
+      if (!saved.includes(signupId)) saved.push(signupId);
+      localStorage.setItem(SAVED_SIGNUPS_KEY, JSON.stringify(saved.slice(-20)));
+    } catch {
+      // Storage unavailable: a repeat signup will just show the generic error.
+    }
+  }
+
+  // Resolves to 'saved' or 'already-subscribed'; rejects when nothing was stored.
+  async function saveNewsletterSignup(email, { consent, source = 'footer' } = {}) {
+    if (consent !== true) {
+      return Promise.reject(new Error('consent-required'));
+    }
+    const unavailable = requireDatabase();
+    if (unavailable) return unavailable;
+
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    const signupId = await emailFingerprint(normalizedEmail);
+    try {
+      await withTimeout(db.collection('launchSignups').doc(signupId).set({
+        email: normalizedEmail,
+        petType: 'not-specified',
+        consent: true,
+        source,
+        offer: 'launch-15',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }), PUBLIC_WRITE_TIMEOUT_MS);
+    } catch (err) {
+      // Signup docs cannot be read back, so an existing signup surfaces as a denied
+      // update. Only treat it as a duplicate when this browser saved it before.
+      if (err && (err.code === 'already-exists'
+        || (err.code === 'permission-denied' && readSavedSignups().includes(signupId)))) {
+        return 'already-subscribed';
+      }
+      throw err;
+    }
+    rememberSignup(signupId);
+    return 'saved';
+  }
+
   // Fetch reviews for specific product
   async function fetchReviews(productId) {
     if (isMock) {
@@ -602,7 +706,9 @@ const WowFirebase = (() => {
     syncMockDataLocally,
     writeOrderToRootDb,
     writeReview,
-    fetchReviews
+    fetchReviews,
+    submitContactMessage,
+    saveNewsletterSignup
   };
 })();
 

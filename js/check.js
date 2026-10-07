@@ -1,5 +1,8 @@
 /* ============================================
-   WowPetStore — Pet-Check AI Logic Engine
+   WowPetStore — Pet Symptom Guide
+   Keyword matching to general care information.
+   This is not a diagnostic tool and must never be
+   described as AI or as veterinary advice.
    ============================================ */
 
 const PetCheckPage = (() => {
@@ -71,7 +74,7 @@ const PetCheckPage = (() => {
     "pale gums", "blue gums", "convulsion", "lethargic cat", "lethargic dog"
   ];
 
-  // Heuristic diagnostic data
+  // General care information per body region (keyword-matched, not a diagnosis)
   const triageData = {
     ears: {
       severity: "green",
@@ -84,8 +87,7 @@ const PetCheckPage = (() => {
         "Apply calming, soothing balm around the outer folds if raw from scratching.",
         "Monitor for 48 hours. If symptoms persist, or if foul odor and yellow/green discharge develop, consult your vet."
       ],
-      vetSummary: "Symptom: Ear itching/shaking head.\nAnatomical Part: Ears.\nDuration: 1-2 days.\nBehavior: Shaking head, scratching ears.\nSuspected Cause: Minor wax buildup, ear irritation, or mild yeast infection.",
-      products: [14, 23] // Calming Diffuser, Paw Balm
+      vetSummary: "Symptom: Ear itching/shaking head.\nAnatomical Part: Ears.\nDuration: 1-2 days.\nBehavior: Shaking head, scratching ears.\nPossible causes to ask your vet about: Minor wax buildup, ear irritation, or mild yeast infection."
     },
     eyes: {
       severity: "yellow",
@@ -98,8 +100,7 @@ const PetCheckPage = (() => {
         "Do not apply human eye drops or medications under any circumstances.",
         "If squinting, cloudiness, yellow discharge, or head tilting is observed, schedule a vet visit immediately."
       ],
-      vetSummary: "Symptom: Redness/watery discharge, head tilting, sneezing.\nAnatomical Part: Head/Eyes.\nDuration: Observed recently.\nBehavior: Squinting, rubbing eyes.\nSuspected Cause: Conjunctivitis, allergies, or early upper respiratory infection.",
-      products: [14, 12] // Calming Diffuser, Probiotic Daily
+      vetSummary: "Symptom: Redness/watery discharge, head tilting, sneezing.\nAnatomical Part: Head/Eyes.\nDuration: Observed recently.\nBehavior: Squinting, rubbing eyes.\nPossible causes to ask your vet about: Conjunctivitis, allergies, or early upper respiratory infection."
     },
     mouth: {
       severity: "yellow",
@@ -112,8 +113,7 @@ const PetCheckPage = (() => {
         "Remove neck collar pressure; utilize a harness for leash walking instead.",
         "If gums are pale, blue, or if breathing becomes labored, treat as an emergency immediately."
       ],
-      vetSummary: "Symptom: Coughing, drooling, gagging.\nAnatomical Part: Mouth/Throat.\nDuration: Active.\nBehavior: Lethargic, raspy breaths.\nSuspected Cause: Tracheal irritation, kennel cough, or dental swelling.",
-      products: [12, 14] // Probiotic, Calming Diffuser
+      vetSummary: "Symptom: Coughing, drooling, gagging.\nAnatomical Part: Mouth/Throat.\nDuration: Active.\nBehavior: Lethargic, raspy breaths.\nPossible causes to ask your vet about: Tracheal irritation, kennel cough, or dental swelling."
     },
     chest: {
       severity: "yellow",
@@ -126,8 +126,7 @@ const PetCheckPage = (() => {
         "Measure breathing rate: Count chest rises for 30 seconds and multiply by 2. If it exceeds 40 breaths/min while resting, see a vet.",
         "Keep the environment quiet to minimize exertion and anxiety."
       ],
-      vetSummary: "Symptom: Rapid breathing, panting heavily, wheezing.\nAnatomical Part: Chest/Lungs.\nDuration: Ongoing.\nBehavior: Reluctance to lie down, panting.\nSuspected Cause: Mild heat stress, respiratory irritation, or anxiety.",
-      products: [14, 21] // Calming Diffuser, Cozy Bed
+      vetSummary: "Symptom: Rapid breathing, panting heavily, wheezing.\nAnatomical Part: Chest/Lungs.\nDuration: Ongoing.\nBehavior: Reluctance to lie down, panting.\nPossible causes to ask your vet about: Mild heat stress, respiratory irritation, or anxiety."
     },
     stomach: {
       severity: "yellow",
@@ -140,8 +139,7 @@ const PetCheckPage = (() => {
         "Check hydration: Gently pull up the skin over the shoulders (scruff). If it does not snap back immediately, dehydration is present.",
         "Consult your vet if vomiting occurs more than 3 times in 24 hours, or if blood is visible in vomit or stool."
       ],
-      vetSummary: "Symptom: Vomiting, diarrhea, loss of appetite.\nAnatomical Part: Stomach/Abdomen.\nDuration: 1 day.\nBehavior: Lost appetite, curled up.\nSuspected Cause: Dietary indiscretion, minor food intolerance, or mild gastroenteritis.",
-      products: [12, 1] // Probiotics, Wilderness Salmon
+      vetSummary: "Symptom: Vomiting, diarrhea, loss of appetite.\nAnatomical Part: Stomach/Abdomen.\nDuration: 1 day.\nBehavior: Lost appetite, curled up.\nPossible causes to ask your vet about: Dietary indiscretion, minor food intolerance, or mild gastroenteritis."
     },
     paws: {
       severity: "yellow",
@@ -154,8 +152,7 @@ const PetCheckPage = (() => {
         "Apply a cold compress (ice pack wrapped in a towel) to any swollen joints for 10-15 minutes to reduce swelling.",
         "Prevent licking: Use an E-collar or slip a clean baby sock over the paw. If limping persists past 48 hours, seek veterinary care."
       ],
-      vetSummary: "Symptom: Limping, paw licking, leg swelling.\nAnatomical Part: Paws/Limbs.\nDuration: Recent onset.\nBehavior: Favoring leg, licking paw.\nSuspected Cause: Soft tissue sprain, paw pad cut, or broken nail.",
-      products: [13, 23, 21] // Joint Chews, Paw Balm, Cozy Bed
+      vetSummary: "Symptom: Limping, paw licking, leg swelling.\nAnatomical Part: Paws/Limbs.\nDuration: Recent onset.\nBehavior: Favoring leg, licking paw.\nPossible causes to ask your vet about: Soft tissue sprain, paw pad cut, or broken nail."
     },
     skin: {
       severity: "green",
@@ -168,8 +165,7 @@ const PetCheckPage = (() => {
         "Moisturize dry paw pads or nose with natural beeswax paw balm.",
         "Use a protective collar if your pet is chewing skin raw. Consult your vet regarding appropriate antihistamine dosages."
       ],
-      vetSummary: "Symptom: Scratching skin, hair loss, rash.\nAnatomical Part: Skin/Coat.\nDuration: 2-3 days.\nBehavior: Obsessive scratching/licking.\nSuspected Cause: Flea allergy dermatitis, environmental allergies, or hot spot.",
-      products: [23, 12, 14] // Paw Balm, Probiotics, Calming Diffuser
+      vetSummary: "Symptom: Scratching skin, hair loss, rash.\nAnatomical Part: Skin/Coat.\nDuration: 2-3 days.\nBehavior: Obsessive scratching/licking.\nPossible causes to ask your vet about: Flea allergy dermatitis, environmental allergies, or hot spot."
     },
     tail: {
       severity: "green",
@@ -182,14 +178,29 @@ const PetCheckPage = (() => {
         "Apply a cool compress to the tail base for 10 minutes if sore.",
         "See vet if tail is hanging completely limp or if pet vocalizes in pain when tail is touched."
       ],
-      vetSummary: "Symptom: Tail biting, tail down.\nAnatomical Part: Tail.\nDuration: Recent.\nBehavior: Tail limp, biting base.\nSuspected Cause: Tail muscle strain (limber tail) or flea nesting irritation.",
-      products: [23, 14] // Paw Balm, Calming Diffuser
+      vetSummary: "Symptom: Tail biting, tail down.\nAnatomical Part: Tail.\nDuration: Recent.\nBehavior: Tail limp, biting base.\nPossible causes to ask your vet about: Tail muscle strain (limber tail) or flea nesting irritation."
     }
   };
 
   function init() {
-    console.log("🐾 [WowPetStore] Pet-Check AI module initialized.");
     setPetMode('dog');
+    initHotspotKeyboard();
+  }
+
+  // The body-map hotspots are SVG groups; make them reachable and operable by keyboard.
+  function initHotspotKeyboard() {
+    document.querySelectorAll('.hotspot-group').forEach(group => {
+      const label = group.querySelector('.hotspot-label');
+      group.setAttribute('tabindex', '0');
+      group.setAttribute('role', 'button');
+      if (label) group.setAttribute('aria-label', label.textContent.replace(/^[^A-Za-z]+/, '').trim());
+      group.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectPart(group.dataset.part);
+        }
+      });
+    });
   }
 
   function setPetMode(mode) {
@@ -282,7 +293,7 @@ const PetCheckPage = (() => {
     }
   }
 
-  function runDiagnostic(e) {
+  function runCheck(e) {
     if (e) e.preventDefault();
     
     const input = document.getElementById('symptom-input');
@@ -413,8 +424,9 @@ const PetCheckPage = (() => {
     // Render Checklist text
     checklistBox.textContent = data.vetSummary + `\nReported Timeline: ${new Date().toLocaleDateString()}`;
 
-    // Render Store Recommendations
-    renderStoreRecommendations(data.products);
+    // Neutral shop link only; symptom results never recommend specific products.
+    const shopLink = document.getElementById('check-shop-link');
+    if (shopLink) shopLink.style.display = '';
 
     // Show results
     resultsWrapper.style.display = 'block';
@@ -426,44 +438,21 @@ const PetCheckPage = (() => {
     }
   }
 
-  function renderStoreRecommendations(productIds) {
-    const section = document.getElementById('store-recommendations-section');
-    const grid = document.getElementById('recommended-products-grid');
-    if (!section || !grid) return;
-
-    if (!productIds || productIds.length === 0) {
-      section.style.display = 'none';
-      return;
-    }
-
-    // Get matching products from store.js
-    const matched = productIds.map(id => WowStore.getProduct(id)).filter(p => p !== undefined);
-
-    if (matched.length === 0) {
-      section.style.display = 'none';
-      return;
-    }
-
-    // Render cards using WowApp if available
-    if (typeof WowApp !== 'undefined') {
-      grid.innerHTML = matched.map(p => WowApp.renderProductCard(p)).join('');
-      section.style.display = 'block';
-    } else {
-      section.style.display = 'none';
-    }
-  }
-
   function triggerEmergency() {
+    // Hide standard results (including the shop link) before showing the emergency message
+    const resultsWrapper = document.getElementById('results-wrapper');
+    if (resultsWrapper) {
+      resultsWrapper.style.display = 'none';
+    }
+    const shopLink = document.getElementById('check-shop-link');
+    if (shopLink) shopLink.style.display = 'none';
+
     const overlay = document.getElementById('emergency-overlay');
     if (overlay) {
       overlay.style.display = 'flex';
       document.body.style.overflow = 'hidden';
-    }
-    
-    // Hide standard results
-    const resultsWrapper = document.getElementById('results-wrapper');
-    if (resultsWrapper) {
-      resultsWrapper.style.display = 'none';
+      const title = document.getElementById('emergency-title');
+      if (title) title.focus();
     }
   }
 
@@ -473,6 +462,8 @@ const PetCheckPage = (() => {
       overlay.style.display = 'none';
       document.body.style.overflow = '';
     }
+    const submitBtn = document.getElementById('run-check-btn');
+    if (submitBtn) submitBtn.focus();
   }
 
   function copyChecklist() {
@@ -508,7 +499,7 @@ const PetCheckPage = (() => {
     clearSelectedRegion,
     addSymptomTag,
     setSymptomText,
-    runDiagnostic,
+    runCheck,
     dismissEmergency,
     copyChecklist
   };

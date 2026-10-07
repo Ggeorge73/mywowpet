@@ -83,7 +83,7 @@
 }
 
 .nav-logo .logo-accent {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .nav-links {
@@ -484,7 +484,7 @@
 }
 
 .mobile-menu .mobile-nav-link:hover {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .mobile-menu .mobile-nav-link .link-icon {
@@ -996,7 +996,7 @@
   background: var(--color-surface);
   border-color: var(--color-primary);
   box-shadow: var(--shadow-sm);
-  color: var(--color-primary-dark);
+  color: var(--color-primary-text);
   font-weight: var(--fw-semibold);
 }
 
@@ -1062,7 +1062,7 @@
 }
 
 .tab.active {
-  color: var(--color-primary-dark);
+  color: var(--color-primary-text);
   border-bottom-color: var(--color-primary);
   font-weight: var(--fw-semibold);
 }
@@ -1095,12 +1095,15 @@
 }
 
 .breadcrumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   color: var(--color-text-secondary);
   transition: color var(--duration-fast);
 }
 
 .breadcrumbs a:hover {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .breadcrumbs .separator {
@@ -1131,6 +1134,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  color: var(--color-text);
   padding: var(--space-4);
   cursor: pointer;
   font-family: var(--font-accent);
@@ -1167,6 +1173,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  width: 100%;
+  min-height: 32px;
+  text-align: left;
   padding: var(--space-2) 0;
   cursor: pointer;
   font-size: var(--fs-sm);
@@ -1193,7 +1202,7 @@
 .filter-option.active .filter-checkbox {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: white;
+  color: var(--color-on-primary);
 }
 
 .filter-option .count {
@@ -1264,7 +1273,7 @@
 }
 
 .loyalty-tier.active {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-weight: var(--fw-semibold);
 }
 
@@ -1338,7 +1347,7 @@
   transform: translateY(-2px);
 }
 
-.footer-column h4 {
+.footer-column .footer-heading {
   font-family: var(--font-accent);
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
@@ -1355,6 +1364,9 @@
 }
 
 .footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   font-size: var(--fs-sm);
   color: var(--color-dark-text-muted);
   transition: color var(--duration-fast);
@@ -1370,11 +1382,54 @@
 
 .footer-newsletter-form {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footer-newsletter-row {
+  display: flex;
   gap: var(--space-2);
 }
 
-.footer-newsletter-form input {
+.footer-newsletter-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-relaxed);
+  color: var(--color-dark-text-muted);
+  cursor: pointer;
+}
+
+.footer-newsletter-consent input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  accent-color: var(--color-primary);
+}
+
+.footer-newsletter-status {
+  min-height: 1em;
+  font-size: var(--fs-xs);
+  color: var(--color-dark-text-muted);
+}
+
+.footer-newsletter-status:empty {
+  display: none;
+}
+
+.footer-newsletter-status.is-success {
+  color: #86EFAC;
+}
+
+.footer-newsletter-status.is-error {
+  color: #FCA5A5;
+}
+
+.footer-newsletter-row input {
   flex: 1;
+  min-width: 0;
   padding: var(--space-3) var(--space-4);
   background: var(--color-dark-surface);
   border: 1.5px solid var(--color-dark-border);
@@ -1392,10 +1447,15 @@
   border-color: var(--color-primary);
 }
 
+.footer-newsletter-form input:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
 .footer-newsletter-form button {
   padding: var(--space-3) var(--space-5);
   background: var(--color-primary);
-  color: white;
+  color: var(--color-on-primary);
   font-family: var(--font-accent);
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
@@ -1476,8 +1536,10 @@
   opacity: 0.6;
 }
 
+.empty-state h2,
 .empty-state h3 {
   margin-bottom: var(--space-3);
+  font-size: var(--fs-2xl);
 }
 
 .empty-state p {
@@ -1610,7 +1672,7 @@
   gap: var(--space-2);
   margin-top: var(--space-2);
   font-size: var(--fs-xs);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-weight: var(--fw-medium);
 }
 
