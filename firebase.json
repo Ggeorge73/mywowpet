@@ -26,7 +26,9 @@
       "*.config.*",
       "serve.json",
       "firestore.rules",
-      "firestore.indexes.json"
+      "firestore.indexes.json",
+      "dist/**",
+      "scripts/**"
     ],
     "cleanUrls": true,
     "headers": [
