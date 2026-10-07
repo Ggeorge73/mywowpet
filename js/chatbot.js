@@ -7,6 +7,13 @@ const WowChatbot = (() => {
   const SUPPORT_EMAIL = "support@mywowpet.com";
   const STORAGE_KEY = "wow_chat_history";
   const MAX_HISTORY = 16;
+  // Mirror the storefront feature flags so the assistant never promises
+  // autoship pricing or loyalty rewards that checkout cannot honour.
+  const subscriptionsLive = Boolean(window.WowStore?.FEATURES?.subscriptions);
+  const loyaltyLive = Boolean(window.WowStore?.FEATURES?.loyalty);
+  // Shipping terms come from the single source in WowStore (js/store.js).
+  const FREE_SHIPPING_MIN = `$${window.WowStore?.FREE_SHIPPING_THRESHOLD}`;
+  const SHIPPING_FLAT = `$${Number(window.WowStore?.SHIPPING_FLAT_RATE).toFixed(2)}`;
 
   const fallbackPrompts = [
     "What is your shipping policy?",
@@ -20,7 +27,7 @@ const WowChatbot = (() => {
       id: "shipping",
       label: "Shipping",
       keywords: ["ship", "shipping", "delivery", "deliver", "freight", "postage", "arrive", "transit", "express", "overnight", "international", "apo", "fpo", "po box"],
-      answer: "My Wow Pet offers free standard shipping on orders over $49. Orders under $49 ship for $5.99. Standard delivery is usually 5-7 business days after 1-2 business days of processing. Express is 2-3 business days for $12.99, and overnight is 1 business day for $24.99. The store currently ships within the United States, including APO/FPO/DPO addresses. P.O. Boxes are supported with standard shipping only.",
+      answer: `My Wow Pet offers free standard shipping on orders over ${FREE_SHIPPING_MIN}. Orders under ${FREE_SHIPPING_MIN} ship for ${SHIPPING_FLAT}. Standard delivery is usually 5-7 business days after 1-2 business days of processing. Express is 2-3 business days for $12.99, and overnight is 1 business day for $24.99. The store currently ships within the United States, including APO/FPO/DPO addresses. P.O. Boxes are supported with standard shipping only.`,
       links: [{ label: "Shipping info", href: "shipping.html" }, { label: "Track order", href: "tracking.html" }]
     },
     {
@@ -34,8 +41,12 @@ const WowChatbot = (() => {
       id: "subscribe",
       label: "Subscribe & Save",
       keywords: ["subscribe", "subscription", "recurring", "auto ship", "autoship", "save", "frequency", "pause", "skip", "cancel subscription"],
-      answer: "Subscribe & Save gives 15% off eligible food, treats, hay, seed blends, and health items. You can choose a delivery schedule such as every 2, 4, 6, or 8 weeks, then manage, pause, skip, or cancel from your account. Items with a subscribe price on the product page qualify.",
-      links: [{ label: "Subscribe & Save", href: "subscribe.html" }, { label: "My pets", href: "profile.html#subscriptions" }]
+      answer: subscriptionsLive
+        ? "Subscribe & Save gives 15% off eligible food, treats, hay, seed blends, and health items. You can choose a delivery schedule such as every 2, 4, 6, or 8 weeks, then manage, pause, skip, or cancel from your account. Items with a subscribe price on the product page qualify."
+        : "Autoship (Subscribe & Save) is coming soon, so recurring deliveries and subscription pricing are not available yet. Every order is a one-time purchase at the price shown in your cart. Email support to join the autoship list.",
+      links: subscriptionsLive
+        ? [{ label: "Subscribe & Save", href: "subscribe.html" }, { label: "My pets", href: "profile.html#subscriptions" }]
+        : [{ label: "Join the autoship list", href: `mailto:${SUPPORT_EMAIL}?subject=Autoship%20waitlist` }, { label: "Shop", href: "shop.html" }]
     },
     {
       id: "payment",
@@ -63,14 +74,16 @@ const WowChatbot = (() => {
       id: "loyalty",
       label: "Loyalty",
       keywords: ["loyalty", "points", "tier", "bronze", "silver", "gold", "platinum", "rewards"],
-      answer: "My Wow Pet loyalty tiers are Bronze, Silver, Gold, and Platinum. Points are stored in your profile, and higher tiers can earn stronger rewards. You can review current points, history, and tier progress from the My Pets profile area.",
+      answer: loyaltyLive
+        ? "My Wow Pet loyalty tiers are Bronze, Silver, Gold, and Platinum. Points are stored in your profile, and higher tiers can earn stronger rewards. You can review current points, history, and tier progress from the My Pets profile area."
+        : "A loyalty and rewards program is not available yet, so purchases do not earn points right now. We will announce it when it launches.",
       links: [{ label: "My pets", href: "profile.html" }]
     },
     {
       id: "discounts",
       label: "Discounts",
-      keywords: ["discount", "promo", "coupon", "code", "welcome15", "pet10", "freeship", "sale"],
-      answer: "New customers can use WELCOME15 for 15% off. Other store codes include PET10 for 10% off and FREESHIP for a shipping credit. Subscribe & Save items show their own 15% subscription price when eligible.",
+      keywords: ["discount", "promo", "coupon", "code", "welcome15", "sale"],
+      answer: "New customers can use code WELCOME15 for 15% off their first order. Enter it in the cart or at checkout; codes are validated and applied at secure checkout, so the cart shows prices before any discount.",
       links: [{ label: "Shop deals", href: "shop.html" }]
     }
   ];
@@ -325,8 +338,8 @@ const WowChatbot = (() => {
 
   function productDetailResponse(product, normalized) {
     const parts = [
-      `${product.name} by ${product.brand} is ${formatMoney(product.price)}${product.subscribable ? `, or ${formatMoney(product.subscribePrice)} with Subscribe & Save` : ""}.`,
-      `It is a ${product.petType.replace("-", " ")} ${product.category} item rated ${product.rating}/5 from ${product.reviewCount} reviews.`,
+      `${product.name} by ${product.brand} is ${formatMoney(product.price)}${subscriptionsLive && product.subscribable ? `, or ${formatMoney(product.subscribePrice)} with Subscribe & Save` : ""}.`,
+      `It is a ${product.petType.replace("-", " ")} ${product.category} item. ${describeRating(product)}`,
       product.description
     ];
 
@@ -359,7 +372,7 @@ const WowChatbot = (() => {
     const totals = WowStore.getCartTotal();
     if (!cart.length) {
       return {
-        text: "Your cart is empty right now. Free standard shipping starts at $49, so I can help find a product if you tell me the pet type or category you need.",
+        text: `Your cart is empty right now. Free standard shipping starts at ${FREE_SHIPPING_MIN}, so I can help find a product if you tell me the pet type or category you need.`,
         links: [{ label: "Shop now", href: "shop.html" }],
         confidence: 0.9
       };
@@ -368,12 +381,12 @@ const WowChatbot = (() => {
     const itemLines = cart.map(item => {
       const product = WowStore.getProduct(item.productId);
       if (!product) return null;
-      const price = item.isSubscription && product.subscribePrice ? product.subscribePrice : product.price;
+      const price = subscriptionsLive && item.isSubscription && product.subscribePrice ? product.subscribePrice : product.price;
       return `${item.qty} x ${product.name} (${formatMoney(price)} each${item.isSubscription ? ", subscription" : ""})`;
     }).filter(Boolean);
 
     return {
-      text: `Your cart has ${WowStore.getCartCount()} item(s):\n${itemLines.join("\n")}\n\nEstimated subtotal: ${formatMoney(totals.subtotal)}. Shipping is ${totals.shipping === 0 ? "free" : formatMoney(totals.shipping)}. Estimated total with tax/discounts: ${formatMoney(totals.total)}.`,
+      text: `Your cart has ${WowStore.getCartCount()} item(s):\n${itemLines.join("\n")}\n\nEstimated subtotal: ${formatMoney(totals.subtotal)}. Shipping is ${totals.shipping === 0 ? "free" : formatMoney(totals.shipping)}. Estimated total with tax, before any discount code: ${formatMoney(totals.total)}.`,
       links: [{ label: "View cart", href: "cart.html" }, { label: "Checkout", href: "checkout.html" }],
       confidence: 0.95
     };
@@ -382,6 +395,10 @@ const WowChatbot = (() => {
   function answerOrders(normalized) {
     if (!hasAny(normalized, ["my order", "recent order", "order history", "subscription status", "next delivery"])) return null;
     if (!window.WowStore) return null;
+
+    if (!subscriptionsLive && (normalized.includes("subscription") || normalized.includes("next delivery"))) {
+      return { text: "Autoship is coming soon, so there are no subscriptions to manage yet. Email support to join the autoship list.", links: [{ label: "Join the autoship list", href: `mailto:${SUPPORT_EMAIL}?subject=Autoship%20waitlist` }], confidence: 0.8 };
+    }
 
     if (normalized.includes("subscription") || normalized.includes("next delivery")) {
       const subs = typeof WowStore.getSubscriptions === "function" ? WowStore.getSubscriptions() : [];
@@ -620,9 +637,10 @@ const WowChatbot = (() => {
         if (product.lifeStage?.includes(normalizedStage)) score += 3;
       });
       breedSize.forEach(size => { if (product.breedSize?.includes(size) || product.breedSize?.includes("all")) score += 2; });
-      score += Number(product.rating || 0) * 0.5;
-      score += Math.min(Number(product.reviewCount || 0) / 250, 2);
-      if (hasAny(normalized, ["subscribe", "autoship", "recurring"]) && product.subscribable) score += 4;
+      const rating = getRating(product);
+      score += rating.average * 0.5;
+      score += Math.min(rating.count / 250, 2);
+      if (subscriptionsLive && hasAny(normalized, ["subscribe", "autoship", "recurring"]) && product.subscribable) score += 4;
       return { product, score };
     }).sort((a, b) => b.score - a.score);
   }
@@ -697,8 +715,21 @@ const WowChatbot = (() => {
   }
 
   function formatProductLine(product) {
-    const sub = product.subscribable ? `, subscribe ${formatMoney(product.subscribePrice)}` : "";
-    return `- ${product.name}: ${formatMoney(product.price)}${sub}, ${product.rating}/5 rating. ${product.description}`;
+    const sub = subscriptionsLive && product.subscribable ? `, subscribe ${formatMoney(product.subscribePrice)}` : "";
+    const rating = getRating(product);
+    const ratingText = rating.count ? `, ${rating.average}/5 from ${rating.count} review${rating.count === 1 ? "" : "s"}` : "";
+    return `- ${product.name}: ${formatMoney(product.price)}${sub}${ratingText}. ${product.description}`;
+  }
+
+  // Ratings come only from real customer reviews (see WowStore.getProductRating).
+  function getRating(product) {
+    return window.WowStore?.getProductRating ? WowStore.getProductRating(product.id) : { average: 0, count: 0 };
+  }
+
+  function describeRating(product) {
+    const rating = getRating(product);
+    if (!rating.count) return "It has no customer reviews yet.";
+    return `Customers rate it ${rating.average}/5 from ${rating.count} review${rating.count === 1 ? "" : "s"}.`;
   }
 
   function formatMoney(value) {

@@ -208,16 +208,17 @@ const PetGame = (() => {
     document.getElementById('game-play').classList.remove('active');
     document.getElementById('game-results').classList.add('active');
 
-    // Determine rank
-    let rank, icon, points, code;
+    // Determine rank. No discount codes are handed out here: the PETIQ* codes
+    // never existed in Shopify, so checkout would have rejected them.
+    let rank, icon, points;
     if (correctCount === 10) {
-      rank = 'Nutrition Genius!'; icon = '💎'; points = 500; code = 'PETIQ25';
+      rank = 'Nutrition Genius!'; icon = '💎'; points = 500;
     } else if (correctCount >= 7) {
-      rank = 'Gold Scholar'; icon = '🥇'; points = 200; code = 'PETIQ15';
+      rank = 'Gold Scholar'; icon = '🥇'; points = 200;
     } else if (correctCount >= 4) {
-      rank = 'Silver Learner'; icon = '🥈'; points = 100; code = 'PETIQ10';
+      rank = 'Silver Learner'; icon = '🥈'; points = 100;
     } else {
-      rank = 'Bronze Beginner'; icon = '🥉'; points = 50; code = null;
+      rank = 'Bronze Beginner'; icon = '🥉'; points = 50;
     }
 
     document.getElementById('results-icon').textContent = icon;
@@ -228,7 +229,10 @@ const PetGame = (() => {
     const scoreEl = document.getElementById('results-score');
     WowAnimations.counterUp(scoreEl, score, 1500);
 
-    // Reward
+    // Reward (loyalty points only, and only while the loyalty program is live)
+    const rewardsLive = WowStore.FEATURES.loyalty;
+    const rewardBox = document.getElementById('results-reward');
+    if (rewardBox) rewardBox.style.display = rewardsLive ? '' : 'none';
     const today = new Date().toISOString().split('T')[0];
     const lastEarned = localStorage.getItem('wow_game_last_earned');
     const pointsAlreadyEarned = (lastEarned === today);
@@ -240,16 +244,10 @@ const PetGame = (() => {
     }
 
     const codeContainer = document.getElementById('reward-code-container');
-    if (code) {
-      codeContainer.innerHTML = `<p style="font-size: var(--fs-sm); color: rgba(255,255,255,0.5); margin: var(--space-3) 0;">+ Promo Code:</p>
-        <span class="reward-code" onclick="navigator.clipboard.writeText('${code}'); this.textContent = 'Copied! ✓'; setTimeout(() => this.textContent = '${code}', 2000);">${code}</span>
-        <p style="font-size: var(--fs-xs); color: rgba(255,255,255,0.4); margin-top: var(--space-2);">Click to copy · ${code === 'PETIQ25' ? '25% off' : code === 'PETIQ15' ? '15% off' : '10% off'} your next order</p>`;
-    } else {
-      codeContainer.innerHTML = `<p style="font-size: var(--fs-sm); color: rgba(255,255,255,0.4); margin-top: var(--space-3);">Score 4+ correct to unlock a discount code!</p>`;
-    }
+    if (codeContainer) codeContainer.innerHTML = '';
 
     // Save rewards
-    if (!pointsAlreadyEarned) {
+    if (rewardsLive && !pointsAlreadyEarned) {
       WowStore.addLoyaltyPoints(points, `Pet Nutrition IQ — ${rank}`);
       localStorage.setItem('wow_game_last_earned', today);
     }

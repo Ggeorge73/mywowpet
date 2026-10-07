@@ -78,11 +78,9 @@ describe('other array-backed readers', () => {
   });
 
   it.each([['getOrders', 'wow_orders'], ['getSubscriptions', 'wow_subscriptions']])(
-    '%s returns an array and keeps its seed data intact',
+    '%s returns an array and starts empty for a new visitor',
     (fn, key) => {
-      const seeded = WowStore[fn]();
-      expect(Array.isArray(seeded)).toBe(true);
-      expect(seeded.length).toBeGreaterThan(0);
+      expect(WowStore[fn]()).toEqual([]); // no demo data (H2)
 
       localStorage.setItem(key, '{"not":"a list"}');
       expect(Array.isArray(WowStore[fn]())).toBe(true);
@@ -127,10 +125,12 @@ describe('cart mutations', () => {
     expect(WowStore.getCartCount()).toBe(3);
   });
 
-  it('keeps subscription and one-off lines separate', () => {
+  it('merges a subscription request into the one-off line while subscriptions are off', () => {
+    // FEATURES.subscriptions is false (no Shopify selling plans), so a
+    // subscription add is stored as a one-time purchase.
     WowStore.addToCart(1, 1, false);
     WowStore.addToCart(1, 1, true);
-    expect(WowStore.getCart()).toHaveLength(2);
+    expect(WowStore.getCart()).toEqual([{ productId: 1, qty: 2, isSubscription: false, frequency: '4weeks' }]);
   });
 
   it('removes a line when its quantity drops to zero', () => {

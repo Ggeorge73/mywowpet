@@ -5,12 +5,6 @@
 const ProfilePage = (() => {
   let activeTab = 'pets';
 
-  // Default demo pets
-  const defaultPets = [
-    { id: 1, name: 'Buddy', species: 'dog', breed: 'Golden Retriever', birthday: '2020-06-15', emoji: '🐕', notes: 'Grain-free diet, loves salmon' },
-    { id: 2, name: 'Whiskers', species: 'cat', breed: 'Tabby', birthday: '2021-03-22', emoji: '🐈', notes: 'Indoor cat, sensitive stomach' }
-  ];
-
   function init() {
     // Check if user is logged in
     const user = typeof WowFirebase !== 'undefined' ? WowFirebase.getCurrentUser() : null;
@@ -31,7 +25,7 @@ const ProfilePage = (() => {
             <div class="empty-state-icon" style="font-size: 64px; margin-bottom: var(--space-4);">🔒</div>
             <h2 style="font-size: var(--fs-2xl); margin-bottom: var(--space-2); font-weight: var(--fw-bold);">Members-Only Profile</h2>
             <p style="color: var(--color-text-muted); font-size: var(--fs-sm); margin-bottom: var(--space-6); line-height: var(--lh-relaxed);">
-              Join the pack or sign in to view your pet profiles, track your loyalty tier, manage subscriptions, and see order history.
+              Join the pack or sign in to view your pet profiles, wishlist, and order history.
             </p>
             <button class="btn btn-primary btn-lg" onclick="WowApp.showAuthModal()" style="width: 100%; font-family: var(--font-accent); font-weight: var(--fw-bold);">
               Sign In / Create Account
@@ -68,6 +62,11 @@ const ProfilePage = (() => {
       document.querySelectorAll('.profile-tab').forEach((t, i) => {
         const tabList = ['pets', 'loyalty', 'orders', 'subscriptions', 'wishlist', 'settings'];
         t.onclick = () => switchTab(tabList[i]);
+        // Loyalty and autoship are not redeemable/billable yet; hide their tabs.
+        if ((tabList[i] === 'loyalty' && !WowStore.FEATURES.loyalty) ||
+            (tabList[i] === 'subscriptions' && !WowStore.FEATURES.subscriptions)) {
+          t.style.display = 'none';
+        }
       });
     }
 
@@ -93,16 +92,12 @@ const ProfilePage = (() => {
       }
     }
 
-    // Seed demo pets if none exist
-    if (WowStore.getPets().length === 0) {
-      defaultPets.forEach(p => WowStore.savePet(p));
-    }
-
+    // New members start with no pets; the "Add a Pet" card is the empty state.
     renderTierBadge();
     renderPets();
-    renderLoyalty();
+    if (WowStore.FEATURES.loyalty) renderLoyalty();
     renderOrders();
-    renderSubscriptions();
+    if (WowStore.FEATURES.subscriptions) renderSubscriptions();
     renderWishlist();
     renderSettings();
   }
@@ -119,9 +114,15 @@ const ProfilePage = (() => {
   }
 
   function renderTierBadge() {
+    const badge = document.getElementById('tier-badge');
+    if (!badge) return;
+    if (!WowStore.FEATURES.loyalty) {
+      badge.style.display = 'none';
+      return;
+    }
     const loyalty = WowStore.getLoyalty();
     const tier = WowStore.getLoyaltyTier(loyalty.points);
-    document.getElementById('tier-badge').innerHTML = `${tier.icon} ${tier.name} Member`;
+    badge.innerHTML = `${tier.icon} ${tier.name} Member`;
   }
 
   // ---- Pets ----
@@ -356,7 +357,7 @@ const ProfilePage = (() => {
               <div class="flex justify-between items-center" onclick="event.stopPropagation();">
                 <span class="order-total">Total: ${WowStore.formatPrice(order.total)}</span>
                 <div class="flex gap-2">
-                  <span class="text-sm" style="color: var(--color-primary);">⭐ +${order.pointsEarned} pts</span>
+                  ${WowStore.FEATURES.loyalty && order.pointsEarned ? `<span class="text-sm" style="color: var(--color-primary);">⭐ +${order.pointsEarned} pts</span>` : ''}
                   <button class="btn btn-sm btn-secondary" onclick="ProfilePage.reorder(${JSON.stringify(order.items).replace(/"/g, '&quot;')})">🔄 Reorder</button>
                 </div>
               </div>
@@ -383,7 +384,7 @@ const ProfilePage = (() => {
     const container = document.getElementById('section-subscriptions');
 
     if (subs.length === 0) {
-      container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔄</div><h3>No Active Subscriptions</h3><p>Set up recurring deliveries and save 15% on every order.</p><a href="subscribe.html" class="btn btn-primary">Start Subscribing</a></div>`;
+      container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔄</div><h3>No Active Subscriptions</h3><p>Set up recurring deliveries for your pet's essentials.</p><a href="subscribe.html" class="btn btn-primary">Start Subscribing</a></div>`;
       return;
     }
 
@@ -490,8 +491,8 @@ const ProfilePage = (() => {
     }).join('');
 
     const subtotal = order.items.reduce((s, item) => s + (item.price || 0) * item.qty, 0);
-    const shipping = subtotal >= 49 ? 0 : 5.99;
-    const tax = subtotal * 0.08;
+    const shipping = WowStore.getShippingEstimate(subtotal);
+    const tax = subtotal * WowStore.TAX_RATE;
 
     let profile = { name: 'Pet Parent', phone: '', address: '123 Pet Lane, San Francisco, CA 94105' };
     try {
@@ -517,9 +518,9 @@ const ProfilePage = (() => {
           <div class="summary-row text-xs" style="display:flex; justify-content:between; margin-bottom:4px; font-family:var(--font-accent); color:var(--color-text-secondary);"><span>Tax</span><span style="margin-left:auto;">${WowStore.formatPrice(tax)}</span></div>
           <div class="summary-row text-sm font-bold" style="display:flex; justify-content:between; border-top: 1px solid var(--color-border-light); padding-top:4px; margin-top:4px; font-family:var(--font-accent); font-size: 14px;"><span>Total</span><span style="margin-left:auto;">${WowStore.formatPrice(order.total || (subtotal + shipping + tax))}</span></div>
           
-          <div style="margin-top: var(--space-4); padding: var(--space-2); background: rgba(var(--color-primary-rgb), 0.08); border-radius: var(--radius-md); text-align: center;">
+          ${WowStore.FEATURES.loyalty && order.pointsEarned ? `<div style="margin-top: var(--space-4); padding: var(--space-2); background: rgba(var(--color-primary-rgb), 0.08); border-radius: var(--radius-md); text-align: center;">
             <span style="font-size: 11px; color: var(--color-primary-dark); font-family: var(--font-accent);">⭐ Points Earned: <strong>+${order.pointsEarned}</strong></span>
-          </div>
+          </div>` : ''}
         </div>
 
         <!-- Shipping Details -->

@@ -112,8 +112,12 @@ const WowApp = (() => {
         <span class="badge ${product.badge === 'bestseller' ? 'badge-primary' : product.badge === 'new' ? 'badge-new' : 'badge-sale'}">${product.badge === 'bestseller' ? '★ Bestseller' : product.badge === 'new' ? '✦ New' : product.badge}</span>
       </div>` : '';
 
-    const subscribePriceHtml = product.subscribable ?
+    const subscribePriceHtml = WowStore.FEATURES.subscriptions && product.subscribable ?
       `<span class="subscribe-price">Subscribe ${WowStore.formatPrice(product.subscribePrice)}</span>` : '';
+
+    // Stars only for products with real customer reviews.
+    const ratingSummary = WowStore.renderRatingSummary(product.id, { emptyText: '' });
+    const ratingHtml = ratingSummary ? `<div class="product-card-rating">${ratingSummary}</div>` : '';
 
     return `
       <div class="product-card fade-in" data-id="${product.id}">
@@ -128,10 +132,7 @@ const WowApp = (() => {
         <div class="product-card-body">
           <span class="product-card-category">${product.brand}</span>
           <a href="product.html?id=${product.id}" class="product-card-title">${product.name}</a>
-          <div class="product-card-rating">
-            ${WowStore.renderStars(product.rating)}
-            <span class="count">(${product.reviewCount})</span>
-          </div>
+          ${ratingHtml}
           <div class="product-card-footer">
             <div class="product-card-price">
               <span class="price">${WowStore.formatPrice(product.price)}</span>
@@ -180,7 +181,7 @@ const WowApp = (() => {
               <a href="shop.html?pet=cat">Cats</a>
               <a href="shop.html?pet=small-pet">Small Pets</a>
               <a href="shop.html?pet=bird">Birds</a>
-              <a href="subscribe.html">Subscribe & Save</a>
+              ${WowStore.FEATURES.subscriptions ? '<a href="subscribe.html">Subscribe & Save</a>' : ''}
             </div>
           </div>
           <div class="footer-column">
@@ -195,9 +196,9 @@ const WowApp = (() => {
           </div>
           <div class="footer-column">
             <h4>Stay Connected</h4>
-            <p class="footer-desc" style="margin-bottom: var(--space-4);">Get 15% off your first order!</p>
+            <p class="footer-desc" style="margin-bottom: var(--space-4);">New customers: 15% off your first order with code WELCOME15 at checkout.</p>
             <div class="footer-newsletter">
-              <form class="footer-newsletter-form" onsubmit="event.preventDefault(); WowApp.showToast('Thanks for subscribing! Check your inbox for 15% off.', '🎉'); this.reset();">
+              <form class="footer-newsletter-form" onsubmit="event.preventDefault(); WowApp.showToast('Thanks! Use code WELCOME15 at checkout for 15% off your first order.', '🎉'); this.reset();">
                 <input type="email" placeholder="Your email" required>
                 <button type="submit">Join</button>
               </form>
@@ -222,9 +223,9 @@ const WowApp = (() => {
   function getNavHTML(activePage = '') {
     return `
     <div class="announcement-bar">
-      <span class="announcement-text">🚚 <span class="highlight">FREE SHIPPING</span> on orders over $49</span>
-      <span class="announcement-text">🎉 New customers get <span class="highlight">15% OFF</span> — use code WELCOME15</span>
-      <span class="announcement-text">🔄 <span class="highlight">SUBSCRIBE & SAVE</span> up to 15% on every delivery</span>
+      <span class="announcement-text">🚚 <span class="highlight">FREE SHIPPING</span> on orders over $${WowStore.FREE_SHIPPING_THRESHOLD}</span>
+      <span class="announcement-text">🎉 New customers get <span class="highlight">15% OFF</span> — use code WELCOME15 at checkout</span>
+      ${WowStore.FEATURES.subscriptions ? '<span class="announcement-text">🔄 <span class="highlight">SUBSCRIBE & SAVE</span> up to 15% on every delivery</span>' : ''}
     </div>
     <nav class="navbar" id="navbar">
       <div class="container">
@@ -236,7 +237,7 @@ const WowApp = (() => {
           <a href="shop.html" class="nav-link ${activePage === 'shop' ? 'active' : ''}">Shop</a>
           <a href="check.html" class="nav-link ${activePage === 'check' ? 'active' : ''}">🩺 Pet-Check AI</a>
           <a href="game.html" class="nav-link ${activePage === 'game' ? 'active' : ''}">🧠 Play & Learn</a>
-          <a href="subscribe.html" class="nav-link ${activePage === 'subscribe' ? 'active' : ''}">Subscribe & Save</a>
+          ${WowStore.FEATURES.subscriptions ? `<a href="subscribe.html" class="nav-link ${activePage === 'subscribe' ? 'active' : ''}">Subscribe & Save</a>` : ''}
           <a href="profile.html" class="nav-link ${activePage === 'profile' ? 'active' : ''}">My Pets</a>
         </div>
         <div class="nav-search">
@@ -271,7 +272,7 @@ const WowApp = (() => {
       <a href="shop.html?pet=bird" class="mobile-nav-link"><span class="link-icon">🦜</span> Birds</a>
       <a href="check.html" class="mobile-nav-link"><span class="link-icon">🩺</span> Pet-Check AI</a>
       <a href="game.html" class="mobile-nav-link"><span class="link-icon">🧠</span> Play & Learn</a>
-      <a href="subscribe.html" class="mobile-nav-link"><span class="link-icon">🔄</span> Subscribe & Save</a>
+      ${WowStore.FEATURES.subscriptions ? '<a href="subscribe.html" class="mobile-nav-link"><span class="link-icon">🔄</span> Subscribe & Save</a>' : ''}
       <a href="profile.html" id="mobile-profile-link" class="mobile-nav-link"><span class="link-icon">👤</span> My Profile</a>
       <a href="cart.html" class="mobile-nav-link"><span class="link-icon">🛒</span> Cart</a>
     </div>`;
@@ -1257,10 +1258,7 @@ const WowApp = (() => {
     if (typeof WowAnimations !== 'undefined') WowAnimations.init();
 
     // Engagement features
-    if (typeof WowFlashSale !== 'undefined') WowFlashSale.init();
-    if (typeof WowSocialProof !== 'undefined') WowSocialProof.init();
     if (typeof WowStreak !== 'undefined') WowStreak.init();
-    if (typeof WowSpinWheel !== 'undefined') WowSpinWheel.init();
 
     // Load Firebase assets dynamically
     loadFirebaseAssets();

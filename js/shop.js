@@ -110,7 +110,7 @@ const ShopPage = (() => {
         </div>
         <div class="filter-group-body">${breedSizeOptions}</div>
       </div>
-      <div class="filter-group">
+      ${WowStore.FEATURES.subscriptions ? `<div class="filter-group">
         <div class="filter-group-header" onclick="this.parentElement.classList.toggle('open')">
           <span>Subscription</span><span class="chevron">▾</span>
         </div>
@@ -120,7 +120,7 @@ const ShopPage = (() => {
             <span>Subscribe & Save eligible</span>
           </div>
         </div>
-      </div>
+      </div>` : ''}
     `;
   }
 
