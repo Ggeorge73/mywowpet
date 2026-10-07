@@ -217,7 +217,9 @@ test.describe('Checkout handoff failure (QA-03)', () => {
   test('shows a persistent inline retry UI and keeps the cart', async ({ page }) => {
     await suppressInstallPrompt(page);
     await blockFirebase(page);
-    await page.route('https://*.myshopify.com/**', route => route.abort());
+    // Match by hostname: WebKit let the `https://*.myshopify.com/**` glob through
+    // and reached the real Storefront API in CI.
+    await page.route(url => url.hostname.endsWith('.myshopify.com'), route => route.abort('failed'));
 
     await page.goto('/shop.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.WowStore && typeof window.WowStore.getProducts === 'function');
