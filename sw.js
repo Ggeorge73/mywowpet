@@ -3,7 +3,8 @@
    Caches core shell for installable app loading
    ============================================ */
 
-const CACHE_NAME = 'mywowpet-v8';
+// Bump the version on every deploy that changes precached files.
+const CACHE_NAME = 'mywowpet-v9-2026-10-07';
 const CORE_ASSETS = [
   './',
   'index.html',
@@ -68,10 +69,35 @@ const CORE_ASSETS = [
 
 const cacheUrl = (path) => new URL(path, self.registration.scope).toString();
 
+// Firebase Hosting runs with cleanUrls, so /shop.html answers with a 301 to /shop.
+// A redirected Response cannot be used to answer a navigation, so copy it into a
+// plain Response before it goes into the cache.
+const toCacheable = (response) => {
+  if (!response.redirected) return response;
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+};
+
+const precache = (cache, path) => {
+  const url = cacheUrl(path);
+  // cache: 'reload' bypasses the HTTP cache so a new SW never re-caches stale files.
+  return fetch(new Request(url, { cache: 'reload' })).then((response) => {
+    if (!response.ok) throw new Error(`Precache failed for ${url}: ${response.status}`);
+    const finalUrl = response.redirected ? response.url : null;
+    const body = toCacheable(response);
+    if (!finalUrl || finalUrl === url) return cache.put(url, body);
+    // Store under both the requested URL and the clean URL it redirected to.
+    return Promise.all([cache.put(url, body.clone()), cache.put(finalUrl, body)]);
+  });
+};
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(CORE_ASSETS.map(cacheUrl)))
+      .then((cache) => Promise.all(CORE_ASSETS.map((path) => precache(cache, path))))
       .then(() => self.skipWaiting())
   );
 });
@@ -98,7 +124,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          if (!response || response.status !== 200) return response;
+          if (!response || response.status !== 200 || response.redirected) return response;
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
           return response;
@@ -115,16 +141,17 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) {
-        fetch(request).then((response) => {
+        // Revalidate against the server, not the HTTP cache.
+        fetch(request, { cache: 'no-cache' }).then((response) => {
           if (!response || response.status !== 200) return;
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, response));
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, toCacheable(response)));
         }).catch(() => {});
         return cached;
       }
 
       return fetch(request).then((response) => {
         if (!response || response.status !== 200) return response;
-        const clone = response.clone();
+        const clone = toCacheable(response.clone());
         caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
         return response;
       });

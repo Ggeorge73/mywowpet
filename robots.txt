@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /profile
+Disallow: /checkout
+Disallow: /cart
+Disallow: /check
+
+Sitemap: https://www.mywowpet.com/sitemap.xml
