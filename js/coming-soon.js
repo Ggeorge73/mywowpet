@@ -71,11 +71,43 @@
       .join('');
   }
 
+  // Signup docs cannot be read back (rules deny reads), so a re-submit of an existing
+  // signup surfaces as permission-denied. Remember fingerprints saved from this browser
+  // so only that genuine duplicate is reported as "already on the list".
+  var SAVED_SIGNUPS_KEY = 'wow_launch_signups';
+
+  function readSavedSignups() {
+    try {
+      var saved = JSON.parse(window.localStorage.getItem(SAVED_SIGNUPS_KEY) || '[]');
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function rememberSignup(signupId) {
+    try {
+      var saved = readSavedSignups();
+      if (saved.indexOf(signupId) === -1) saved.push(signupId);
+      window.localStorage.setItem(SAVED_SIGNUPS_KEY, JSON.stringify(saved.slice(-20)));
+    } catch {
+      // Storage unavailable: duplicates will just show the generic retry message.
+    }
+  }
+
+  async function isKnownSignup(email) {
+    try {
+      return readSavedSignups().indexOf(await emailFingerprint(email)) !== -1;
+    } catch {
+      return false;
+    }
+  }
+
   async function saveSignup(email, petType) {
     var db = database || initializeDatabase();
     var signupId = await emailFingerprint(email);
 
-    return db.collection('launchSignups').doc(signupId).set({
+    await db.collection('launchSignups').doc(signupId).set({
       email: email,
       petType: petType,
       consent: true,
@@ -83,6 +115,7 @@
       offer: 'launch-15',
       createdAt: window.firebase.firestore.FieldValue.serverTimestamp()
     });
+    rememberSignup(signupId);
   }
 
   if (!form || !emailInput || !petTypeInput || !consentInput) return;
@@ -119,7 +152,9 @@
       form.reset();
       setStatus('You’re in the pack! We’ll send your private 15% code before opening day.', 'success');
     } catch (error) {
-      if (error && (error.code === 'permission-denied' || error.code === 'already-exists')) {
+      var isDuplicate = error && (error.code === 'already-exists'
+        || (error.code === 'permission-denied' && await isKnownSignup(email)));
+      if (isDuplicate) {
         setStatus('You’re already on the list — your 15% opening offer is saved.', 'success');
       } else {
         setStatus('We couldn’t save your spot just now. Please try again in a moment.', 'error');
