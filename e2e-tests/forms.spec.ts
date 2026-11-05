@@ -251,7 +251,9 @@ test.describe('Checkout handoff failure (QA-03)', () => {
     // Retrying runs the handoff again and fails the same honest way.
     await error.getByRole('button', { name: 'Try again' }).click();
     await expect(page.locator('#checkout-error')).toContainText('couldn’t open secure checkout', { timeout: 20_000 });
-    expect(page.url()).toContain('cart.html');
+    // Firebase Hosting (cleanUrls) serves /cart.html as /cart, so main and
+    // nightly runs against staging see /cart while PR runs see /cart.html.
+    await expect(page).toHaveURL(/\/cart(\.html)?([?#]|$)/);
   });
 });
 
